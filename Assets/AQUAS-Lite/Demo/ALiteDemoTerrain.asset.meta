@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9a203924af969ff4e9e93eb1129c14a9
+timeCreated: 1452791902
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 53519
+  packageName: AQUAS Water LITE
+  packageVersion: 1.2.1
+  assetPath: Assets/AQUAS-Lite/Demo/ALiteDemoTerrain.asset
+  uploadId: 335520
