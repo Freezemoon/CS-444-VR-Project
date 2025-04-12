@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ac37227b3ee4f8741834ba282afda443
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 244190
+  packageName: Low Poly Fire
+  packageVersion: 1.0.0
+  assetPath: Assets/Low Poly Fire/Materials/FireMaterial.mat
+  uploadId: 571636
