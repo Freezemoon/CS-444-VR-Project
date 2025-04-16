@@ -12,6 +12,7 @@ public class Boat : MonoBehaviour
     void Update()
     {
         transform.position += new Vector3(-0.2f, 0, 0) * Time.deltaTime; // Move the boat forward at a speed of 0.5 units per second
+        // GetComponent<Rigidbody>().MovePosition(GetComponent<Rigidbody>().position + new Vector3(-0.2f, 0, 0) * Time.fixedDeltaTime);
     }
 
     private void OnTriggerEnter(Collider other)
