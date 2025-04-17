@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: be2f4aa750c530144bd7219a00354c98
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 260727
+  packageName: Animals FREE - Animated Low Poly 3D Models
+  packageVersion: 2.2
+  assetPath: Assets/ithappy/Animals_FREE/Scripts/CreatureMover.cs
+  uploadId: 738856
