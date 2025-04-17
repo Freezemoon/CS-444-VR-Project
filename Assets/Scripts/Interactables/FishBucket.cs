@@ -8,6 +8,12 @@ using UnityEngine;
 /// </summary>
 public class FishBucket : MonoBehaviour
 {
+    private AudioSource _audioSource;
+
+    private void Awake()
+    {
+        _audioSource = GetComponent<AudioSource>();
+    }
     
     private void OnTriggerEnter(Collider other)
     {
@@ -25,8 +31,6 @@ public class FishBucket : MonoBehaviour
 
         // End with the socket animation
         StartCoroutine(SocketAnimation(duplicate));
-        
-        Debug.Log("Nice catch!");
     }
     
     // Animates the given GameObject then destroys it.
@@ -45,6 +49,7 @@ public class FishBucket : MonoBehaviour
 
         float elapsed = 0f;
 
+        bool audioPlayed = false;
         while (elapsed < duration)
         {
             float t = elapsed / duration;
@@ -56,6 +61,13 @@ public class FishBucket : MonoBehaviour
             {
                 float shrinkT = (t - 0.5f) * 2f; // Normalize to 0–1 over second half
                 fish.transform.localScale = Vector3.Lerp(startScale, endScale, shrinkT);
+            }
+            
+            // SFX
+            if (t >= 0.55 && !audioPlayed)
+            {
+                _audioSource.Play();
+                audioPlayed = true;
             }
 
             elapsed += Time.deltaTime;
