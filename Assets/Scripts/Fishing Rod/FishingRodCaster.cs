@@ -34,21 +34,14 @@ public class FishingRodCaster : MonoBehaviour
 
     private void Start()
     {
-        baitRb.isKinematic = true;
-
-        _isBaitAtInitPos = true;
-
-        _previousPos = controllerTransform.position;
-        
-        baitTransform.SetParent(transform);
-        baitTransform.position = baitInitPosTransform.position;
+        OnReelReachedMinLength();
     }
 
     private void OnEnable()
     {
         // Store callbacks so we can unsubscribe later
-        _onCastStarted = ctx => StartHoldingToThrowBait();
-        _onCastCanceled = ctx => ReleaseAndCastBait();
+        _onCastStarted = _ => StartHoldingToThrowBait();
+        _onCastCanceled = _ => ReleaseAndCastBait();
         
         castAction.action.started += _onCastStarted;
         castAction.action.canceled += _onCastCanceled;
