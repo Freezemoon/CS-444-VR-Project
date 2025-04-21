@@ -165,6 +165,6 @@ crashlytics-build.properties
 
 .utmp
 .idea
-/.vscode
+.vscode
 .vsconfig
 *.unitypackage.meta
