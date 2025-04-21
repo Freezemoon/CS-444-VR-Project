@@ -12,6 +12,9 @@ public class GrabRotateAroundPivot : MonoBehaviour
     public Transform pullTowardTransform;
     public float reelForceMultiplier = 0.005f;
     public float lockedLineLengthMax = 8f;
+    public float lineLengthMin = 0.1f;
+    
+    public static event Action OnReelReachedMinLength;
 
     private readonly Vector3 _localNormalPlanePivot = Vector3.up;
 
@@ -76,6 +79,11 @@ public class GrabRotateAroundPivot : MonoBehaviour
         
             float angleDelta = Vector3.SignedAngle(_previousDirectionOnPlane, projectedHand, planeNormal);
             UpdateReelForce(angleDelta, toBait);
+
+            if (_lockedLineLength <= lineLengthMin * 1.1f)
+            {
+                OnReelReachedMinLength?.Invoke();
+            }
             
             _previousDirectionOnPlane = projectedHand;
         }
@@ -109,7 +117,7 @@ public class GrabRotateAroundPivot : MonoBehaviour
         baitRigidbody.linearVelocity += directionToTarget * forceAmount;
     
         // shorten locked line length slightly (if you want to simulate reeling in)
-        _lockedLineLength = Mathf.Max(_lockedLineLength - Mathf.Abs(forceAmount), 0.1f); // Prevent zero length
+        _lockedLineLength = Mathf.Max(_lockedLineLength - Mathf.Abs(forceAmount), lineLengthMin); // Prevent zero length
     }
 
     private void UpdateReelMaxDistance(Vector3 toBait)

@@ -23,6 +23,7 @@ public class FishingRodCaster : MonoBehaviour
     [Header("Casting Settings")]
     public float castForceMultiplier = 1.5f;
 
+    private bool _isBaitAtInitPos;
     private bool _isHeld;
     private bool _isHolding;
     private Vector3 _previousPos;
@@ -35,6 +36,8 @@ public class FishingRodCaster : MonoBehaviour
     {
         baitRb.isKinematic = true;
 
+        _isBaitAtInitPos = true;
+
         _previousPos = controllerTransform.position;
         
         baitTransform.SetParent(transform);
@@ -44,14 +47,16 @@ public class FishingRodCaster : MonoBehaviour
     private void OnEnable()
     {
         // Store callbacks so we can unsubscribe later
-        _onCastStarted = ctx => StartHolding();
-        _onCastCanceled = ctx => ReleaseAndCast();
+        _onCastStarted = ctx => StartHoldingToThrowBait();
+        _onCastCanceled = ctx => ReleaseAndCastBait();
         
         castAction.action.started += _onCastStarted;
         castAction.action.canceled += _onCastCanceled;
+
+        GrabRotateAroundPivot.OnReelReachedMinLength += OnReelReachedMinLength;
         
-        rodInteractable.selectEntered.AddListener(OnGrabbed);
-        rodInteractable.selectExited.AddListener(OnReleased);
+        rodInteractable.selectEntered.AddListener(OnGrabbedFishingRod);
+        rodInteractable.selectExited.AddListener(OnReleasedFishingRod);
 
         castAction.action.Enable();
     }
@@ -61,23 +66,38 @@ public class FishingRodCaster : MonoBehaviour
         castAction.action.started -= _onCastStarted;
         castAction.action.canceled -= _onCastCanceled;
         
-        rodInteractable.selectEntered.RemoveListener(OnGrabbed);
-        rodInteractable.selectExited.RemoveListener(OnReleased);
+        GrabRotateAroundPivot.OnReelReachedMinLength -= OnReelReachedMinLength;
+        
+        rodInteractable.selectEntered.RemoveListener(OnGrabbedFishingRod);
+        rodInteractable.selectExited.RemoveListener(OnReleasedFishingRod);
     }
 
     private void Update()
     {
         UpdateHandVelocity();
     }
+
+    private void OnReelReachedMinLength()
+    {
+        baitRb.isKinematic = true;
+        baitRb.linearVelocity = Vector3.zero;
+
+        _isBaitAtInitPos = true;
+
+        _previousPos = controllerTransform.position;
+        
+        baitTransform.SetParent(transform);
+        baitTransform.position = baitInitPosTransform.position;
+    }
     
-    private void OnGrabbed(SelectEnterEventArgs args)
+    private void OnGrabbedFishingRod(SelectEnterEventArgs args)
     {
         _isHeld = true;
         // Disables collider which avoids unintentional grab with the other hand
         rodCollider.enabled = false;
     }
 
-    private void OnReleased(SelectExitEventArgs args)
+    private void OnReleasedFishingRod(SelectExitEventArgs args)
     {
         _isHeld = false;
         // Disables collider which avoids unintentional grab with the other hand
@@ -91,9 +111,10 @@ public class FishingRodCaster : MonoBehaviour
         _previousPos = current;
     }
 
-    private void StartHolding()
+    private void StartHoldingToThrowBait()
     {
         if (!_isHeld) return;
+        if (!_isBaitAtInitPos) return;
         
         _isHolding = true;
         
@@ -104,12 +125,13 @@ public class FishingRodCaster : MonoBehaviour
         baitTransform.position = baitInitPosTransform.position;
     }
 
-    private void ReleaseAndCast()
+    private void ReleaseAndCastBait()
     {
         if (!_isHeld) return;
         if (!_isHolding) return;
         
         _isHolding = false;
+        _isBaitAtInitPos = false;
         
         baitTransform.SetParent(baitParentTransform);
         baitTransform.position = baitInitPosTransform.position;
