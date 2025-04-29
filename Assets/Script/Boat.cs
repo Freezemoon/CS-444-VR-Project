@@ -11,6 +11,7 @@ public class Boat : MonoBehaviour
     private bool engine = false;
     private int reverse = 1; // 1 = forward, -1 = reverse
     private InputDevice device;
+    public Transform leverTransform; // Reference to the lever transform
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -35,13 +36,16 @@ public class Boat : MonoBehaviour
 
         float angle = hinge.angle;
         if (float.IsNaN(angle)) angle = 0;
+        float localAngle = leverTransform.localRotation.eulerAngles.y;
+        if (localAngle > 180f) localAngle -= 360f;
         if (engine == true)
         {
             float speed = 0.5f * maxSpeed; //0.5f replaces the triggervalue because it don't work
             transform.position -= transform.right * speed * reverse * Time.deltaTime;
 
-            float turnSpeed = angle * turnSensitivity; // How fast to turn
-            transform.Rotate(0, turnSpeed * Time.deltaTime, 0);
+            float turnSpeed = localAngle * turnSensitivity; // How fast to turn
+            Debug.Log("Boat angle: " + localAngle); // Debug message
+            transform.Rotate(0, - turnSpeed * Time.deltaTime, 0);
         }
     }
 
