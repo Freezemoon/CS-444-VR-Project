@@ -5,13 +5,13 @@ public class Boat : MonoBehaviour
 {
     public XRNode inputSource = XRNode.RightHand;
     public HingeJoint hinge;
+    public Transform leverTransform; // Reference to the lever transform
     public float maxSpeed = 2f; // Max boat speed
     public float turnSensitivity = 0.2f; // Boat turn sensitivity
-
     private bool engine = false;
     private int reverse = 1; // 1 = forward, -1 = reverse
     private InputDevice device;
-    public Transform leverTransform; // Reference to the lever transform
+    
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -34,8 +34,6 @@ public class Boat : MonoBehaviour
             triggerValue = value;
         }
 
-        float angle = hinge.angle;
-        if (float.IsNaN(angle)) angle = 0;
         float localAngle = leverTransform.localRotation.eulerAngles.y;
         if (localAngle > 180f) localAngle -= 360f;
         if (engine == true)
@@ -44,7 +42,7 @@ public class Boat : MonoBehaviour
             transform.position -= transform.right * speed * reverse * Time.deltaTime;
 
             float turnSpeed = localAngle * turnSensitivity; // How fast to turn
-            Debug.Log("Boat angle: " + localAngle); // Debug message
+            Debug.Log("Boat handle angle: " + localAngle);
             transform.Rotate(0, - turnSpeed * Time.deltaTime, 0);
         }
     }
