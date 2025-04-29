@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fad123cd0fb02cf40a5c780dbd2f807d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 112000000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 262473
+  packageName: Low-Poly Medieval Market
+  packageVersion: 1.1
+  assetPath: Assets/Low-Poly Medieval Market/Scenes/SampleScene/LightingData.asset
+  uploadId: 617661
