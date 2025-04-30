@@ -1,0 +1,318 @@
+{
+    "name": "PlayerControls",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "dc5a34d6-07bd-402f-a46f-a84963cfaca7",
+            "actions": [
+                {
+                    "name": "Movement",
+                    "type": "PassThrough",
+                    "id": "cabae42f-4119-48e0-b4d1-0e6b54ecfc68",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hotbar 1",
+                    "type": "PassThrough",
+                    "id": "5d214460-fe8a-4c65-a2f3-9746c710602f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hotbar 2",
+                    "type": "PassThrough",
+                    "id": "1093df29-dc2b-45f0-b012-134f07e594b5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hotbar 3",
+                    "type": "PassThrough",
+                    "id": "e2f39e40-ed15-43dd-adc0-5daddf1c4873",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hotbar 4",
+                    "type": "PassThrough",
+                    "id": "4b77c418-336b-4feb-9c58-abd5e88f1830",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hotbar 5",
+                    "type": "PassThrough",
+                    "id": "077b89ca-4833-444c-a01f-d490769b1be6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hotbar 6",
+                    "type": "PassThrough",
+                    "id": "4f473ce1-5c39-42c3-a858-5326a1b82ea0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hotbar 7",
+                    "type": "PassThrough",
+                    "id": "7b471c9a-6de2-4038-8b4c-117c4af7e262",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hotbar 8",
+                    "type": "PassThrough",
+                    "id": "c47ef8e1-cc6e-4cf3-ada6-6ef8543e3e76",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hotbar 9",
+                    "type": "PassThrough",
+                    "id": "21d82963-d7dc-4424-9437-cb231a473e65",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hotbar 10",
+                    "type": "PassThrough",
+                    "id": "62629b15-9640-4473-8df6-0f1138be6497",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Mouse Wheel",
+                    "type": "PassThrough",
+                    "id": "22443041-2b7d-43f9-b5bf-ea91af458656",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Use Item",
+                    "type": "Button",
+                    "id": "15e8e587-9ab7-45f5-b4eb-e01e27ee585a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "2D Vector",
+                    "id": "7f8026fe-511d-4454-aee6-7e73b0dd8990",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "3c4fea76-115f-46e1-8e28-aef4744a2fcb",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "4b5bc7b8-bfd6-4412-8005-a670881822d8",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "b7c3aa51-29cf-4ab5-a71f-4aef1e156e18",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "c61d0e0f-52b0-44de-b4b6-ecbf0b8ae450",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "492771e3-8a8a-43a0-a351-89250f5809c0",
+                    "path": "<Keyboard>/1",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hotbar 1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b4d08b28-a3e1-4460-a698-be7781b1e337",
+                    "path": "<Keyboard>/2",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hotbar 2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "67c2eb1e-fe11-4878-875d-603c18f1c205",
+                    "path": "<Keyboard>/3",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hotbar 3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "479d677e-c7e7-452f-8867-00d1c36f9fa3",
+                    "path": "<Keyboard>/4",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hotbar 4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "507e4a9a-3400-42b2-a07e-9718164882f6",
+                    "path": "<Keyboard>/5",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hotbar 5",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a536ab47-ed93-4068-8c50-9a6a61ed4353",
+                    "path": "<Keyboard>/6",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hotbar 6",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4601ec75-522f-4482-88c6-07552beafadd",
+                    "path": "<Keyboard>/7",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hotbar 7",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f10b317d-1874-4228-8044-e93f1028af4d",
+                    "path": "<Keyboard>/8",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hotbar 8",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "34c6ad23-7ded-4ebe-a02e-9cfa3bfd11a7",
+                    "path": "<Keyboard>/9",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hotbar 9",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "87d0b2a2-cff2-41fb-9d0c-d715950df6c4",
+                    "path": "<Keyboard>/0",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hotbar 10",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8fc22d3e-6103-4103-866c-abc0f6f7c1f3",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Mouse Wheel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "05d92ba9-18a2-4227-8c1d-74a4aca56702",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Use Item",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
