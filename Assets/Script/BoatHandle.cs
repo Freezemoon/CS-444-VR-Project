@@ -1,61 +1,88 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public class BoatHandle : MonoBehaviour
 {
     [Header("References")]
     public Transform boat;
     public Transform handlePivot;
+    public XRGrabInteractable grabInteractable;
 
     [Header("Settings")]
     public float maxRotation = 45f;
-    public float rotationSensitivity = 300f; // Increase for snappier response
+    public float rotationSpeed = 150f;
 
-    private Transform grabbingHandTransform;
-    private float currentYRotation;
-    private Vector3 localOffset;
-
-    private float initialHandX;
-    private float startRotation;
+    private Transform _grabbingHand;
+    private float _currentYRotation;
+    private Vector3 _localOffset;
+    private float _initialGrabAngle;
+    private float _initialHandleRotation;
 
     private void Start()
     {
-        localOffset = boat.InverseTransformPoint(transform.position);
-        currentYRotation = transform.localEulerAngles.y;
-        if (currentYRotation > 180f) currentYRotation -= 360f;
+        _localOffset = boat.InverseTransformPoint(transform.position);
+
+        grabInteractable.selectEntered.AddListener(OnGrab);
+        grabInteractable.selectExited.AddListener(OnRelease);
+    }
+
+    private void OnDestroy()
+    {
+        grabInteractable.selectEntered.RemoveListener(OnGrab);
+        grabInteractable.selectExited.RemoveListener(OnRelease);
     }
 
     private void Update()
     {
-        FollowBoat();
-
-        if (grabbingHandTransform != null)
+        if (_grabbingHand == null)
         {
-            float handDelta = grabbingHandTransform.position.x - initialHandX;
-            float deltaY = handDelta * rotationSensitivity;
-            currentYRotation = Mathf.Clamp(startRotation + deltaY, -maxRotation, maxRotation);
+            transform.position = boat.TransformPoint(_localOffset);
+            transform.rotation = boat.rotation * Quaternion.Euler(0f, _currentYRotation, 0f);
+        }
+        else
+        {
+            Vector3 handLocal = boat.InverseTransformPoint(_grabbingHand.position);
+            Vector3 pivotLocal = boat.InverseTransformPoint(handlePivot.position);
+            Vector3 dir = handLocal - pivotLocal;
 
-            transform.localRotation = Quaternion.Euler(0f, currentYRotation, 0f);
+            float currentAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+            float deltaAngle = currentAngle - _initialGrabAngle;
+
+            float targetRotation = _initialHandleRotation + deltaAngle;
+            targetRotation = Mathf.Clamp(targetRotation, -maxRotation, maxRotation);
+
+            _currentYRotation = Mathf.MoveTowards(_currentYRotation, targetRotation, rotationSpeed * Time.deltaTime);
+
+            transform.rotation = Quaternion.Euler(0f, _currentYRotation, 0f) * boat.rotation;
+            transform.position = boat.TransformPoint(_localOffset);
         }
     }
 
-    private void FollowBoat()
+    private void OnGrab(SelectEnterEventArgs args)
     {
-        transform.position = boat.TransformPoint(localOffset);
-        transform.rotation = boat.rotation * Quaternion.Euler(0f, currentYRotation, 0f);
+        _grabbingHand = args.interactorObject.transform;
+
+        // Calculate initial angle between hand and pivot (in boat local space)
+        Vector3 handLocal = boat.InverseTransformPoint(_grabbingHand.position);
+        Vector3 pivotLocal = boat.InverseTransformPoint(handlePivot.position);
+        Vector3 dir = handLocal - pivotLocal;
+
+        _initialGrabAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+        _initialHandleRotation = _currentYRotation;
     }
 
-    public void OnGrab(SelectEnterEventArgs args)
+    private void OnRelease(SelectExitEventArgs args)
     {
-        grabbingHandTransform = args.interactorObject.transform;
-        startRotation = currentYRotation;
+        _grabbingHand = null;
 
-        // Cache the hand's world X position
-        initialHandX = grabbingHandTransform.position.x;
+        // Clamp rotation within bounds after release
+        _currentYRotation = Mathf.Clamp(_currentYRotation, -maxRotation, maxRotation);
     }
 
-    public void OnRelease(SelectExitEventArgs args)
+    public float GetNormalizedSteerAmount()
     {
-        grabbingHandTransform = null;
+        // Returns -1 to 1 based on handle rotation
+        return _currentYRotation / maxRotation;
     }
 }
