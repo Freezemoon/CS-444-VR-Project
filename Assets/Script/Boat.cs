@@ -4,7 +4,6 @@ using UnityEngine.XR;
 public class Boat : MonoBehaviour
 {
     public XRNode inputSource = XRNode.RightHand;
-    public HingeJoint hinge;
     public Transform leverTransform; // Reference to the lever transform
     public float maxSpeed = 2f; // Max boat speed
     public float turnSensitivity = 0.2f; // Boat turn sensitivity
