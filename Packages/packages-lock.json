@@ -9,6 +9,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.rito.pivot-editor": {
+      "version": "https://github.com/rito15/Unity-Pivot-Editor.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "6df9361222c2ddc28324116c6cda89b42e76fb2b"
+    },
     "com.unity.burst": {
       "version": "1.8.19",
       "depth": 2,
