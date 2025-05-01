@@ -33,7 +33,8 @@ public class Boat : MonoBehaviour
             triggerValue = value;
         }
 
-        float localAngle = leverTransform.localRotation.eulerAngles.y;
+        Quaternion boatToHandle = Quaternion.Inverse(transform.rotation) * leverTransform.rotation;
+        float localAngle = boatToHandle.eulerAngles.y;
         if (localAngle > 180f) localAngle -= 360f;
         if (engine == true)
         {
