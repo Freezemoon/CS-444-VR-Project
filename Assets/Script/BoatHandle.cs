@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
@@ -8,29 +9,37 @@ public class BoatHandle : MonoBehaviour
     public Transform boat;
     public Transform handlePivot;
     public XRGrabInteractable grabInteractable;
+    public InputActionReference throttleAction; // Trigger button
+    public Transform throttleButtonVisual; // Visual button to move up/down
 
     [Header("Settings")]
     public float maxRotation = 45f;
     public float rotationSpeed = 150f;
+    public float maxButtonYMovement = 0.2f;
 
     private Transform _grabbingHand;
     private float _currentYRotation;
     private Vector3 _localOffset;
+    private float _triggerValue;
+
+    public System.Action<float> OnThrottleChanged; // Notify Boat.cs
+
     private float _initialGrabAngle;
     private float _initialHandleRotation;
 
     private void Start()
     {
         _localOffset = boat.InverseTransformPoint(transform.position);
-
         grabInteractable.selectEntered.AddListener(OnGrab);
         grabInteractable.selectExited.AddListener(OnRelease);
+        throttleAction.action.Enable();
     }
 
     private void OnDestroy()
     {
         grabInteractable.selectEntered.RemoveListener(OnGrab);
         grabInteractable.selectExited.RemoveListener(OnRelease);
+        throttleAction.action.Disable();
     }
 
     private void Update()
@@ -39,23 +48,33 @@ public class BoatHandle : MonoBehaviour
         {
             transform.position = boat.TransformPoint(_localOffset);
             transform.rotation = boat.rotation * Quaternion.Euler(0f, _currentYRotation, 0f);
+            return;
         }
-        else
+
+        // --- Handle Rotation ---
+        Vector3 handLocal = boat.InverseTransformPoint(_grabbingHand.position);
+        Vector3 pivotLocal = boat.InverseTransformPoint(handlePivot.position);
+        Vector3 dir = handLocal - pivotLocal;
+
+        float currentAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+        float deltaAngle = currentAngle - _initialGrabAngle;
+        float targetRotation = _initialHandleRotation + deltaAngle;
+
+        _currentYRotation = Mathf.MoveTowards(_currentYRotation, Mathf.Clamp(targetRotation, -maxRotation, maxRotation), rotationSpeed * Time.deltaTime);
+
+        transform.rotation = Quaternion.Euler(0f, _currentYRotation, 0f) * boat.rotation;
+        transform.position = boat.TransformPoint(_localOffset);
+
+        // --- Throttle Input ---
+        _triggerValue = throttleAction.action.ReadValue<float>(); // 0 to 1
+        OnThrottleChanged?.Invoke(_triggerValue); // Send value to Boat.cs
+
+        // --- Move Throttle Button Visually ---
+        if (throttleButtonVisual != null)
         {
-            Vector3 handLocal = boat.InverseTransformPoint(_grabbingHand.position);
-            Vector3 pivotLocal = boat.InverseTransformPoint(handlePivot.position);
-            Vector3 dir = handLocal - pivotLocal;
-
-            float currentAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-            float deltaAngle = currentAngle - _initialGrabAngle;
-
-            float targetRotation = _initialHandleRotation + deltaAngle;
-            targetRotation = Mathf.Clamp(targetRotation, -maxRotation, maxRotation);
-
-            _currentYRotation = Mathf.MoveTowards(_currentYRotation, targetRotation, rotationSpeed * Time.deltaTime);
-
-            transform.rotation = Quaternion.Euler(0f, _currentYRotation, 0f) * boat.rotation;
-            transform.position = boat.TransformPoint(_localOffset);
+            Vector3 localPos = throttleButtonVisual.localPosition;
+            localPos.y = Mathf.Lerp(0f, maxButtonYMovement, _triggerValue);
+            throttleButtonVisual.localPosition = localPos;
         }
     }
 
@@ -63,7 +82,6 @@ public class BoatHandle : MonoBehaviour
     {
         _grabbingHand = args.interactorObject.transform;
 
-        // Calculate initial angle between hand and pivot (in boat local space)
         Vector3 handLocal = boat.InverseTransformPoint(_grabbingHand.position);
         Vector3 pivotLocal = boat.InverseTransformPoint(handlePivot.position);
         Vector3 dir = handLocal - pivotLocal;
@@ -75,14 +93,10 @@ public class BoatHandle : MonoBehaviour
     private void OnRelease(SelectExitEventArgs args)
     {
         _grabbingHand = null;
-
-        // Clamp rotation within bounds after release
-        _currentYRotation = Mathf.Clamp(_currentYRotation, -maxRotation, maxRotation);
     }
 
     public float GetNormalizedSteerAmount()
     {
-        // Returns -1 to 1 based on handle rotation
         return _currentYRotation / maxRotation;
     }
 }

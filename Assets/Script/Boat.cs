@@ -1,50 +1,38 @@
 using UnityEngine;
-using UnityEngine.XR;
 
 public class Boat : MonoBehaviour
 {
-    public XRNode inputSource = XRNode.RightHand;
-    public Transform leverTransform; // Reference to the lever transform
-    public float maxSpeed = 2f; // Max boat speed
+    public Transform leverTransform; // Reference to the handle
+    public float speedMultiplier = 4f; // Multiplie the boat speed
     public float turnSensitivity = 0.2f; // Boat turn sensitivity
     private bool engine = false;
     private int reverse = 1; // 1 = forward, -1 = reverse
-    private InputDevice device;
-    
+    private float speed = 0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        leverTransform.GetComponent<BoatHandle>().OnThrottleChanged += UpdateThrottle;
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Get the InputDevice if not valid
-        if (!device.isValid)
-        {
-            device = InputDevices.GetDeviceAtXRNode(inputSource);
-        }
-
-        float triggerValue = 0f;
-        if (device.TryGetFeatureValue(CommonUsages.trigger, out float value))
-        {
-            triggerValue = value;
-        }
-
         Quaternion boatToHandle = Quaternion.Inverse(transform.rotation) * leverTransform.rotation;
         float localAngle = boatToHandle.eulerAngles.y;
         if (localAngle > 180f) localAngle -= 360f;
         if (engine == true)
         {
-            float speed = 0.5f * maxSpeed; //0.5f replaces the triggervalue because it don't work
             transform.position -= transform.right * speed * reverse * Time.deltaTime;
 
-            float turnSpeed = localAngle * turnSensitivity; // How fast to turn
-            Debug.Log("Boat handle angle: " + localAngle);
+            float turnSpeed = localAngle * turnSensitivity; // How fast the boat turns
             transform.Rotate(0, - turnSpeed * Time.deltaTime, 0);
         }
+    }
+
+    private void UpdateThrottle(float value)
+    {
+        speed = value * speedMultiplier; // Value goes from 0 to 1 based on trigger press
     }
 
     private void OnTriggerEnter(Collider other)
@@ -56,7 +44,7 @@ public class Boat : MonoBehaviour
         }
         else
         {
-            Debug.Log("Something entered the boat trigger zone"); // Debug message
+            Debug.Log("Something entered the boat trigger zone");
         }
     }
 
