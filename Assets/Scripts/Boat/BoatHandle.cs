@@ -5,25 +5,20 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public class BoatHandle : MonoBehaviour
 {
-    [Header("References")]
     public Transform boat;
     public Transform handlePivot;
     public XRGrabInteractable grabInteractable;
     public InputActionReference throttleAction; // Trigger button
     public Transform throttleButtonVisual; // Visual button to move up/down
-
-    [Header("Settings")]
+    public float rotationSpeed = 250f;
     public float maxRotation = 45f;
-    public float rotationSpeed = 150f;
     public float maxButtonYMovement = 0.2f;
+    public System.Action<float> OnThrottleChanged; // Notify Boat.cs
 
     private Transform _grabbingHand;
     private float _currentYRotation;
     private Vector3 _localOffset;
     private float _triggerValue;
-
-    public System.Action<float> OnThrottleChanged; // Notify Boat.cs
-
     private float _initialGrabAngle;
     private float _initialHandleRotation;
 

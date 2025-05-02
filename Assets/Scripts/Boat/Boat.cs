@@ -25,8 +25,12 @@ public class Boat : MonoBehaviour
         {
             transform.position -= transform.right * speed * reverse * Time.deltaTime;
 
-            float turnSpeed = localAngle * turnSensitivity; // How fast the boat turns
-            transform.Rotate(0, - turnSpeed * Time.deltaTime, 0);
+            if (speed > 0f)
+            {
+                float turnSpeed = localAngle * turnSensitivity; // How fast the boat turns
+                transform.Rotate(0, - turnSpeed * Time.deltaTime, 0);
+            }
+            
         }
     }
 
