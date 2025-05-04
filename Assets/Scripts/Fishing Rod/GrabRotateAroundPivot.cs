@@ -11,7 +11,6 @@ public class GrabRotateAroundPivot : MonoBehaviour
     public Rigidbody baitRigidbody;
     public Transform pullTowardTransform;
     public float reelForceMultiplier = 0.005f;
-    public float lockedLineLengthMax = 8f;
     public float lineLengthMin = 0.1f;
     
     public static event Action OnReelReachedMinLength;
@@ -26,6 +25,11 @@ public class GrabRotateAroundPivot : MonoBehaviour
     private Vector3 _previousDirectionOnPlane;
     
     private float _lockedLineLength;
+    
+    private readonly float _lockedLineLengthMax = 10f;
+    private readonly float _lockedLineLengthMaxAddForGame = 8f;
+    
+    private float _currentLockedLineLengthMax;
 
     private void OnEnable()
     {
@@ -42,7 +46,9 @@ public class GrabRotateAroundPivot : MonoBehaviour
 
     private void Start()
     {
-        _lockedLineLength = lockedLineLengthMax;
+        _currentLockedLineLengthMax = _lockedLineLengthMax;
+        
+        _lockedLineLength = _currentLockedLineLengthMax;
     }
 
     private void OnGrab(SelectEnterEventArgs args)
@@ -61,11 +67,20 @@ public class GrabRotateAroundPivot : MonoBehaviour
     private void OnRelease(SelectExitEventArgs args)
     {
         _interactorAttachTransform = null;
-        _lockedLineLength = lockedLineLengthMax;
+        _lockedLineLength = _currentLockedLineLengthMax;
     }
 
     private void Update()
     {
+        if (FishingGame.instance.gameState == FishingGame.GameState.NotStarted)
+        {
+            _currentLockedLineLengthMax = _lockedLineLengthMax;
+        }
+        else
+        {
+            _currentLockedLineLengthMax = _lockedLineLengthMax + _lockedLineLengthMaxAddForGame;
+        }
+        
         Vector3 toBait = baitRigidbody.position - pullTowardTransform.position;
 
         if (_interactorAttachTransform && handlerPivotTransform)
@@ -129,6 +144,12 @@ public class GrabRotateAroundPivot : MonoBehaviour
         {
             return;
         }
+
+        if (FishingGame.instance.gameState != FishingGame.GameState.NotStarted)
+        {
+            FishingGame.instance.LoseGame();
+        }
+        
         Vector3 clampedPos = pullTowardTransform.position + toBait.normalized * _lockedLineLength;
         baitRigidbody.position = clampedPos;
 
