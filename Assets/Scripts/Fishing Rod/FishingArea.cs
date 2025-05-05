@@ -35,5 +35,7 @@ public class FishingArea : MonoBehaviour
         if (!other.CompareTag("FishingBait")) return;
         
         FishingRodExit();
+
+        FishingGame.instance.ExitFishingArea();
     }
 }
