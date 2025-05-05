@@ -28,7 +28,7 @@ public class FishingRodCaster : MonoBehaviour
     public AudioSource hookSetAudio;
 
     private bool _canTriggerPull = true;
-    private float _pullCooldown = 1.0f;
+    private readonly float _pullCooldown = 1.0f;
     private float _lastPullTime;
     
     private bool _isBaitAtInitPos;
@@ -80,7 +80,7 @@ public class FishingRodCaster : MonoBehaviour
         UpdateHandVelocity();
         
         UpdateHandPitchRotation();
-        DetectHookPull();
+        DetectRodPull();
     }
 
     private void OnReelReachedMinLength()
@@ -149,20 +149,20 @@ public class FishingRodCaster : MonoBehaviour
     private void UpdateHandPitchRotation()
     {
         Quaternion currentRotation = controllerTransform.rotation;
-        Quaternion delta = currentRotation * Quaternion.Inverse(_prevHandRotation);
+        Quaternion deltaCurrAndPrev = currentRotation * Quaternion.Inverse(_prevHandRotation);
 
-        delta.ToAngleAxis(out float angle, out Vector3 worldAxis);
+        deltaCurrAndPrev.ToAngleAxis(out float angle, out Vector3 worldAxis);
         _prevHandRotation = currentRotation;
 
         if (angle > 180f) angle -= 360f;
 
-        // Project world axis to local space of the controller
+        // Convert the world axis to the controller’s local space
         Vector3 localAxis = controllerTransform.InverseTransformDirection(worldAxis);
 
         // We're interested in rotation around local X (pitch)
         bool isPitch = Mathf.Abs(localAxis.x) > 0.7f && Mathf.Abs(localAxis.y) < 0.4f && Mathf.Abs(localAxis.z) < 0.4f;
 
-        // If rotating around pitch and in the backward direction (positive X)
+        // If rotating around pitch and in the backward direction (negative X)
         if (isPitch && localAxis.x < 0f)
         {
             _backwardPitchSpeed = Mathf.Abs(angle) / Time.deltaTime;
@@ -173,7 +173,7 @@ public class FishingRodCaster : MonoBehaviour
         }
     }
     
-    private void DetectHookPull()
+    private void DetectRodPull()
     {
         if (!_isHeld) return;
         

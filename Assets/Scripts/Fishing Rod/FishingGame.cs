@@ -12,8 +12,13 @@ public class FishingGame : MonoBehaviour
     public int maxPull = 6;
     public float minWaitingFishTime = 2.5f;
     public float maxWaitingFishTime = 10;
+    public float maxPullingTimeBeforeLose = 10;
+    public float maxReelingTimeBeforeLose = 10;
+    public float minReelLength = 1.5f;
+    public float maxReelLength = 3;
     public int minPhaseBeforeWin = 3;
-    public int maxPhaseBeforeWin = 8;
+    public int maxPhaseBeforeWin = 7;
+    public float reelForceMultiplierDivisor = 10;
     
     public enum GameState
     {
@@ -33,9 +38,15 @@ public class FishingGame : MonoBehaviour
 
     private float _neededWaitingFishTime;
     private float _currentWaitingFishTime;
+
+    private float _neededPhaseTimeBeforeLose;
+    private float _currentPhaseTimeBeforeLose;
     
     private int _neededPhaseBeforeWin;
     private int _currentPhaseBeforeWin;
+
+    private float _neededReel;
+    private float _currentReel;
 
     private void Awake()
     {
@@ -63,12 +74,39 @@ public class FishingGame : MonoBehaviour
         {
             case GameState.WaitingFish:
                 _currentWaitingFishTime += Time.deltaTime;
+                
                 if (_currentWaitingFishTime >= _neededWaitingFishTime)
                 {
                     StartPulling();
+                    break;
                 }
+
+                UpdateText();
+                
                 break;
+            case GameState.Pulling:
+            case GameState.Reeling:
+                _currentPhaseTimeBeforeLose += Time.deltaTime;
+                
+                if (_currentPhaseTimeBeforeLose >= _neededPhaseTimeBeforeLose)
+                {
+                    LoseGame();
+                }
+
+                UpdateText();
+
+                break;
+            case GameState.NotStarted:
+            case GameState.Win:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
+    }
+
+    public void FishGrabbed()
+    {
+        gameState = GameState.NotStarted;
     }
 
     public void StartGame()
@@ -80,28 +118,47 @@ public class FishingGame : MonoBehaviour
 
         _currentPhaseBeforeWin = 0;
         _neededPhaseBeforeWin = Random.Range(minPhaseBeforeWin, maxPhaseBeforeWin + 1);
-        
-        UpdateText();
+    }
+
+    public void ExitFishingArea()
+    {
+        if (gameState == GameState.WaitingFish)
+        {
+            LoseGame();
+        }
     }
     
     public void LoseGame()
     {
+        if (gameState == GameState.Win) return;
+        
         gameState = GameState.NotStarted;
         
         UpdateText();
+    }
+
+    public bool ReelSuccess(float amount)
+    {
+        if (gameState != GameState.Reeling) return false;
+        
+        _currentReel += amount;
+
+        if (!(_currentReel >= _neededReel)) return false;
+        NextGamePhase();
+        
+        return true;
     }
     
 
     public void PullSuccess()
     {
+        if (gameState != GameState.Pulling) return;
+        
         _currentPull++;
 
-        if (_currentPull >= _neededPull)
-        {
-            NextGamePhase();
-        }
+        if (_currentPull < _neededPull) return;
         
-        UpdateText();
+        NextGamePhase();
     }
 
     private void StartPulling()
@@ -111,7 +168,8 @@ public class FishingGame : MonoBehaviour
         _currentPull = 0;
         _neededPull = Random.Range(minPull, maxPull + 1);
         
-        UpdateText();
+        _currentPhaseTimeBeforeLose = 0;
+        _neededPhaseTimeBeforeLose = maxPullingTimeBeforeLose;
     }
 
     private void NextGamePhase()
@@ -121,16 +179,24 @@ public class FishingGame : MonoBehaviour
         if (_currentPhaseBeforeWin >= _neededPhaseBeforeWin)
         {
             gameState = GameState.Win;
+            UpdateText();
             return;
         }
         
-        if (gameState == GameState.Pulling)
+        switch (gameState)
         {
-            StartReeling();
-        }
-        else if (gameState == GameState.Reeling)
-        {
-            StartPulling();
+            case GameState.Pulling:
+                StartReeling();
+                break;
+            case GameState.Reeling:
+                StartPulling();
+                break;
+            case GameState.NotStarted:
+            case GameState.WaitingFish:
+            case GameState.Win:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
@@ -138,10 +204,11 @@ public class FishingGame : MonoBehaviour
     {
         gameState = GameState.Reeling;
         
-        // TODO define how much to reel
-        NextGamePhase(); // TEMP
+        _currentReel = 0;
+        _neededReel = Random.Range(minReelLength, maxReelLength);
         
-        UpdateText();
+        _currentPhaseTimeBeforeLose = 0;
+        _neededPhaseTimeBeforeLose = maxReelingTimeBeforeLose;
     }
 
     private void UpdateText()
@@ -149,7 +216,6 @@ public class FishingGame : MonoBehaviour
         switch (gameState)
         {
             case GameState.NotStarted:
-            case GameState.Reeling:
             case GameState.Win:
                 tmpText.text = gameState.ToString() + ":";
                 break;
@@ -157,7 +223,14 @@ public class FishingGame : MonoBehaviour
                 tmpText.text = gameState.ToString() + ": " + _currentWaitingFishTime + "/" + _neededWaitingFishTime;
                 break;
             case GameState.Pulling:
-                tmpText.text = gameState.ToString() + ": " + _currentPull + "/" + _neededPull;
+                tmpText.text = gameState.ToString() + ": " + _currentPull + "/" + _neededPull + "\n"
+                               + _currentPhaseTimeBeforeLose + "/" + _neededPhaseTimeBeforeLose + "\n"
+                               + _currentPhaseBeforeWin + "/" + _neededPhaseBeforeWin;
+                break;
+            case GameState.Reeling:
+                tmpText.text = gameState.ToString() + ": " + _currentReel + "/" + _neededReel + "\n"
+                               + _currentPhaseTimeBeforeLose + "/" + _neededPhaseTimeBeforeLose + "\n"
+                               + _currentPhaseBeforeWin + "/" + _neededPhaseBeforeWin;
                 break;
         }
     }
