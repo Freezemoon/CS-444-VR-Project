@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class FishingArea : MonoBehaviour
 {
-    public Color _defaultColor = Color.blue;
+    public Color _defaultColor = Color.green;
     public Color _enterColor = Color.red;
 
     private void Start()
