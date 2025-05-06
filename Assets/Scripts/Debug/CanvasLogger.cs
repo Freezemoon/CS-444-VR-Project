@@ -12,9 +12,6 @@ public class UIConsoleLogger : MonoBehaviour
     [SerializeField]
     private TMP_Text output;       // Or: public Text _output;
 
-    // Optional limit so you don’t overflow the UI
-    [FormerlySerializedAs("_maxLines")] [SerializeField] private int maxLines = 50;
-
     readonly System.Collections.Generic.List<string> _logs = new();
 
     void OnEnable()
