@@ -44,12 +44,15 @@ public class BoatHandle : MonoBehaviour
     {
         if (_grabbingHand == null)
         {
+            transform.rotation = Quaternion.Euler(0f, _currentYRotation, 0f) * boat.rotation;
             transform.position = boat.TransformPoint(_localOffset);
-            transform.rotation = boat.rotation * Quaternion.Euler(0f, _currentYRotation, 0f);
+
+            _triggerValue = 0f;
+            OnThrottleChanged?.Invoke(_triggerValue);
+            throttleButtonVisual.localPosition = buttonPosition;
             return;
         }
 
-        // --- Handle Rotation ---
         Vector3 handLocal = boat.InverseTransformPoint(_grabbingHand.position);
         Vector3 pivotLocal = boat.InverseTransformPoint(handlePivot.position);
         Vector3 dir = handLocal - pivotLocal;
