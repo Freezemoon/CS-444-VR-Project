@@ -9,11 +9,11 @@ public class BoatHandle : MonoBehaviour
     public Transform handlePivot;
     public XRGrabInteractable grabInteractable;
     public InputActionReference throttleAction; // Trigger button
-    public Transform throttleButtonVisual; // Visual button to move up/down
+    public Transform throttleButtonVisual; // Visual button to move
     public float rotationSpeed = 250f;
     public float maxRotation = 45f;
     public float maxButtonYMovement = 0.2f;
-    public System.Action<float> OnThrottleChanged; // Notify Boat.cs
+    public System.Action<float> OnThrottleChanged; // Notify the Boat script
 
     private Transform _grabbingHand;
     private float _currentYRotation;
@@ -21,6 +21,7 @@ public class BoatHandle : MonoBehaviour
     private float _triggerValue;
     private float _initialGrabAngle;
     private float _initialHandleRotation;
+    private Vector3 buttonPosition;
 
     private void Start()
     {
@@ -28,6 +29,8 @@ public class BoatHandle : MonoBehaviour
         grabInteractable.selectEntered.AddListener(OnGrab);
         grabInteractable.selectExited.AddListener(OnRelease);
         throttleAction.action.Enable();
+
+        buttonPosition = throttleButtonVisual.localPosition;
     }
 
     private void OnDestroy()
@@ -55,22 +58,17 @@ public class BoatHandle : MonoBehaviour
         float deltaAngle = currentAngle - _initialGrabAngle;
         float targetRotation = _initialHandleRotation + deltaAngle;
 
-        _currentYRotation = Mathf.MoveTowards(_currentYRotation, Mathf.Clamp(targetRotation, -maxRotation, maxRotation), rotationSpeed * Time.deltaTime);
+        _currentYRotation = Mathf.MoveTowards(_currentYRotation, Mathf.Clamp(targetRotation, - maxRotation, maxRotation), rotationSpeed * Time.deltaTime);
 
         transform.rotation = Quaternion.Euler(0f, _currentYRotation, 0f) * boat.rotation;
         transform.position = boat.TransformPoint(_localOffset);
 
-        // --- Throttle Input ---
         _triggerValue = throttleAction.action.ReadValue<float>(); // 0 to 1
-        OnThrottleChanged?.Invoke(_triggerValue); // Send value to Boat.cs
+        OnThrottleChanged?.Invoke(_triggerValue); // Send value to the Boat script
 
-        // --- Move Throttle Button Visually ---
-        if (throttleButtonVisual != null)
-        {
-            Vector3 localPos = throttleButtonVisual.localPosition;
-            localPos.y = Mathf.Lerp(0f, maxButtonYMovement, _triggerValue);
-            throttleButtonVisual.localPosition = localPos;
-        }
+        Vector3 buttonPositionTemp = buttonPosition;
+        buttonPositionTemp.y = buttonPosition.y - (_triggerValue * maxButtonYMovement);
+        throttleButtonVisual.localPosition = buttonPositionTemp;
     }
 
     private void OnGrab(SelectEnterEventArgs args)
