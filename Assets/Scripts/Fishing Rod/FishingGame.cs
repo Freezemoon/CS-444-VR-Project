@@ -220,16 +220,20 @@ public class FishingGame : MonoBehaviour
                 tmpText.text = gameState.ToString() + ":";
                 break;
             case GameState.WaitingFish:
-                tmpText.text = gameState.ToString() + ": " + _currentWaitingFishTime + "/" + _neededWaitingFishTime;
+                tmpText.text = gameState.ToString() + ": " + _currentWaitingFishTime.ToString("F2") + "/"
+                               + _neededWaitingFishTime.ToString("F2");
                 break;
             case GameState.Pulling:
                 tmpText.text = gameState.ToString() + ": " + _currentPull + "/" + _neededPull + "\n"
-                               + _currentPhaseTimeBeforeLose + "/" + _neededPhaseTimeBeforeLose + "\n"
+                               + _currentPhaseTimeBeforeLose.ToString("F2") + "/"
+                               + _neededPhaseTimeBeforeLose.ToString("F2") + "\n"
                                + _currentPhaseBeforeWin + "/" + _neededPhaseBeforeWin;
                 break;
             case GameState.Reeling:
-                tmpText.text = gameState.ToString() + ": " + _currentReel + "/" + _neededReel + "\n"
-                               + _currentPhaseTimeBeforeLose + "/" + _neededPhaseTimeBeforeLose + "\n"
+                tmpText.text = gameState.ToString() + ": " + _currentReel.ToString("F2") + "/" 
+                               + _neededReel.ToString("F2") + "\n"
+                               + _currentPhaseTimeBeforeLose.ToString("F2") + "/" 
+                               + _neededPhaseTimeBeforeLose.ToString("F2") + "\n"
                                + _currentPhaseBeforeWin + "/" + _neededPhaseBeforeWin;
                 break;
         }
