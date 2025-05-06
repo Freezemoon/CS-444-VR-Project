@@ -83,18 +83,6 @@ public class FishBucket : MonoBehaviour
         // Remove or change tag to prevent re-triggering
         fish.tag = "Untagged";
         
-        // Disable all scripts
-        foreach (var script in fish.GetComponents<MonoBehaviour>())
-        {
-            script.enabled = false;
-        }
-        
-        // disable all colliders
-        foreach (var col in fish.GetComponentsInChildren<Collider>())
-        {
-            col.enabled = false;
-        }
-        
         // disable rigidbody if any
         var rb = fish.GetComponent<Rigidbody>();
         if (rb != null)
