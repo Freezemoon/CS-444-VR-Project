@@ -26,5 +26,10 @@ namespace Game
             FishingRodStats rod = GameManager.instance.GetPlayerRod();
             Debug.Log($"Your rod is now {rod.Name}");
         }
+        
+        public void SpawnTest()
+        {
+            GameManager.instance.SpawnOnWater();
+        }
     }
 }
