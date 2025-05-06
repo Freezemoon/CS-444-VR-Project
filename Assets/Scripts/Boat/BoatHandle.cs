@@ -19,6 +19,7 @@ public class BoatHandle : MonoBehaviour
     private float _currentYRotation;
     private Vector3 _localOffset;
     private float _triggerValue;
+    private float triggerValueOld;
     private float _initialGrabAngle;
     private float _initialHandleRotation;
     private Vector3 buttonPosition;
@@ -47,8 +48,11 @@ public class BoatHandle : MonoBehaviour
             transform.rotation = Quaternion.Euler(0f, _currentYRotation, 0f) * boat.rotation;
             transform.position = boat.TransformPoint(_localOffset);
 
+            triggerValueOld = _triggerValue;
             _triggerValue = 0f;
             OnThrottleChanged?.Invoke(_triggerValue);
+            // Todo : need to transform localposition.x by triggerValueOld - _triggerValue
+
             throttleButtonVisual.localPosition = buttonPosition;
             return;
         }
@@ -66,8 +70,15 @@ public class BoatHandle : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, _currentYRotation, 0f) * boat.rotation;
         transform.position = boat.TransformPoint(_localOffset);
 
+        triggerValueOld = _triggerValue;
         _triggerValue = throttleAction.action.ReadValue<float>(); // 0 to 1
         OnThrottleChanged?.Invoke(_triggerValue); // Send value to the Boat script
+        // Todo : need to transform localposition.x by triggerValueOld - _triggerValue
+
+        // Todo : reduce tremblement, (use lerp or smoothdamp)
+        // Todo : rename variable for more clarity
+        // Todo : add button indicator, change reverse button always activable
+        // Todo : add motor sound
 
         Vector3 buttonPositionTemp = buttonPosition;
         buttonPositionTemp.y = buttonPosition.y - (_triggerValue * maxButtonYMovement);
@@ -89,10 +100,5 @@ public class BoatHandle : MonoBehaviour
     private void OnRelease(SelectExitEventArgs args)
     {
         _grabbingHand = null;
-    }
-
-    public float GetNormalizedSteerAmount()
-    {
-        return _currentYRotation / maxRotation;
     }
 }
