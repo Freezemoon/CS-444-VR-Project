@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public class FishingRodCaster : MonoBehaviour
@@ -25,9 +26,9 @@ public class FishingRodCaster : MonoBehaviour
     
     [Header("Hook Detection")]
     public float hookPitchThreshold = 500f; // Degrees per second
-    public AudioSource hookSetAudio;
+    public AudioSource pullSuccessAudioSource;
 
-    private bool _canTriggerPull = true;
+    private bool _canTriggerPull = false;
     private readonly float _pullCooldown = 1.0f;
     private float _lastPullTime;
     
@@ -177,21 +178,20 @@ public class FishingRodCaster : MonoBehaviour
     {
         if (!_isHeld) return;
         
-        if (Time.time - _lastPullTime >= _pullCooldown)
+        if (FishingGame.instance.gameState == FishingGame.GameState.Pulling &&
+            Time.time - _lastPullTime >= _pullCooldown)
         {
             _canTriggerPull = true;
         }
 
         if (!_canTriggerPull) return;
         
-        // Debug
-        // FishingGame.instance.tmp_text.text = _backwardPitchSpeed.ToString();
-        
         // Only trigger if the angular speed is a fast upward (backward) flick
         if (_backwardPitchSpeed > hookPitchThreshold)
         {
-            // hookSetAudio?.Play();
+            pullSuccessAudioSource?.Play();
             FishingGame.instance.PullSuccess();
+            
             _canTriggerPull = false;
             _lastPullTime = Time.time;
         }
