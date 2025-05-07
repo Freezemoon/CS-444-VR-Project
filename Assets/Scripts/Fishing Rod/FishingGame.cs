@@ -2,12 +2,20 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using Random = UnityEngine.Random;
 
 public class FishingGame : MonoBehaviour
 {
     public TMP_Text tmpText;
+    
+    [FormerlySerializedAs("audioSource")] public AudioSource phaseSuccessAudioSource;
 
+    [Header("Haptics")]
+    public HapticImpulsePlayer rightHandHaptics;
+    public HapticImpulsePlayer leftHandHaptics;
+
+    [Header("Parameters")]
     public int minPull = 3;
     public int maxPull = 6;
     public float minWaitingFishTime = 2.5f;
@@ -144,6 +152,8 @@ public class FishingGame : MonoBehaviour
         _currentReel += amount;
 
         if (!(_currentReel >= _neededReel)) return false;
+        
+        phaseSuccessAudioSource?.Play();
         NextGamePhase();
         
         return true;
@@ -158,18 +168,32 @@ public class FishingGame : MonoBehaviour
 
         if (_currentPull < _neededPull) return;
         
+        phaseSuccessAudioSource?.Play();
         NextGamePhase();
     }
 
     private void StartPulling()
     {
         gameState = GameState.Pulling;
+        rightHandHaptics.SendHapticImpulse(0.8f, 0.8f);
         
         _currentPull = 0;
         _neededPull = Random.Range(minPull, maxPull + 1);
         
         _currentPhaseTimeBeforeLose = 0;
         _neededPhaseTimeBeforeLose = maxPullingTimeBeforeLose;
+    }
+
+    private void StartReeling()
+    {
+        gameState = GameState.Reeling;
+        leftHandHaptics.SendHapticImpulse(0.8f, 0.8f);
+        
+        _currentReel = 0;
+        _neededReel = Random.Range(minReelLength, maxReelLength);
+        
+        _currentPhaseTimeBeforeLose = 0;
+        _neededPhaseTimeBeforeLose = maxReelingTimeBeforeLose;
     }
 
     private void NextGamePhase()
@@ -179,7 +203,10 @@ public class FishingGame : MonoBehaviour
         if (_currentPhaseBeforeWin >= _neededPhaseBeforeWin)
         {
             gameState = GameState.Win;
+            
+            phaseSuccessAudioSource?.Play();
             UpdateText();
+            
             return;
         }
         
@@ -198,17 +225,6 @@ public class FishingGame : MonoBehaviour
             default:
                 throw new ArgumentOutOfRangeException();
         }
-    }
-
-    private void StartReeling()
-    {
-        gameState = GameState.Reeling;
-        
-        _currentReel = 0;
-        _neededReel = Random.Range(minReelLength, maxReelLength);
-        
-        _currentPhaseTimeBeforeLose = 0;
-        _neededPhaseTimeBeforeLose = maxReelingTimeBeforeLose;
     }
 
     private void UpdateText()
