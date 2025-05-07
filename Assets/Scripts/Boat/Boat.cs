@@ -15,10 +15,16 @@ public class Boat : MonoBehaviour
     public AudioClip engineLoopClip;
     private AudioSource engineAudioSource;
 
+    public GameObject OnOffIndicatorLamp;
+    public GameObject reverseIndicatorLamp;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         leverTransform.GetComponent<BoatHandle>().OnThrottleChanged += UpdateThrottle;
+
+        OnOffIndicatorLamp.GetComponent<Light>().enabled = false;
+        reverseIndicatorLamp.GetComponent<Light>().enabled = false;
 
         engineAudioSource = gameObject.AddComponent<AudioSource>();
         engineAudioSource.loop = true;
@@ -88,6 +94,7 @@ public class Boat : MonoBehaviour
         if (engine == false)
         {
             engine = true; // Turn on the engine
+            OnOffIndicatorLamp.GetComponent<Light>().enabled = true;
 
             AudioSource.PlayClipAtPoint(engineStartClip, transform.position);
             engineAudioSource.Play();
@@ -96,6 +103,7 @@ public class Boat : MonoBehaviour
         else
         {
             engine = false;
+            OnOffIndicatorLamp.GetComponent<Light>().enabled = false;
 
             engineAudioSource.Stop();
             Debug.Log("Engine is off"); 
@@ -107,11 +115,13 @@ public class Boat : MonoBehaviour
         if (reverse == 1)
         {
             reverse = -1; // Turn on the reverse
+            reverseIndicatorLamp.GetComponent<Light>().enabled = true;
             Debug.Log("Reverse is on");
         }
         else
         {
             reverse = 1;
+            reverseIndicatorLamp.GetComponent<Light>().enabled = false;
             Debug.Log("Reverse is off"); 
         }
     }
