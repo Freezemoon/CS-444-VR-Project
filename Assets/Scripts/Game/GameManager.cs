@@ -26,7 +26,6 @@ namespace Game
 
             instance = this;
             DontDestroyOnLoad(gameObject);
-            Debug.Log("GameManager Awake");
             
             // Permet de charger le prefab qu'on veut faire spawn
             // TODO : Changer pour le préfab voulu
@@ -76,6 +75,11 @@ namespace Game
         /// <summary>
         /// Permet de spawn les poissons sur une surface taggée avec "Water".
         /// Système random très simple pour le moment.
+        /// TODO pour affiner le système later :
+        /// - Prendre en compte la position du joueur pour pas spawn les préfabs trop loin
+        /// - Faire en sorte que quand un poisson est pêché, un respawn un nouveau random. Le but du spawn
+        /// count devient donc de maintenir un nombre fix d'instance de poisson à pêcher en tout temps
+        /// - Prendre en compte les zones innaccessible du lac pour pas spawn là bas (plusieurs tags?)
         /// </summary>
         public void SpawnOnWater()
         {
