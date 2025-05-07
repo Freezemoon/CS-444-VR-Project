@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Make sure to use the same namespace as GameManager
+// TODO : À supprimer plus tard car utilisé qu'en test.
 
 namespace Game
 {
