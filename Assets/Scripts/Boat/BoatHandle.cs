@@ -15,18 +15,17 @@ public class BoatHandle : MonoBehaviour
     public float maxButtonYMovement = 0.2f;
     public System.Action<float> OnThrottleChanged; // Notify the Boat script
 
-    private Transform _grabbingHand;
-    private float _currentYRotation;
-    private Vector3 _localOffset;
-    private float _triggerValue;
-    private float triggerValueOld;
-    private float _initialGrabAngle;
-    private float _initialHandleRotation;
+    private Transform grabbingHand;
+    private float currentYRotation;
+    private Vector3 localOffset;
+    private float triggerValue;
+    private float initialGrabAngle;
+    private float initialHandleRotation;
     private Vector3 buttonPosition;
 
     private void Start()
     {
-        _localOffset = boat.InverseTransformPoint(transform.position);
+        localOffset = boat.InverseTransformPoint(transform.position);
         grabInteractable.selectEntered.AddListener(OnGrab);
         grabInteractable.selectExited.AddListener(OnRelease);
         throttleAction.action.Enable();
@@ -43,62 +42,53 @@ public class BoatHandle : MonoBehaviour
 
     private void Update()
     {
-        if (_grabbingHand == null)
+        if (grabbingHand == null)
         {
-            transform.rotation = Quaternion.Euler(0f, _currentYRotation, 0f) * boat.rotation;
-            transform.position = boat.TransformPoint(_localOffset);
+            transform.rotation = Quaternion.Euler(0f, currentYRotation, 0f) * boat.rotation;
+            transform.position = boat.TransformPoint(localOffset);
 
-            triggerValueOld = _triggerValue;
-            _triggerValue = 0f;
-            OnThrottleChanged?.Invoke(_triggerValue);
-            // Todo : need to transform localposition.x by triggerValueOld - _triggerValue
+            triggerValue = 0f;
+            OnThrottleChanged?.Invoke(triggerValue);
 
             throttleButtonVisual.localPosition = buttonPosition;
             return;
         }
 
-        Vector3 handLocal = boat.InverseTransformPoint(_grabbingHand.position);
+        Vector3 handLocal = boat.InverseTransformPoint(grabbingHand.position);
         Vector3 pivotLocal = boat.InverseTransformPoint(handlePivot.position);
         Vector3 dir = handLocal - pivotLocal;
 
         float currentAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-        float deltaAngle = currentAngle - _initialGrabAngle;
-        float targetRotation = _initialHandleRotation + deltaAngle;
+        float deltaAngle = currentAngle - initialGrabAngle;
+        float targetRotation = initialHandleRotation + deltaAngle;
 
-        _currentYRotation = Mathf.MoveTowards(_currentYRotation, Mathf.Clamp(targetRotation, - maxRotation, maxRotation), rotationSpeed * Time.deltaTime);
+        currentYRotation = Mathf.MoveTowards(currentYRotation, Mathf.Clamp(targetRotation, - maxRotation, maxRotation), rotationSpeed * Time.deltaTime);
 
-        transform.rotation = Quaternion.Euler(0f, _currentYRotation, 0f) * boat.rotation;
-        transform.position = boat.TransformPoint(_localOffset);
+        transform.rotation = Quaternion.Euler(0f, currentYRotation, 0f) * boat.rotation;
+        transform.position = boat.TransformPoint(localOffset);
 
-        triggerValueOld = _triggerValue;
-        _triggerValue = throttleAction.action.ReadValue<float>(); // 0 to 1
-        OnThrottleChanged?.Invoke(_triggerValue); // Send value to the Boat script
-        // Todo : need to transform localposition.x by triggerValueOld - _triggerValue
-
-        // Todo : reduce tremblement, (use lerp or smoothdamp)
-        // Todo : rename variable for more clarity
-        // Todo : add button indicator, change reverse button always activable
-        // Todo : add motor sound
+        triggerValue = throttleAction.action.ReadValue<float>(); // 0 to 1
+        OnThrottleChanged?.Invoke(triggerValue); // Send value to the Boat script
 
         Vector3 buttonPositionTemp = buttonPosition;
-        buttonPositionTemp.y = buttonPosition.y - (_triggerValue * maxButtonYMovement);
+        buttonPositionTemp.y = buttonPosition.y - (triggerValue * maxButtonYMovement);
         throttleButtonVisual.localPosition = buttonPositionTemp;
     }
 
     private void OnGrab(SelectEnterEventArgs args)
     {
-        _grabbingHand = args.interactorObject.transform;
+        grabbingHand = args.interactorObject.transform;
 
-        Vector3 handLocal = boat.InverseTransformPoint(_grabbingHand.position);
+        Vector3 handLocal = boat.InverseTransformPoint(grabbingHand.position);
         Vector3 pivotLocal = boat.InverseTransformPoint(handlePivot.position);
         Vector3 dir = handLocal - pivotLocal;
 
-        _initialGrabAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-        _initialHandleRotation = _currentYRotation;
+        initialGrabAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+        initialHandleRotation = currentYRotation;
     }
 
     private void OnRelease(SelectExitEventArgs args)
     {
-        _grabbingHand = null;
+        grabbingHand = null;
     }
 }
