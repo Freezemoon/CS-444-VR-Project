@@ -3,16 +3,27 @@ using UnityEngine;
 public class Boat : MonoBehaviour
 {
     public Transform leverTransform; // Reference to the handle
-    public float speedMultiplier = 4f; // Multiplie the boat speed
-    public float turnSensitivity = 0.2f; // Boat turn sensitivity
+    public float speedMultiplier = 3f; // Multiplie the boat speed
+    public float turnSensitivity = 0.25f; // Boat turn sensitivity
+    public float accelerationRate = 1.5f;
     private bool engine = false;
     private int reverse = 1; // 1 = forward, -1 = reverse
     private float speed = 0f;
+    private float currentSpeed = 0f;
+
+    public AudioClip engineStartClip;
+    public AudioClip engineLoopClip;
+    private AudioSource engineAudioSource;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         leverTransform.GetComponent<BoatHandle>().OnThrottleChanged += UpdateThrottle;
+
+        engineAudioSource = gameObject.AddComponent<AudioSource>();
+        engineAudioSource.loop = true;
+        engineAudioSource.playOnAwake = false;
+        engineAudioSource.clip = engineLoopClip;
     }
 
     // Update is called once per frame
@@ -23,14 +34,29 @@ public class Boat : MonoBehaviour
         if (localAngle > 180f) localAngle -= 360f;
         if (engine == true)
         {
-            transform.position -= transform.right * speed * reverse * Time.deltaTime;
+            currentSpeed = Mathf.MoveTowards(currentSpeed, speed, accelerationRate * Time.deltaTime);
+            transform.position -= transform.right * currentSpeed * reverse * Time.deltaTime;
 
-            if (speed > 0f)
+            if (currentSpeed > 0f)
             {
                 float turnSpeed = localAngle * turnSensitivity; // How fast the boat turns
                 transform.Rotate(0, - turnSpeed * Time.deltaTime, 0);
             }
-            
+            if (speed == 0f)
+            {
+                engineAudioSource.volume = 0.5f;
+                engineAudioSource.pitch = 1f;
+            }
+            else if (reverse == -1)
+            {
+                engineAudioSource.volume = 1f;
+                engineAudioSource.pitch = 0.6f;
+            }
+            else
+            {
+                engineAudioSource.volume = 1f;
+                engineAudioSource.pitch = 1.5f;
+            }
         }
     }
 
@@ -45,10 +71,6 @@ public class Boat : MonoBehaviour
         {
             other.transform.SetParent(transform); // Set the boat as a parent of the player
             Debug.Log("Player entered the boat trigger zone");
-        }
-        else
-        {
-            Debug.Log("Something entered the boat trigger zone");
         }
     }
 
@@ -66,12 +88,16 @@ public class Boat : MonoBehaviour
         if (engine == false)
         {
             engine = true; // Turn on the engine
-            reverse = 1; 
+
+            AudioSource.PlayClipAtPoint(engineStartClip, transform.position);
+            engineAudioSource.Play();
             Debug.Log("Engine is on and reverse is off"); 
         }
         else
         {
             engine = false;
+
+            engineAudioSource.Stop();
             Debug.Log("Engine is off"); 
         }
     }
