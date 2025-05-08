@@ -23,8 +23,8 @@ public class Boat : MonoBehaviour
     {
         leverTransform.GetComponent<BoatHandle>().OnThrottleChanged += UpdateThrottle;
 
-        OnOffIndicatorLamp.GetComponent<Light>().enabled = false;
-        reverseIndicatorLamp.GetComponent<Light>().enabled = false;
+        OnOffIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
+        reverseIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
 
         engineAudioSource = gameObject.AddComponent<AudioSource>();
         engineAudioSource.loop = true;
@@ -50,13 +50,13 @@ public class Boat : MonoBehaviour
             }
             if (speed == 0f)
             {
-                engineAudioSource.volume = 0.5f;
+                engineAudioSource.volume = 0.7f;
                 engineAudioSource.pitch = 1f;
             }
             else if (reverse == -1)
             {
                 engineAudioSource.volume = 1f;
-                engineAudioSource.pitch = 0.6f;
+                engineAudioSource.pitch = 0.7f;
             }
             else
             {
@@ -94,7 +94,7 @@ public class Boat : MonoBehaviour
         if (engine == false)
         {
             engine = true; // Turn on the engine
-            OnOffIndicatorLamp.GetComponent<Light>().enabled = true;
+            OnOffIndicatorLamp.GetComponent<MeshRenderer>().enabled = true;
 
             AudioSource.PlayClipAtPoint(engineStartClip, transform.position);
             engineAudioSource.Play();
@@ -103,7 +103,7 @@ public class Boat : MonoBehaviour
         else
         {
             engine = false;
-            OnOffIndicatorLamp.GetComponent<Light>().enabled = false;
+            OnOffIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
 
             engineAudioSource.Stop();
             Debug.Log("Engine is off"); 
@@ -115,13 +115,13 @@ public class Boat : MonoBehaviour
         if (reverse == 1)
         {
             reverse = -1; // Turn on the reverse
-            reverseIndicatorLamp.GetComponent<Light>().enabled = true;
+            reverseIndicatorLamp.GetComponent<MeshRenderer>().enabled = true;
             Debug.Log("Reverse is on");
         }
         else
         {
             reverse = 1;
-            reverseIndicatorLamp.GetComponent<Light>().enabled = false;
+            reverseIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
             Debug.Log("Reverse is off"); 
         }
     }
