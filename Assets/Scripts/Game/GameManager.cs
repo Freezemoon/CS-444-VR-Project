@@ -4,17 +4,26 @@ using UnityEngine.SceneManagement;
 namespace Game
 {
     /// <summary>
-    /// Singleton (est unique et instantié automatiquement et persiste tout le jeu donc) qui permet
-    /// de gérer le GameState et les systèmes du jeu.
+    /// Singleton  qui permet de gérer le GameState et les systèmes du jeu.
     /// </summary>
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance { get; private set; }
         public GameState State = new();
 
-        private GameObject _spawnPrefab; // Le prefab qui se fait spawn par le spawner
-        private Collider _waterCollider; // Le collider de l'eau pour les poissons
-        private int _spawnCount = 3; // Combien de poissons sont présent en simultané.
+        [Header("Spawning Settings")]
+        [Tooltip("The prefab to spawn on the water surface")]
+        [SerializeField] private GameObject spawnPrefab;
+
+        [Tooltip("Number of instances to spawn")]
+        [SerializeField] private int spawnCount = 3;
+
+        [Tooltip("How high above the water to place the spawn")]
+        [SerializeField] private float heightAbove;
+
+        [Header("Water Surface")]
+        [Tooltip("Collider of the water surface to spawn on")]
+        [SerializeField] private Collider waterCollider;
 
         private void Awake()
         {
@@ -23,53 +32,8 @@ namespace Game
                 Destroy(gameObject);
                 return;
             }
-
             instance = this;
             DontDestroyOnLoad(gameObject);
-            
-            // Permet de charger le prefab qu'on veut faire spawn
-            // TODO : Changer pour le préfab voulu
-            _spawnPrefab = Resources.Load<GameObject>("Prefabs/Debug/Sphere");
-            if (_spawnPrefab == null)
-                Debug.LogError("Could not find MySpawnPrefab in Resources/Prefabs/");
-            
-            SceneManager.sceneLoaded += OnSceneLoaded;
-        }
-        
-        private void OnDestroy()
-        {
-            // clean up
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-        }
-        
-        // called whenever a new scene is loaded
-        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            // try to grab the Water object if it exists in this scene
-            var waterGo = GameObject.FindWithTag("Water");
-            if (waterGo != null)
-            {
-                _waterCollider = waterGo.GetComponent<Collider>();
-                if (_waterCollider == null)
-                    Debug.LogError("Found Water tag, but no Collider!", waterGo);
-
-            }
-            else
-            {
-                // no water in this scene—clear your reference if you like
-                _waterCollider = null;
-            }
-        }
-
-        // Permet d'ajouter le singleton dès le lancement du jeu (ça load avant la scène)
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void InitOnLoad()
-        {
-            if (instance == null)
-            {
-                GameObject go = new GameObject("GameManager");
-                go.AddComponent<GameManager>();
-            }
         }
         
         /// <summary>
@@ -81,33 +45,32 @@ namespace Game
         /// count devient donc de maintenir un nombre fix d'instance de poisson à pêcher en tout temps
         /// - Prendre en compte les zones innaccessible du lac pour pas spawn là bas (plusieurs tags?)
         /// </summary>
+        /// <summary>
+        /// Spawn spawnCount copies of spawnPrefab at random points on waterCollider.
+        /// </summary>
         public void SpawnOnWater()
         {
-            if (_waterCollider == null)
+            if (waterCollider == null || spawnPrefab == null)
                 return;
 
-            var bounds = _waterCollider.bounds;
-            for (int i = 0; i < _spawnCount; i++)
+            var bounds = waterCollider.bounds;
+            for (int i = 0; i < spawnCount; i++)
             {
-                // Pick a random XZ point inside the water’s world‐space bounds
+                // pick a random XZ inside the water’s world‐space bounds
                 float x = Random.Range(bounds.min.x, bounds.max.x);
                 float z = Random.Range(bounds.min.z, bounds.max.z);
-                // Start the ray well above the top of the bounds
                 Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
 
-                // Build a downward ray
-                Ray ray = new Ray(origin, Vector3.down);
-                // Perform the raycast against the water collider only, so we don't register hits for other objects
-                if (_waterCollider.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
+                // raycast down against only the water collider
+                var ray = new Ray(origin, Vector3.down);
+                if (waterCollider.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
                 {
-                    // hit.point is guaranteed to lie on the water mesh
-                    Vector3 spawnPos = hit.point;
-                    Instantiate(_spawnPrefab, spawnPos, Quaternion.identity);
+                    Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
+                    Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
                 }
                 else
                 {
-                    // Missed the water collider (e.g. point was outside the mesh), retry
-                    i--;
+                    i--; // retry if the random point missed the mesh
                 }
             }
         }
