@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 22ef63684cccf564ab931c177f255b19
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 112000000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 168396
+  packageName: 'Environment Pack: Free Forest Sample'
+  packageVersion: 2.0.1
+  assetPath: Assets/Supercyan Free Forest Sample/Scenes/BrightDay/LightingData.asset
+  uploadId: 697266

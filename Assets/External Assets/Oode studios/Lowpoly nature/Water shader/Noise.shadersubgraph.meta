@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 41602bab1ab86b94a95aa41b4e649ad7
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 60072b568d64c40a485e0fc55012dc9f, type: 3}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 260306
+  packageName: 'Low Poly Nature: Spring Season Pack'
+  packageVersion: 1.0.0
+  assetPath: Assets/Oode studios/Lowpoly nature/Water shader/Noise.shadersubgraph
+  uploadId: 679380

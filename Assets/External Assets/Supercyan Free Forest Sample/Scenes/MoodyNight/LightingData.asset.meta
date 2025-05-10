@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 83359cfa09ec3a8409e5abf8de7fa62d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 112000000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 168396
+  packageName: 'Environment Pack: Free Forest Sample'
+  packageVersion: 2.0.1
+  assetPath: Assets/Supercyan Free Forest Sample/Scenes/MoodyNight/LightingData.asset
+  uploadId: 697266

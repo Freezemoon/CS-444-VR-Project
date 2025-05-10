@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 6e64ae1274b15fa4fbea3733685f5b29
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 260727
+  packageName: Animals FREE - Animated Low Poly 3D Models
+  packageVersion: 2.2
+  assetPath: Assets/ithappy/Animals_FREE/Scripts/PlayerCamera.cs
+  uploadId: 738856

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c4d3add090c4d9a4b9166270167cc035
+timeCreated: 1559652796
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 168396
+  packageName: 'Environment Pack: Free Forest Sample'
+  packageVersion: 2.0.1
+  assetPath: Assets/Supercyan Free Forest Sample/Materials/Mobile/Foliage/forestpack_foliage_low.mat
+  uploadId: 697266
