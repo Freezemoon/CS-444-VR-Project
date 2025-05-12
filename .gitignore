@@ -166,3 +166,4 @@ crashlytics-build.properties
 .utmp
 .idea
 .vsconfig
+*.unitypackage.meta

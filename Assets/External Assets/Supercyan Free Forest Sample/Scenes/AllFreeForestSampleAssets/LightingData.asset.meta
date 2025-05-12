@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a06580b201713f049859865adcff3e21
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 112000000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 168396
+  packageName: 'Environment Pack: Free Forest Sample'
+  packageVersion: 2.0.1
+  assetPath: Assets/Supercyan Free Forest Sample/Scenes/AllFreeForestSampleAssets/LightingData.asset
+  uploadId: 697266
