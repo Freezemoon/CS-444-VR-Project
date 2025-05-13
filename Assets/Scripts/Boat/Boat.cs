@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Boat : MonoBehaviour
@@ -6,10 +7,6 @@ public class Boat : MonoBehaviour
     public float speedMultiplier = 3f; // Multiplie the boat speed
     public float turnSensitivity = 0.25f; // Boat turn sensitivity
     public float accelerationRate = 1.5f;
-    private bool engine = false;
-    private int reverse = 1; // 1 = forward, -1 = reverse
-    private float speed = 0f;
-    private float currentSpeed = 0f;
 
     public AudioClip engineStartClip;
     public AudioClip engineLoopClip;
@@ -17,9 +14,18 @@ public class Boat : MonoBehaviour
 
     public GameObject OnOffIndicatorLamp;
     public GameObject reverseIndicatorLamp;
+    
+    private bool engine = false;
+    private int reverse = 1; // 1 = forward, -1 = reverse
+    private float speed = 0f;
+    private float currentSpeed = 0f;
+    
+    // Fields for collision-based movement restriction
+    private float pushForce = 1.2f;
+    private List<Vector3> activePushDirections = new List<Vector3>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
         leverTransform.GetComponent<BoatHandle>().OnThrottleChanged += UpdateThrottle;
 
@@ -33,7 +39,7 @@ public class Boat : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         Quaternion boatToHandle = Quaternion.Inverse(transform.rotation) * leverTransform.rotation;
         float localAngle = boatToHandle.eulerAngles.y;
@@ -41,7 +47,23 @@ public class Boat : MonoBehaviour
         if (engine == true)
         {
             currentSpeed = Mathf.MoveTowards(currentSpeed, speed, accelerationRate * Time.deltaTime);
-            transform.position -= transform.right * currentSpeed * reverse * Time.deltaTime;
+            
+            Vector3 moveDirection = -transform.right * reverse;
+            
+            if (activePushDirections.Count > 0)
+            {
+                Vector3 totalPush = Vector3.zero;
+                foreach (var dir in activePushDirections)
+                {
+                    totalPush += dir;
+                }
+
+                totalPush = totalPush.normalized;
+                moveDirection += totalPush * pushForce;
+                moveDirection = moveDirection.normalized;
+            }
+
+            transform.position += moveDirection * currentSpeed * Time.deltaTime;
 
             if (currentSpeed > 0f)
             {
@@ -73,22 +95,36 @@ public class Boat : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("LakeBorder"))
         {
-            other.transform.SetParent(transform); // Set the boat as a parent of the player
+            Vector3 contactPoint = other.ClosestPoint(transform.position);
+            Vector3 dir = (transform.position - contactPoint).normalized;
+            activePushDirections.Add(dir);
+        }
+        else if (other.CompareTag("Player"))
+        {
+            other.transform.SetParent(transform);
             Debug.Log("Player entered the boat trigger zone");
         }
     }
-
+    
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("LakeBorder"))
         {
-            other.transform.SetParent(null); // Unset the boat as a parent of the player
+            Vector3 contactPoint = other.ClosestPoint(transform.position);
+            Vector3 dir = (transform.position - contactPoint).normalized;
+
+            // Remove approximate match from list
+            activePushDirections.RemoveAll(d => Vector3.Angle(d, dir) < 10f); // Angle threshold to remove correct one
+        }
+        else if (other.CompareTag("Player"))
+        {
+            other.transform.SetParent(null);
             Debug.Log("Player exited the boat trigger zone");
         }
     }
-
+    
     public void EngineButtonOn()
     {
         if (engine == false)
