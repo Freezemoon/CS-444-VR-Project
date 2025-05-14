@@ -79,14 +79,20 @@ public class GrabRotateAroundPivot : MonoBehaviour
 
     private void Update()
     {
-        // If game is started the max length of the line is increased to all movement from the player
-        // without provoking a lose
+        UpdateMaxLineLengthAndReelForceMultiplier();
+
+        UpdateLineLength();
+    }
+
+    private void UpdateMaxLineLengthAndReelForceMultiplier()
+    {
+        // If game is started the max length of the line and the reel force are increased 
         if (FishingGame.instance.gameState == FishingGame.GameState.Reeling)
         {
             _currentLockedLineLengthMax = _lockedLineLengthMax + _lockedLineLengthMaxAddForGame;
             _currentReelForceMultiplier = reelForceMultiplier / FishingGame.instance.reelForceMultiplierDivisor;
         
-            // If locked line length is bigger than max, then lose game
+            // If the locked line length is bigger than max, then lose the game
             if (_currentLockedLineLength > _currentLockedLineLengthMax)
             {
                 FishingGame.instance.LoseGame();
@@ -97,7 +103,10 @@ public class GrabRotateAroundPivot : MonoBehaviour
             _currentLockedLineLengthMax = _lockedLineLengthMax;
             _currentReelForceMultiplier = reelForceMultiplier;
         }
-        
+    }
+
+    private void UpdateLineLength()
+    {
         Vector3 toBait = baitRigidbody.position - pullTowardTransform.position;
 
         if (_interactorAttachTransform && handlerPivotTransform)
@@ -110,7 +119,7 @@ public class GrabRotateAroundPivot : MonoBehaviour
             UpdateRotation(planeNormal, projectedHand);
         
             float angleDelta = Vector3.SignedAngle(_previousDirectionOnPlane, projectedHand, planeNormal);
-            UpdateReelForce(angleDelta, toBait);
+            CheckLineLength(angleDelta, toBait);
 
             bool canReachMinLength = FishingGame.instance.gameState == FishingGame.GameState.NotStarted || 
                                      FishingGame.instance.gameState == FishingGame.GameState.Win;
@@ -129,23 +138,7 @@ public class GrabRotateAroundPivot : MonoBehaviour
             _previousDirectionOnPlane = projectedHand;
         }
         
-        UpdateReelMaxDistance(toBait);
-    }
-    
-    private void ForceRelease()
-    {
-        if (!_handlerGrab.isSelected) return;
-        
-        // This returns the interactor currently selecting this object
-        var interactor = _handlerGrab.firstInteractorSelecting;
-
-        // Get the interaction manager from the XRGrabInteractable
-        var manager = _handlerGrab.interactionManager;
-
-        if (interactor != null && manager)
-        {
-            manager.SelectExit(interactor, _handlerGrab);
-        }
+        CheckMaxLineLength(toBait);
     }
 
     private void UpdateRotation(Vector3 planeNormal, Vector3 finalDirection)
@@ -159,31 +152,48 @@ public class GrabRotateAroundPivot : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(finalDirection, planeNormal);
     }
 
-    private void UpdateReelForce(float angleDelta, Vector3 toBait)
+    private void CheckLineLength(float angleDelta, Vector3 toBait)
     {
+        // Clamp the angle delta to prevent it from going too far
         angleDelta = Mathf.Clamp(angleDelta, 0, 20f);
-        // If actively reeling, shorten the rope
+        // If the angle is small, don't pull inward
         if (Mathf.Abs(angleDelta) < 0.1f)
         {
             return;
         }
         
-        // Pull inward
+        // If the angle is large, pull inward
         Vector3 directionToTarget = -toBait.normalized;
         float forceAmount = angleDelta * _currentReelForceMultiplier;
         baitRigidbody.linearVelocity += directionToTarget * forceAmount;
         
-        bool isDone = FishingGame.instance.ReelSuccess(forceAmount);
-        if (isDone)
+        // If the bait has reeled in enough in fishing game, release the handle
+        if (FishingGame.instance.ReelSuccess(forceAmount))
         {
-            ForceRelease();
+            ReleaseFishingRodHandleIfGrabbed();
         }
     
         // shorten locked line length slightly (if you want to simulate reeling in)
-        _currentLockedLineLength = Mathf.Max(_currentLockedLineLength - Mathf.Abs(forceAmount), lineLengthMin); // Prevent zero length
+        _currentLockedLineLength = Mathf.Max(_currentLockedLineLength - Mathf.Abs(forceAmount), lineLengthMin);
+    }
+    
+    private void ReleaseFishingRodHandleIfGrabbed()
+    {
+        if (!_handlerGrab.isSelected) return;
+        
+        // Get the first interactor selecting the XRGrabInteractable
+        var interactor = _handlerGrab.firstInteractorSelecting;
+
+        // Get the interaction manager from the XRGrabInteractable
+        var manager = _handlerGrab.interactionManager;
+
+        if (interactor != null && manager)
+        {
+            manager.SelectExit(interactor, _handlerGrab);
+        }
     }
 
-    private void UpdateReelMaxDistance(Vector3 toBait)
+    private void CheckMaxLineLength(Vector3 toBait)
     {
         float currentDistance = toBait.magnitude;
         
