@@ -81,7 +81,6 @@ public class ShopSystem
 
     public void SellItem(InventoryItemData kvpKey, int kvpValue, int price)
     {
-        AddToShop(kvpKey, kvpValue);
         ReduceGold(price);
     }
 

@@ -5,24 +5,24 @@ using UnityEngine;
 
 public abstract class ItemSlot : ISerializationCallbackReceiver
 {
-    [NonSerialized] protected InventoryItemData itemData; // Reference to the data
+    [NonSerialized] protected InventoryItemData itemData; 
     [SerializeField] protected int _itemID = -1;
-    [SerializeField] protected int stackSize; // Current stack size - how many of the data do we have?
+    [SerializeField] protected int stackSize; // Currently held 
 
     public InventoryItemData ItemData => itemData;
     public int StackSize => stackSize;
     
-    public void ClearSlot() // Clears the slot
+    public void ClearSlot()
     {
         itemData = null;
         _itemID = -1;
         stackSize = -1;
     }
     
-    public void AssignItem(InventorySlot invSlot) // Assigns an item to the slot
+    public void AssignItem(InventorySlot invSlot)
     {
-        if (itemData == invSlot.ItemData) AddToStack(invSlot.stackSize); // Does the slot contain the same item? Add to stack if so.
-        else // Overwrite slot with the inventory slot that we're passing in.
+        if (itemData == invSlot.ItemData) AddToStack(invSlot.stackSize); //Add to stack if already exists
+        else // Overwrite slot with inventory slot that we're passing in
         {
             itemData = invSlot.itemData;
             _itemID = itemData.ID;
