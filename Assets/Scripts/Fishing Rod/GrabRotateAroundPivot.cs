@@ -127,12 +127,6 @@ public class GrabRotateAroundPivot : MonoBehaviour
             if (canReachMinLength && _currentLockedLineLength <= lineLengthMin * 1.1f)
             {
                 OnReelReachedMinLength?.Invoke();
-                if (FishingGame.instance.gameState == FishingGame.GameState.Win)
-                {
-                    // TODO: Allow user to grab fish, first user should grab fish,
-                    // once grabbed user can throw bait again
-                    FishingGame.instance.FishGrabbed();
-                }
             }
             
             _previousDirectionOnPlane = projectedHand;

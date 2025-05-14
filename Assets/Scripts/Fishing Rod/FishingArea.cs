@@ -24,6 +24,8 @@ public class FishingArea : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("FishingBait")) return;
+        if (FishingGame.instance.gameState != FishingGame.GameState.NotStarted &&
+            FishingGame.instance.gameState != FishingGame.GameState.WaitingFish) return;
         
         FishingRodEnter();
 
@@ -33,6 +35,8 @@ public class FishingArea : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag("FishingBait")) return;
+        if (FishingGame.instance.gameState != FishingGame.GameState.NotStarted &&
+            FishingGame.instance.gameState != FishingGame.GameState.WaitingFish) return;
         
         FishingRodExit();
 

@@ -1,21 +1,25 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using Random = UnityEngine.Random;
 
 public class FishingGame : MonoBehaviour
 {
     public TMP_Text tmpText;
     
-    [FormerlySerializedAs("audioSource")] public AudioSource phaseSuccessAudioSource;
+    public AudioSource phaseSuccessAudioSource;
+    
+    public GameObject fishPrefab;
+    public Transform baitFishAttach;
 
     [Header("Haptics")]
     public HapticImpulsePlayer rightHandHaptics;
     public HapticImpulsePlayer leftHandHaptics;
-
-    [Header("Parameters")]
+    // public List<int> minPullList = new List<int>();
     public int minPull = 3;
     public int maxPull = 6;
     public float minWaitingFishTime = 2.5f;
@@ -36,8 +40,19 @@ public class FishingGame : MonoBehaviour
         Reeling,
         Win
     }
+
+    public enum Difficulty
+    {
+        Easy,
+        Medium,
+        Hard
+    }
     
     public GameState gameState { get; set; } = GameState.NotStarted;
+    public Difficulty difficulty { get; set; } = Difficulty.Easy;
+    public bool canStart { get; set; } = false;
+    
+    public bool canGrabFish => gameState == GameState.Win && _currentFish;
     
     public static FishingGame instance { get; private set; }
     
@@ -55,6 +70,8 @@ public class FishingGame : MonoBehaviour
 
     private float _neededReel;
     private float _currentReel;
+    
+    private GameObject _currentFish;
 
     private void Awake()
     {
@@ -85,6 +102,18 @@ public class FishingGame : MonoBehaviour
                 
                 if (_currentWaitingFishTime >= _neededWaitingFishTime)
                 {
+                    difficulty = (Difficulty)Enum.GetValues(typeof(Difficulty)).GetValue(
+                        Random.Range(0, Enum.GetValues(typeof(Difficulty)).Length));
+                    
+                    _currentFish = Instantiate(fishPrefab, baitFishAttach.position, Quaternion.identity);
+                    _currentFish.GetComponent<XRGrabInteractable>().enabled = false;
+                    Physics.IgnoreCollision(baitFishAttach.parent.GetComponent<Collider>(), _currentFish.GetComponent<Collider>());
+                    ConfigurableJoint currentFishJoin = _currentFish.GetComponent<ConfigurableJoint>();
+                    currentFishJoin.connectedBody = baitFishAttach.parent.GetComponent<Rigidbody>();
+                    currentFishJoin.anchor = Vector3.zero;
+                    currentFishJoin.connectedAnchor = new Vector3(0, 0, 0);
+                    
+                    _neededWaitingFishTime = Random.Range(minWaitingFishTime, maxWaitingFishTime);
                     StartPulling();
                     break;
                 }
@@ -112,13 +141,15 @@ public class FishingGame : MonoBehaviour
         }
     }
 
-    public void FishGrabbed()
+    public void ResetGameWhenFishIsGrabbedByUser()
     {
         gameState = GameState.NotStarted;
     }
 
     public void StartGame()
     {
+        if (!canStart) return;
+        
         gameState = GameState.WaitingFish;
 
         _currentWaitingFishTime = 0;
@@ -141,6 +172,9 @@ public class FishingGame : MonoBehaviour
         if (gameState == GameState.Win) return;
         
         gameState = GameState.NotStarted;
+        
+        Destroy(_currentFish);
+        _currentFish = null;
         
         UpdateText();
     }
@@ -200,9 +234,13 @@ public class FishingGame : MonoBehaviour
     {
         _currentPhaseBeforeWin++;
         
+        // Check if win
         if (_currentPhaseBeforeWin >= _neededPhaseBeforeWin)
         {
             gameState = GameState.Win;
+            
+            _currentFish.GetComponent<XRGrabInteractable>().enabled = true;
+            _currentFish.GetComponent<Rigidbody>().useGravity = true;
             
             phaseSuccessAudioSource?.Play();
             UpdateText();

@@ -78,6 +78,8 @@ public class FishingRodCaster : MonoBehaviour
 
     private void Update()
     {
+        FishingGame.instance.canStart = !baitRb.isKinematic;
+        
         UpdateHandVelocity();
         
         UpdateHandPitchRotation();
@@ -122,6 +124,7 @@ public class FishingRodCaster : MonoBehaviour
     {
         if (!_isHeld) return;
         if (!_isBaitAtInitPos) return;
+        if (FishingGame.instance.canGrabFish) return;
         
         _isHolding = true;
         
