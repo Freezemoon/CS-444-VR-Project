@@ -12,6 +12,7 @@ public class GrabRotateAroundPivot : MonoBehaviour
     public Transform pullTowardTransform;
     public float reelForceMultiplier = 0.002f;
     public float lineLengthMin = 0.1f;
+    public AudioSource reelAudioSource;
     
     public static event Action OnReelReachedMinLength;
 
@@ -73,6 +74,7 @@ public class GrabRotateAroundPivot : MonoBehaviour
 
     private void OnRelease(SelectExitEventArgs args)
     {
+        reelAudioSource.Pause();
         _interactorAttachTransform = null;
         _currentLockedLineLength = _currentLockedLineLengthMax;
     }
@@ -153,10 +155,15 @@ public class GrabRotateAroundPivot : MonoBehaviour
         // If the angle is small, don't pull inward
         if (Mathf.Abs(angleDelta) < 0.1f)
         {
+            reelAudioSource.Pause();
             return;
         }
         
         // If the angle is large, pull inward
+        if (!reelAudioSource.isPlaying)
+        {
+            reelAudioSource.Play();
+        }
         Vector3 directionToTarget = -toBait.normalized;
         float forceAmount = angleDelta * _currentReelForceMultiplier;
         baitRigidbody.linearVelocity += directionToTarget * forceAmount;

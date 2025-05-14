@@ -12,6 +12,8 @@ public class FishingGame : MonoBehaviour
     public TMP_Text tmpText;
     
     public AudioSource phaseSuccessAudioSource;
+    public AudioSource baitGoesInWaterAudioSource;
+    public AudioSource loseAudioSource;
     
     public GameObject fishPrefab;
     public Transform baitFishAttach;
@@ -52,6 +54,8 @@ public class FishingGame : MonoBehaviour
     public Difficulty difficulty { get; set; } = Difficulty.Easy;
     public bool canStart { get; set; } = false;
     
+    public bool canBaitGoInWater => gameState == GameState.WaitingFish && _currentWaitingFishTime >= _neededTimeBeforeBaitGoesInWater;
+    
     public bool canGrabFish => gameState == GameState.Win && _currentFish;
     
     public static FishingGame instance { get; private set; }
@@ -71,7 +75,11 @@ public class FishingGame : MonoBehaviour
     private float _neededReel;
     private float _currentReel;
     
+    private readonly float _neededTimeBeforeBaitGoesInWater = 1.5f;
+    
     private GameObject _currentFish;
+
+    private bool _wasBaitAlreadyInWaterThisRound;
 
     private void Awake()
     {
@@ -99,7 +107,15 @@ public class FishingGame : MonoBehaviour
         {
             case GameState.WaitingFish:
                 _currentWaitingFishTime += Time.deltaTime;
+
+                if (!_wasBaitAlreadyInWaterThisRound &&
+                    _currentWaitingFishTime >= _neededTimeBeforeBaitGoesInWater)
+                {
+                    _wasBaitAlreadyInWaterThisRound = true;
+                    baitGoesInWaterAudioSource.Play();
+                }
                 
+                // Check if fish can spawn
                 if (_currentWaitingFishTime >= _neededWaitingFishTime)
                 {
                     difficulty = (Difficulty)Enum.GetValues(typeof(Difficulty)).GetValue(
@@ -110,7 +126,7 @@ public class FishingGame : MonoBehaviour
                     Physics.IgnoreCollision(baitFishAttach.parent.GetComponent<Collider>(), _currentFish.GetComponent<Collider>());
                     ConfigurableJoint currentFishJoin = _currentFish.GetComponent<ConfigurableJoint>();
                     currentFishJoin.connectedBody = baitFishAttach.parent.GetComponent<Rigidbody>();
-                    currentFishJoin.anchor = Vector3.zero;
+                    currentFishJoin.anchor = Vector3.left * 1.1f;
                     currentFishJoin.connectedAnchor = new Vector3(0, 0, 0);
                     
                     _neededWaitingFishTime = Random.Range(minWaitingFishTime, maxWaitingFishTime);
@@ -149,8 +165,11 @@ public class FishingGame : MonoBehaviour
     public void StartGame()
     {
         if (!canStart) return;
-        
+
+        _wasBaitAlreadyInWaterThisRound = false;
         gameState = GameState.WaitingFish;
+        
+        rightHandHaptics.SendHapticImpulse(0.8f, 0.5f);
 
         _currentWaitingFishTime = 0;
         _neededWaitingFishTime = Random.Range(minWaitingFishTime, maxWaitingFishTime);
@@ -175,6 +194,8 @@ public class FishingGame : MonoBehaviour
         
         Destroy(_currentFish);
         _currentFish = null;
+        
+        loseAudioSource.Play();
         
         UpdateText();
     }

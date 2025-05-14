@@ -10,8 +10,17 @@ public class BaitManager : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
+        if (other.CompareTag("FishingZone"))
+        {
+            if (FishingGame.instance.canBaitGoInWater &&
+                FishingGame.instance.gameState == FishingGame.GameState.WaitingFish)
+            {
+                Destroy(other.gameObject);
+            }
+        }
+        
         if (!other.CompareTag("WaterFishingLimit")) return;
         
         _rb.useGravity = false;
@@ -19,8 +28,16 @@ public class BaitManager : MonoBehaviour
         _rb.angularVelocity = Vector3.zero;
         _rb.linearDamping = 100f;
         _rb.angularDamping = 100f;
+
+        float offset = 0;
+        if (FishingGame.instance.canBaitGoInWater &&
+            FishingGame.instance.gameState == FishingGame.GameState.WaitingFish)
+        {
+            offset = -0.05f;
+        }
+        
         Vector3 corrected = new Vector3(_rb.transform.position.x,
-            other.bounds.max.y, _rb.transform.position.z);
+            other.bounds.max.y + offset, _rb.transform.position.z);
         
         _rb.MovePosition(corrected);
     }
