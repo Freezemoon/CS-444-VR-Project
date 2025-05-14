@@ -88,8 +88,8 @@ public class FishingRodCaster : MonoBehaviour
 
     private void OnReelReachedMinLength()
     {
-        baitRb.isKinematic = true;
         baitRb.linearVelocity = Vector3.zero;
+        baitRb.isKinematic = true;
 
         _isBaitAtInitPos = true;
 
@@ -128,8 +128,8 @@ public class FishingRodCaster : MonoBehaviour
         
         _isHolding = true;
         
-        baitRb.isKinematic = true;
         baitRb.linearVelocity = Vector3.zero;
+        baitRb.isKinematic = true;
         
         baitTransform.SetParent(transform);
         baitTransform.position = baitInitPosTransform.position;
