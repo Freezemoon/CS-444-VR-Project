@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.rito.pivot-editor": {
+      "version": "https://github.com/rito15/Unity-Pivot-Editor.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "6df9361222c2ddc28324116c6cda89b42e76fb2b"
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.7",
       "depth": 0,
@@ -8,13 +15,6 @@
         "com.unity.modules.ai": "1.0.0"
       },
       "url": "https://packages.unity.com"
-    },
-    "com.rito.pivot-editor": {
-      "version": "https://github.com/rito15/Unity-Pivot-Editor.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "6df9361222c2ddc28324116c6cda89b42e76fb2b"
     },
     "com.unity.burst": {
       "version": "1.8.19",
@@ -144,6 +144,18 @@
       "source": "registry",
       "dependencies": {
         "com.unity.modules.physics": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.probuilder": {
+      "version": "6.0.5",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.shadergraph": "17.0.3",
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.settings-manager": "1.0.3"
       },
       "url": "https://packages.unity.com"
     },
