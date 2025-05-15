@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 namespace Game
 {
@@ -10,6 +14,11 @@ namespace Game
     {
         public static GameManager instance { get; private set; }
         public GameState State = new();
+
+        public GameObject typewriterEffectCanvas;
+        public AudioSource larryAudioSource;
+        public List<AudioClip> larrySounds;
+        public AudioClip larrySoundMumble;
 
         [Header("Spawning Settings")]
         [Tooltip("The prefab to spawn on the water surface")]
@@ -24,6 +33,45 @@ namespace Game
         [Header("Water Surface")]
         [Tooltip("Collider of the water surface to spawn on")]
         [SerializeField] private Collider waterCollider;
+        
+        private TypewriterEffect _typewriterEffect;
+
+        private float _currentTextTime;
+        private float _neededTextTime;
+
+        private bool _isCurrentTextDisplay;
+
+        private int _currentTextIndex;
+        
+        private bool isMumbleEnabled;
+        
+        private class TextEntry
+        {
+            public string text;
+            public bool isDisplayable;
+            public bool activateNextText;
+        }
+
+        private List<TextEntry> larryTexts = new()
+        {
+            new TextEntry {
+                text = "Hey! Psst... you! Come over here! Look around the fishing deck, in the water!",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "I need your help!",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "OK your good to go",
+                isDisplayable = false,
+                activateNextText = false
+            }
+        };
 
         private void Awake()
         {
@@ -35,7 +83,16 @@ namespace Game
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        
+
+        private void Start()
+        {
+            larryTexts[0].isDisplayable = true;
+            _isCurrentTextDisplay = true;
+            typewriterEffectCanvas.SetActive(false);
+            _typewriterEffect = typewriterEffectCanvas.GetComponent<TypewriterEffect>();
+            _neededTextTime = 3;
+        }
+
         /// <summary>
         /// Permet de spawn les poissons sur une surface taggée avec "Water".
         /// Système random très simple pour le moment.
@@ -74,7 +131,51 @@ namespace Game
                 }
             }
         }
-        
+
+        private void Update()
+        {
+            _currentTextTime += Time.deltaTime;
+            
+            if (_currentTextIndex < 0 || _currentTextIndex >= larryTexts.Count) return;
+
+            if (_currentTextTime <= _neededTextTime) return;
+
+            if (!larryTexts[_currentTextIndex].isDisplayable) return;
+            
+            typewriterEffectCanvas.SetActive(true);
+            _typewriterEffect.fullText = larryTexts[_currentTextIndex].text;
+            _typewriterEffect.StartTyping();
+
+            if (_currentTextIndex < larrySounds.Count && larrySounds[_currentTextIndex])
+            {
+                larryAudioSource.clip = larrySounds[_currentTextIndex];
+                isMumbleEnabled = false;
+            }
+            else
+            {
+                larryAudioSource.clip = larrySoundMumble;
+                isMumbleEnabled = true;
+            }
+            larryAudioSource.Play();
+            
+            _currentTextIndex++;
+        }
+
+        public void ConfirmDialogue()
+        {
+            if (_currentTextIndex >= larryTexts.Count) return;
+            larryTexts[_currentTextIndex].isDisplayable = larryTexts[_currentTextIndex-1].activateNextText;
+            
+            _currentTextTime = 0;
+            _neededTextTime = 0;
+        }
+
+        public void StopMumble()
+        {
+            if (!isMumbleEnabled) return;
+            larryAudioSource.Pause();
+        }
+
         public int GetMoney() => State.Money;
         public void AddMoney(int amount) => State.Money += amount;
 
