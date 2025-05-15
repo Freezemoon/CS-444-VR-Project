@@ -55,7 +55,7 @@ namespace Game
         private List<TextEntry> larryTexts = new()
         {
             new TextEntry {
-                text = "Hey! Psst... you! Come over here! Look around the fishing deck, in the water!",
+                text = "Hey! Psst… you! Yeah, you. Over here. Look around the fishing dock… in the water!",
                 isDisplayable = false,
                 activateNextText = true
             },
