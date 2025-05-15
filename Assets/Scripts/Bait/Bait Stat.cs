@@ -17,7 +17,7 @@ public class BaitStat : MonoBehaviour
     {
         if (durability == 0)
         {
-            //Destroy(self);
+            Destroy(gameObject);
         }
 
     }

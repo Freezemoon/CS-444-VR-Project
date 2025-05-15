@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using System.Collections;
 
 public class BaitSocket : MonoBehaviour
 {
@@ -25,9 +26,16 @@ public class BaitSocket : MonoBehaviour
 
         StoreBait(levelA, levelB);
 
-        // Destroy both object
-        Destroy(insertedObject);
-        Destroy(socketObject);
+        // destroy both objects after a delay
+        StartCoroutine(DestroyAfterDelay(insertedObject, socketObject, 0.1f));
+    }
+
+    private IEnumerator DestroyAfterDelay(GameObject objA, GameObject objB, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        Destroy(objA);
+        Destroy(objB);
     }
 
     private void StoreBait(int a, int b)
