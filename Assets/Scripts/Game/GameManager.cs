@@ -61,10 +61,39 @@ namespace Game
             },
             new TextEntry
             {
-                text = "I need your help!",
+                text = "There you are! Finally, someone with a face that screams “I know how to hold a fishing rod!” " +
+                       "…Or at least, someone who’s willing to fake it.",
                 isDisplayable = false,
                 activateNextText = true
             },
+            new TextEntry
+            {
+                text = "I’m Larry. I live here. And lately… it’s been a bit crowded in my lake. Too many fish. " +
+                       "Not enough personal space. You get it, right?",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "So! I need your help. You're gonna do a little fishing. Help clear some space. " +
+                       "Don't worry — I’ll walk you through everything.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "First things first. Turn around and look near the edge of the dock. " +
+                       "See that fishing rod? That beauty right there?",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "That’s yours now. Pick it up with your right hand.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // TODO the next one must be activated once the player picked up the rod using the DialogueState, etc.
             new TextEntry
             {
                 text = "OK your good to go",
@@ -72,6 +101,11 @@ namespace Game
                 activateNextText = false
             }
         };
+
+        public enum DialogueState
+        {
+            Intro
+        }
 
         private void Awake()
         {
@@ -174,6 +208,15 @@ namespace Game
         {
             if (!isMumbleEnabled) return;
             larryAudioSource.Pause();
+        }
+
+        public void SetDialogueState(DialogueState state)
+        {
+            switch (state)
+            {
+                case DialogueState.Intro:
+                    break;
+            }
         }
 
         public int GetMoney() => State.Money;
