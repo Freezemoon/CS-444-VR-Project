@@ -13,19 +13,8 @@ public class UIController : MonoBehaviour
         _shopDisplay.gameObject.SetActive(false);
     }
 
-    private void OnEnable()
-    {
-        ShopKeeper.OnShopWindowRequested += DisplayShopWindow;
-    }
-
-    private void OnDisable()
-    {
-        ShopKeeper.OnShopWindowRequested -= DisplayShopWindow;
-    }
-
     private void Update()
     {
-        if (Keyboard.current.escapeKey.wasPressedThisFrame) _shopDisplay.gameObject.SetActive(false);
     }
 
     private void DisplayShopWindow(ShopSystem shopSystem, PlayerInventoryHolder playerInventory)
