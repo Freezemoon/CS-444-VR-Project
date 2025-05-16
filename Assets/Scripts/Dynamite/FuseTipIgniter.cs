@@ -3,8 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class FuseTipIgniter : MonoBehaviour
 {
-    [Tooltip("Reference back to the parent Dynamite script")]
-    [SerializeField] private Dynamite dynamite;
+    [Tooltip("Reference back to the parent Dynamite script")] [SerializeField]
+    private Dynamite dynamite;
 
     void Awake()
     {
