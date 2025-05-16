@@ -227,7 +227,7 @@ namespace Game
             larryTexts[0].isDisplayable = true;
             _isCurrentTextDisplay = true;
             typewriterEffectCanvas.SetActive(false);
-            _neededTextTime = 3;
+            _neededTextTime = 6;
         }
 
         /// <summary>

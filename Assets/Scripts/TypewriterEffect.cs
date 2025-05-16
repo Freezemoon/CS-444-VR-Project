@@ -2,6 +2,7 @@ using System.Collections;
 using Game;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class TypewriterEffect : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class TypewriterEffect : MonoBehaviour
     public GameObject canvas;
 
     [Header("Bouncing Target")]
-    public Transform bounceTarget;
+    public Transform larryMustache;
     public float bounceAmplitude = 0.1f;
     public float bounceFrequency = 5f;
 
@@ -22,8 +23,8 @@ public class TypewriterEffect : MonoBehaviour
     public void StartTyping()
     {
         StartCoroutine(TypeText());
-        if (bounceTarget != null)
-            initialBouncePos = bounceTarget.localPosition;
+        if (larryMustache != null)
+            initialBouncePos = larryMustache.localPosition;
     }
 
     public void ConfirmDialogue()
@@ -46,16 +47,16 @@ public class TypewriterEffect : MonoBehaviour
         isTyping = false;
         GameManager.instance.StopMumble();
 
-        if (bounceTarget != null)
-            bounceTarget.localPosition = initialBouncePos;
+        if (larryMustache != null)
+            larryMustache.localPosition = initialBouncePos;
     }
     
     void Update()
     {
-        if (isTyping && bounceTarget != null)
+        if (isTyping && larryMustache != null)
         {
             float offsetY = Mathf.Sin(Time.time * bounceFrequency) * bounceAmplitude;
-            bounceTarget.localPosition = initialBouncePos + new Vector3(0, offsetY, 0);
+            larryMustache.localPosition = initialBouncePos + new Vector3(0, offsetY, 0);
         }
     }
 }
