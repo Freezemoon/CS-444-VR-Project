@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Game;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -111,6 +112,8 @@ public class FishingGame : MonoBehaviour
                 if (!_wasBaitAlreadyInWaterThisRound &&
                     _currentWaitingFishTime >= _neededTimeBeforeBaitGoesInWater)
                 {
+                    GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroWaitingFish);
+                    
                     _wasBaitAlreadyInWaterThisRound = true;
                     baitGoesInWaterAudioSource.Play();
                 }
@@ -230,6 +233,8 @@ public class FishingGame : MonoBehaviour
 
     private void StartPulling()
     {
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroPullFight);
+        
         gameState = GameState.Pulling;
         rightHandHaptics.SendHapticImpulse(0.8f, 0.8f);
         
@@ -242,6 +247,8 @@ public class FishingGame : MonoBehaviour
 
     private void StartReeling()
     {
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroReelFight);
+        
         gameState = GameState.Reeling;
         leftHandHaptics.SendHapticImpulse(0.8f, 0.8f);
         
@@ -259,6 +266,8 @@ public class FishingGame : MonoBehaviour
         // Check if win
         if (_currentPhaseBeforeWin >= _neededPhaseBeforeWin)
         {
+            GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroGrabFish);
+            
             gameState = GameState.Win;
             
             _currentFish.GetComponent<XRGrabInteractable>().enabled = true;
@@ -276,6 +285,7 @@ public class FishingGame : MonoBehaviour
                 StartReeling();
                 break;
             case GameState.Reeling:
+                GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroAlternatePullReel);
                 StartPulling();
                 break;
             case GameState.NotStarted:

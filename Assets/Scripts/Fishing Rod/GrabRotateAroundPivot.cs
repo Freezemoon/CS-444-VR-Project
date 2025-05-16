@@ -1,4 +1,5 @@
 using System;
+using Game;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -49,6 +50,14 @@ public class GrabRotateAroundPivot : MonoBehaviour
 
     private void Start()
     {
+        Vector3 planeNormal = handlerPivotTransform.TransformDirection(_localNormalPlanePivot).normalized;
+        Vector3 toStick = transform.position - handlerPivotTransform.position;
+        Vector3 projected = Vector3.ProjectOnPlane(toStick, planeNormal);
+
+        _grabbedRadius = projected.magnitude;
+        
+        Debug.Log(_grabbedRadius);
+        
         _currentLockedLineLengthMax = _lockedLineLengthMax;
         
         _currentLockedLineLength = _currentLockedLineLengthMax;
@@ -58,11 +67,6 @@ public class GrabRotateAroundPivot : MonoBehaviour
     {
         _interactorAttachTransform = args.interactorObject.GetAttachTransform(_handlerGrab);
 
-        Vector3 planeNormal = handlerPivotTransform.TransformDirection(_localNormalPlanePivot).normalized;
-        Vector3 toStick = transform.position - handlerPivotTransform.position;
-        Vector3 projected = Vector3.ProjectOnPlane(toStick, planeNormal);
-
-        _grabbedRadius = projected.magnitude;
         
         if (FishingGame.instance.gameState == FishingGame.GameState.Pulling)
         {
@@ -74,8 +78,8 @@ public class GrabRotateAroundPivot : MonoBehaviour
 
     private void OnRelease(SelectExitEventArgs args)
     {
-        reelAudioSource.Pause();
         _interactorAttachTransform = null;
+        reelAudioSource.Pause();
         _currentLockedLineLength = _currentLockedLineLengthMax;
     }
 
@@ -128,6 +132,7 @@ public class GrabRotateAroundPivot : MonoBehaviour
             
             if (canReachMinLength && _currentLockedLineLength <= lineLengthMin * 1.1f)
             {
+                GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroAimBubble);
                 OnReelReachedMinLength?.Invoke();
             }
             

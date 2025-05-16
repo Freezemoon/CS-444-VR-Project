@@ -6,7 +6,8 @@ using UnityEngine;
 public class TypewriterEffect : MonoBehaviour
 {
     public TMP_Text textComponent;
-    public float typingSpeed = 0.05f;
+    public float typingSpeed = 0.1f;
+    public GameObject canvas;
 
     [Header("Bouncing Target")]
     public Transform bounceTarget;
@@ -28,7 +29,7 @@ public class TypewriterEffect : MonoBehaviour
     public void ConfirmDialogue()
     {
         GameManager.instance.ConfirmDialogue();
-        gameObject.SetActive(false);
+        canvas.SetActive(false);
     }
 
     private IEnumerator TypeText()

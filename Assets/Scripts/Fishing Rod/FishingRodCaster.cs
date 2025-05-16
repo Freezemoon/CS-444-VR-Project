@@ -1,3 +1,4 @@
+using Game;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -10,7 +11,6 @@ public class FishingRodCaster : MonoBehaviour
     [Header("Input")]
     public InputActionReference castAction; // Reference to trigger action (Press & Release)
     public XRGrabInteractable rodInteractable;
-    public Collider rodCollider;
 
     [Header("Transforms")]
     public Transform controllerTransform;  // The hand/controller transform
@@ -88,7 +88,6 @@ public class FishingRodCaster : MonoBehaviour
 
     private void OnReelReachedMinLength()
     {
-        baitRb.linearVelocity = Vector3.zero;
         baitRb.isKinematic = true;
 
         _isBaitAtInitPos = true;
@@ -101,16 +100,13 @@ public class FishingRodCaster : MonoBehaviour
     
     private void OnGrabbedFishingRod(SelectEnterEventArgs args)
     {
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroFishingRodGrabbed);
         _isHeld = true;
-        // Disables collider which avoids unintentional grab with the other hand
-        rodCollider.enabled = false;
     }
 
     private void OnReleasedFishingRod(SelectExitEventArgs args)
     {
         _isHeld = false;
-        // Disables collider which avoids unintentional grab with the other hand
-        rodCollider.enabled = true;
     }
 
     private void UpdateHandVelocity()
@@ -128,7 +124,6 @@ public class FishingRodCaster : MonoBehaviour
         
         _isHolding = true;
         
-        baitRb.linearVelocity = Vector3.zero;
         baitRb.isKinematic = true;
         
         baitTransform.SetParent(transform);
@@ -140,6 +135,7 @@ public class FishingRodCaster : MonoBehaviour
         if (!_isHeld) return;
         if (!_isHolding) return;
         
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroReel);
         _isHolding = false;
         _isBaitAtInitPos = false;
         

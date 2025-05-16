@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 namespace Game
@@ -13,12 +14,15 @@ namespace Game
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance { get; private set; }
-        public GameState State = new();
+        public GameObject spawnFishPrefab;
+        public Transform initSpawnFishPos;
 
         public GameObject typewriterEffectCanvas;
+        public TypewriterEffect typewriterEffect;
         public AudioSource larryAudioSource;
         public List<AudioClip> larrySounds;
         public AudioClip larrySoundMumble;
+        public GameObject larryTextButton;
 
         [Header("Spawning Settings")]
         [Tooltip("The prefab to spawn on the water surface")]
@@ -34,7 +38,23 @@ namespace Game
         [Tooltip("Collider of the water surface to spawn on")]
         [SerializeField] private Collider waterCollider;
         
-        private TypewriterEffect _typewriterEffect;
+        public GameState State = new();
+
+        public enum DialogueState
+        {
+            IntroStart,
+            IntroFishingRodGrabbed,
+            IntroReel,
+            IntroAimBubble,
+            IntroWaitingFish,
+            IntroPullFight,
+            IntroReelFight,
+            IntroAlternatePullReel,
+            IntroGrabFish,
+            IntroDropFishInBucket,
+            IntroHopOnBoat,
+            IntroPressStartBoat,
+        }
 
         private float _currentTextTime;
         private float _neededTextTime;
@@ -83,29 +103,113 @@ namespace Game
             new TextEntry
             {
                 text = "First things first. Turn around and look near the edge of the dock. " +
-                       "See that fishing rod? That beauty right there?",
+                       "See that fishing rod? That beauty right there? " +
+                       "That’s yours now. Pick it up with your right hand.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // 5
+            // IntroFishingRodGrabbed
+            new TextEntry
+            {
+                text = "Okay, time for the fun part. Hold the select button. " +
+                       "Throw like you’re tossing a paper airplane. " +
+                       "Then let go to launch the bait. " +
+                       "Aim anywhere — just try it out!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // IntroReel
+            new TextEntry
+            {
+                text = "Time to reel it back. " +
+                       "Grab the handle with your left hand. " +
+                       "Make sure you're turning the right way — it matters!" +
+                       "Keep reeling until the bait's back to you.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // IntroAimBubble
+            new TextEntry
+            {
+                text = "Nice! Now cast again, but look for bubbles on the water. " +
+                       "See them? That means a fish is lurking below. " +
+                       "Maybe even one of my neighbors. " +
+                       "Toss your bait right into that bubbly spot.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // IntroWaitingFish
+            new TextEntry
+            {
+                text = "Now… wait. Patience is key. Fish are shy. Like me on Mondays.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // IntroPullFight
+            new TextEntry
+            {
+                text = "Whoa! You got a bite! Quick — pull back! Show that fish who's boss! " +
+                       "Keep pulling... don’t let go yet!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // 10
+            // IntroReelFight
+            new TextEntry
+            {
+                text = "Alright — now reel it in!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // IntroAlternatePullReel
+            new TextEntry
+            {
+                text = "Now keep going — pull, then reel, then pull again. " +
+                       "Just keep alternating until the fish gives up. " +
+                       "You'll feel it when it's done fighting!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // IntroGrabFish
+            new TextEntry
+            {
+                text = "Nice catch! You did it! " +
+                       "Now, while holding the rod, grab the fish with your left hand. " +
+                       "Don’t be shy — it won’t bite.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // IntroDropFishInBucket
+            new TextEntry
+            {
+                text = "Then drop it in a bucket like the one near the boat. " +
+                       "That’s your storage. Like a fridge… but splashier.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // IntroHopOnBoat
+            new TextEntry
+            {
+                text = "Wanna explore? Hop on the boat — I’ll meet you there!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // 15
+            // IntroPressStartBoat
+            new TextEntry
+            {
+                text = "Surprised? I swim fast... Now press the on/off button to start the boat engine.",
                 isDisplayable = false,
                 activateNextText = true
             },
             new TextEntry
             {
-                text = "That’s yours now. Pick it up with your right hand.",
-                isDisplayable = false,
-                activateNextText = false
-            },
-            // TODO the next one must be activated once the player picked up the rod using the DialogueState, etc.
-            new TextEntry
-            {
-                text = "OK your good to go",
+                text = "OK, Alex has to do the rest of the dialogue, see you soon my fisherman friend!",
                 isDisplayable = false,
                 activateNextText = false
             }
         };
-
-        public enum DialogueState
-        {
-            Intro
-        }
 
         private void Awake()
         {
@@ -123,7 +227,6 @@ namespace Game
             larryTexts[0].isDisplayable = true;
             _isCurrentTextDisplay = true;
             typewriterEffectCanvas.SetActive(false);
-            _typewriterEffect = typewriterEffectCanvas.GetComponent<TypewriterEffect>();
             _neededTextTime = 3;
         }
 
@@ -177,8 +280,9 @@ namespace Game
             if (!larryTexts[_currentTextIndex].isDisplayable) return;
             
             typewriterEffectCanvas.SetActive(true);
-            _typewriterEffect.fullText = larryTexts[_currentTextIndex].text;
-            _typewriterEffect.StartTyping();
+            larryTextButton.SetActive(larryTexts[_currentTextIndex].activateNextText);
+            typewriterEffect.fullText = larryTexts[_currentTextIndex].text;
+            typewriterEffect.StartTyping();
 
             if (_currentTextIndex < larrySounds.Count && larrySounds[_currentTextIndex])
             {
@@ -210,12 +314,57 @@ namespace Game
             larryAudioSource.Pause();
         }
 
-        public void SetDialogueState(DialogueState state)
+        public void SetDialogueState(DialogueState state, bool canSetToPrevDialogue = false)
         {
+            Debug.Log(state);
+            int index = 0;
             switch (state)
             {
-                case DialogueState.Intro:
+                case DialogueState.IntroStart:
+                    index = 0;
                     break;
+                case DialogueState.IntroFishingRodGrabbed:
+                    index = 5;
+                    break;
+                case DialogueState.IntroReel:
+                    index = 6;
+                    break;
+                case DialogueState.IntroAimBubble:
+                    index = 7;
+                    Instantiate(spawnFishPrefab, initSpawnFishPos.position, Quaternion.identity);
+                    break;
+                case DialogueState.IntroWaitingFish:
+                    index = 8;
+                    break;
+                case DialogueState.IntroPullFight:
+                    index = 9;
+                    break;
+                case DialogueState.IntroReelFight:
+                    index = 10;
+                    break;
+                case DialogueState.IntroAlternatePullReel:
+                    index = 11;
+                    break;
+                case DialogueState.IntroGrabFish:
+                    index = 12;
+                    break;
+                case DialogueState.IntroDropFishInBucket:
+                    index = 13;
+                    break;
+                case DialogueState.IntroHopOnBoat:
+                    index = 14;
+                    break;
+                case DialogueState.IntroPressStartBoat:
+                    index = 15;
+                    break;
+            }
+
+            if (index >= _currentTextIndex || canSetToPrevDialogue)
+            {
+                _currentTextIndex = index;
+                larryTexts[_currentTextIndex].isDisplayable = true;
+                _currentTextTime = 0;
+                _neededTextTime = 0;
             }
         }
 
