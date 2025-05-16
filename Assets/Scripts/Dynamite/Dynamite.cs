@@ -11,10 +11,6 @@ public class Dynamite : MonoBehaviour
     [SerializeField] private Transform fuseStartPoint;
     [Tooltip("Where on the dynamite the fuse ends.")]
     [SerializeField] private Transform fuseEndPoint;
-    
-    [Header("Blast Radius")]
-    [Tooltip("Child SphereCollider used as the blast trigger.")]
-    [SerializeField] private SphereCollider blastTrigger;
 
     [Tooltip("Blast radius in world units.")]
     [SerializeField, Range(0.1f, 20f)] 
@@ -41,17 +37,13 @@ public class Dynamite : MonoBehaviour
 
     private AudioSource _audioSource;
     private Coroutine _fuseRoutine;
-    
-    void OnValidate()
-    {
-        // Called in the Editor whenever you tweak serialized fields
-        SetupBlastTrigger();
-    }
+    private Rigidbody _rb;
+    private bool _isSinking;
     
     void Awake()
     {
         _audioSource = GetComponent<AudioSource>();
-        SetupBlastTrigger();
+        _rb          = GetComponent<Rigidbody>();
     }
     
     void Start()
@@ -59,22 +51,35 @@ public class Dynamite : MonoBehaviour
         if (lit) Ignite();
     }
     
-    /// <summary>
-    /// Sets the trigger collider radius
-    /// </summary>
-    private void SetupBlastTrigger()
+    void OnTriggerEnter(Collider other)
     {
-        if (blastTrigger == null)
-            blastTrigger = GetComponentInChildren<SphereCollider>();
+        if (_isSinking) return;
+        if (other.CompareTag("Water"))
+            StartCoroutine(HandleWaterSink(other));
+    }
+    
+    private IEnumerator HandleWaterSink(Collider water)
+    {
+        _isSinking = true;
 
-        if (blastTrigger != null)
+        // Play splash sound
+        if (waterSound)
+            AudioSource.PlayClipAtPoint(waterSound, transform.position);
+
+        // Freeze at the water surface
+        _rb.isKinematic = true;
+        Vector3 pos = transform.position;
+        float surfY = water.transform.position.y;
+        transform.position = new Vector3(pos.x, surfY, pos.z);
+
+        // Wait before sinking
+        yield return new WaitForSeconds(0.15f);
+
+        // Sink slowly
+        while (true)
         {
-            blastTrigger.isTrigger = true;
-            blastTrigger.radius = blastRadius;
-        }
-        else
-        {
-            Debug.LogWarning($"{name}: No SphereCollider found for blastTrigger.");
+            transform.position += Vector3.down * (0.65f * Time.deltaTime);
+            yield return null;
         }
     }
     
@@ -88,10 +93,10 @@ public class Dynamite : MonoBehaviour
         // 1) spawn & move the fuse VFX
         if (fuseVFX && fuseStartPoint != null && fuseEndPoint != null)
         {
-            var fuseGO = Instantiate(fuseVFX, fuseStartPoint.position, fuseStartPoint.rotation, transform);
+            var fuseGo = Instantiate(fuseVFX, fuseStartPoint.position, fuseStartPoint.rotation, transform);
             // force it to the exact start-local position
-            fuseGO.transform.localPosition = fuseStartPoint.localPosition;
-            _ = StartCoroutine(MoveFuseVFX(fuseGO.transform));
+            fuseGo.transform.localPosition = fuseStartPoint.localPosition;
+            _ = StartCoroutine(MoveFuseVFX(fuseGo.transform));
         }
 
         // 2) play fuse sound
@@ -130,6 +135,7 @@ public class Dynamite : MonoBehaviour
     /// </summary>
     public void Explode()
     {
+        
         if (explosionVFX)
             Instantiate(explosionVFX, transform.position, Quaternion.identity);
 
@@ -138,7 +144,16 @@ public class Dynamite : MonoBehaviour
 
         if (smokeVFX)
             Instantiate(smokeVFX, transform.position, Quaternion.identity);
-
+        
+        var hits = Physics.OverlapSphere(transform.position, blastRadius);
+        foreach (var hit in hits)
+        {
+            if (hit.CompareTag("FishingZone"))
+            {
+                Destroy(hit.gameObject);
+            }
+        }
+        
         Destroy(gameObject);
     }
 }
