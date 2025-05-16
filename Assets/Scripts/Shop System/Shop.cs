@@ -5,14 +5,12 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(UniqueID))]
-public class ShopKeeper : MonoBehaviour, IInteractable
+public class Shop : MonoBehaviour
 {
     [SerializeField] private ShopItemList _shopItemsHeld;
     [SerializeField] private ShopSystem _shopSystem;
 
     private ShopSaveData _shopSaveData;
-
-    public static UnityAction<ShopSystem, PlayerInventoryHolder> OnShopWindowRequested;
 
     private string _id;
 
@@ -33,7 +31,7 @@ public class ShopKeeper : MonoBehaviour, IInteractable
 
     private void Start()
     {
-        if (!SaveGameManager.data._shopKeeperDictionary.ContainsKey(_id)) SaveGameManager.data._shopKeeperDictionary.Add(_id, _shopSaveData);
+
     }
 
     private void OnEnable()
@@ -54,27 +52,6 @@ public class ShopKeeper : MonoBehaviour, IInteractable
         SaveLoad.OnLoadGame -= LoadInventory;
     }
 
-    public UnityAction<IInteractable> OnInteractionComplete { get; set; }
-    public void Interact(Interactor interactor, out bool interactSuccessful)
-    {
-        var playerInv = interactor.GetComponent<PlayerInventoryHolder>();
-
-        if (playerInv != null)
-        {
-            OnShopWindowRequested?.Invoke(_shopSystem, playerInv);
-            interactSuccessful = true;
-        }
-        else
-        {
-            interactSuccessful = false;
-            Debug.LogError("Player inventory not found");
-        }
-    }
-
-    public void EndInteraction()
-    {
-
-    }
 }
 
 [System.Serializable]

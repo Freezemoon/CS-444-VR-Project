@@ -5,10 +5,8 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(UniqueID))]
-public class ChestInventory : InventoryHolder, IInteractable
+public class ChestInventory : InventoryHolder
 {
-    public UnityAction<IInteractable> OnInteractionComplete { get; set; }
-
     private void Start()
     {
         var chestSaveData = new InventorySaveData(primaryInventorySystem, transform.position, transform.rotation);
@@ -25,16 +23,5 @@ public class ChestInventory : InventoryHolder, IInteractable
             this.transform.position = chestData.Position;
             this.transform.rotation = chestData.Rotation;
         }
-    }
-
-    public void Interact(Interactor interactor, out bool interactSuccessful)
-    {
-        OnDynamicInventoryDisplayRequested?.Invoke(primaryInventorySystem, 0);
-        interactSuccessful = true;
-    }
-
-    public void EndInteraction()
-    {
-        
     }
 }
