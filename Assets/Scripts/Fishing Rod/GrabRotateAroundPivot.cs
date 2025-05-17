@@ -1,4 +1,5 @@
 using System;
+using Game;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -33,6 +34,7 @@ public class GrabRotateAroundPivot : MonoBehaviour
     private readonly float _lockedLineLengthMaxAddForGame = 8f;
     
     private float _currentLockedLineLengthMax;
+    private Vector3 _toHandPrev;
 
     private void OnEnable()
     {
@@ -49,6 +51,15 @@ public class GrabRotateAroundPivot : MonoBehaviour
 
     private void Start()
     {
+        Vector3 planeNormal = handlerPivotTransform.TransformDirection(_localNormalPlanePivot).normalized;
+        Vector3 toStick = transform.position - handlerPivotTransform.position;
+        Vector3 projected = Vector3.ProjectOnPlane(toStick, planeNormal);
+
+        _grabbedRadius = projected.magnitude;
+        
+        Vector3 projectedHand = Vector3.ProjectOnPlane(Vector3.up, planeNormal).normalized;
+        UpdateRotation(planeNormal, projectedHand);
+        
         _currentLockedLineLengthMax = _lockedLineLengthMax;
         
         _currentLockedLineLength = _currentLockedLineLengthMax;
@@ -57,12 +68,6 @@ public class GrabRotateAroundPivot : MonoBehaviour
     private void OnGrab(SelectEnterEventArgs args)
     {
         _interactorAttachTransform = args.interactorObject.GetAttachTransform(_handlerGrab);
-
-        Vector3 planeNormal = handlerPivotTransform.TransformDirection(_localNormalPlanePivot).normalized;
-        Vector3 toStick = transform.position - handlerPivotTransform.position;
-        Vector3 projected = Vector3.ProjectOnPlane(toStick, planeNormal);
-
-        _grabbedRadius = projected.magnitude;
         
         if (FishingGame.instance.gameState == FishingGame.GameState.Pulling)
         {
@@ -74,9 +79,13 @@ public class GrabRotateAroundPivot : MonoBehaviour
 
     private void OnRelease(SelectExitEventArgs args)
     {
-        reelAudioSource.Pause();
         _interactorAttachTransform = null;
+        reelAudioSource.Pause();
         _currentLockedLineLength = _currentLockedLineLengthMax;
+        
+        Vector3 planeNormal = handlerPivotTransform.TransformDirection(_localNormalPlanePivot).normalized;
+        Vector3 projectedHand = Vector3.ProjectOnPlane(_toHandPrev, planeNormal).normalized;
+        UpdateRotation(planeNormal, projectedHand);
     }
 
     private void Update()
@@ -111,13 +120,12 @@ public class GrabRotateAroundPivot : MonoBehaviour
     {
         Vector3 toBait = baitRigidbody.position - pullTowardTransform.position;
 
-        if (_interactorAttachTransform && handlerPivotTransform)
+        if (_interactorAttachTransform)
         {
-            Vector3 planeNormal = handlerPivotTransform.TransformDirection(_localNormalPlanePivot).normalized;
-
             // Vector from pivot to current hand position, projected on plane
-            Vector3 toHand = _interactorAttachTransform.position - handlerPivotTransform.position;
-            Vector3 projectedHand = Vector3.ProjectOnPlane(toHand, planeNormal).normalized;
+            _toHandPrev = _interactorAttachTransform.position - handlerPivotTransform.position;
+            Vector3 planeNormal = handlerPivotTransform.TransformDirection(_localNormalPlanePivot).normalized;
+            Vector3 projectedHand = Vector3.ProjectOnPlane(_toHandPrev, planeNormal).normalized;
             UpdateRotation(planeNormal, projectedHand);
         
             float angleDelta = Vector3.SignedAngle(_previousDirectionOnPlane, projectedHand, planeNormal);
@@ -128,6 +136,7 @@ public class GrabRotateAroundPivot : MonoBehaviour
             
             if (canReachMinLength && _currentLockedLineLength <= lineLengthMin * 1.1f)
             {
+                GameManager.instance.SetDialogueState(GameManager.DialogueState.AimBubble);
                 OnReelReachedMinLength?.Invoke();
             }
             

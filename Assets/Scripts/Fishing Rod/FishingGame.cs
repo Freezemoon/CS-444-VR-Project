@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Game;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -14,6 +15,7 @@ public class FishingGame : MonoBehaviour
     public AudioSource phaseSuccessAudioSource;
     public AudioSource baitGoesInWaterAudioSource;
     public AudioSource loseAudioSource;
+    public AudioSource victoryAudioSource;
     
     public GameObject fishPrefab;
     public Transform baitFishAttach;
@@ -111,6 +113,8 @@ public class FishingGame : MonoBehaviour
                 if (!_wasBaitAlreadyInWaterThisRound &&
                     _currentWaitingFishTime >= _neededTimeBeforeBaitGoesInWater)
                 {
+                    GameManager.instance.SetDialogueState(GameManager.DialogueState.WaitingFish);
+                    
                     _wasBaitAlreadyInWaterThisRound = true;
                     baitGoesInWaterAudioSource.Play();
                 }
@@ -123,6 +127,7 @@ public class FishingGame : MonoBehaviour
                     
                     _currentFish = Instantiate(fishPrefab, baitFishAttach.position, Quaternion.identity);
                     _currentFish.GetComponent<XRGrabInteractable>().enabled = false;
+                    _currentFish.GetComponent<Rigidbody>().useGravity = false;
                     Physics.IgnoreCollision(baitFishAttach.parent.GetComponent<Collider>(), _currentFish.GetComponent<Collider>());
                     ConfigurableJoint currentFishJoin = _currentFish.GetComponent<ConfigurableJoint>();
                     currentFishJoin.connectedBody = baitFishAttach.parent.GetComponent<Rigidbody>();
@@ -196,6 +201,7 @@ public class FishingGame : MonoBehaviour
         _currentFish = null;
         
         loseAudioSource.Play();
+        GameManager.instance.restartFishingTutoIfLostBeforeGrabFish();
         
         UpdateText();
     }
@@ -208,7 +214,6 @@ public class FishingGame : MonoBehaviour
 
         if (!(_currentReel >= _neededReel)) return false;
         
-        phaseSuccessAudioSource?.Play();
         NextGamePhase();
         
         return true;
@@ -223,12 +228,13 @@ public class FishingGame : MonoBehaviour
 
         if (_currentPull < _neededPull) return;
         
-        phaseSuccessAudioSource?.Play();
         NextGamePhase();
     }
 
     private void StartPulling()
     {
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.PullFight);
+        
         gameState = GameState.Pulling;
         rightHandHaptics.SendHapticImpulse(0.8f, 0.8f);
         
@@ -241,6 +247,8 @@ public class FishingGame : MonoBehaviour
 
     private void StartReeling()
     {
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.ReelFight);
+        
         gameState = GameState.Reeling;
         leftHandHaptics.SendHapticImpulse(0.8f, 0.8f);
         
@@ -258,16 +266,20 @@ public class FishingGame : MonoBehaviour
         // Check if win
         if (_currentPhaseBeforeWin >= _neededPhaseBeforeWin)
         {
+            GameManager.instance.SetDialogueState(GameManager.DialogueState.GrabFish);
+            
             gameState = GameState.Win;
             
             _currentFish.GetComponent<XRGrabInteractable>().enabled = true;
             _currentFish.GetComponent<Rigidbody>().useGravity = true;
             
-            phaseSuccessAudioSource?.Play();
+            victoryAudioSource?.Play();
             UpdateText();
             
             return;
         }
+        
+        phaseSuccessAudioSource?.Play();
         
         switch (gameState)
         {
@@ -275,6 +287,7 @@ public class FishingGame : MonoBehaviour
                 StartReeling();
                 break;
             case GameState.Reeling:
+                GameManager.instance.SetDialogueState(GameManager.DialogueState.AlternatePullReel);
                 StartPulling();
                 break;
             case GameState.NotStarted:

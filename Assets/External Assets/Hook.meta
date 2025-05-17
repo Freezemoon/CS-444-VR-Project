@@ -1,5 +1,9 @@
 fileFormatVersion: 2
-guid: 410766cb9332dc243893268b61fe6e1a
+<<<<<<<< HEAD:Assets/External Assets/Hook.meta
+guid: 548a05fe87485f748a4483d800643c50
+========
+guid: ae0981c55f9d9704781bb82bf3b3ae22
+>>>>>>>> 4d8b5c5 (Start Larry and text):Assets/External Assets/AddOns.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

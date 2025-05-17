@@ -1,3 +1,4 @@
+using Game;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -23,6 +24,7 @@ public class GrabFish : MonoBehaviour
 
     private void OnGrab(SelectEnterEventArgs args)
     {
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.DropFishInBucket);
         Destroy(GetComponent<ConfigurableJoint>());
         FishingGame.instance.ResetGameWhenFishIsGrabbedByUser();
     }

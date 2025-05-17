@@ -5,6 +5,8 @@ public class BaitManager : MonoBehaviour
 {
     private Rigidbody _rb = null;
 
+    private const float BaitOffsetInWater = -0.08f;
+
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
@@ -33,7 +35,7 @@ public class BaitManager : MonoBehaviour
         if (FishingGame.instance.canBaitGoInWater &&
             FishingGame.instance.gameState == FishingGame.GameState.WaitingFish)
         {
-            offset = -0.05f;
+            offset = BaitOffsetInWater;
         }
         
         Vector3 corrected = new Vector3(_rb.transform.position.x,

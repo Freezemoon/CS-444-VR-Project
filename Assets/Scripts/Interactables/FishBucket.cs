@@ -1,4 +1,5 @@
 using System.Collections;
+using Game;
 using UnityEngine;
 
 /// <summary>
@@ -20,6 +21,7 @@ public class FishBucket : MonoBehaviour
         if (!other.CompareTag("Fish"))
             return;
 
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.HopOnBoat);
         // Duplicate the fish
         GameObject duplicate = Instantiate(other.gameObject);
         
