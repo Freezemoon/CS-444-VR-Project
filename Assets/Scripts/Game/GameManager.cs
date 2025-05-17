@@ -658,7 +658,7 @@ namespace Game
 
         public void SellBucket()
         {
-            State.Money += State.BucketValue;
+            AddMoney(State.BucketValue);
             State.BucketValue = 0;
         }
 
