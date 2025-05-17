@@ -1,18 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
-using UnityEngine.XR;
-using UnityEngine.XR.Hands;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
-using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
 
 [RequireComponent(typeof(XRGrabInteractable))]
 public class Dynamite : MonoBehaviour
 {
-    [Header("Fuse")] [Tooltip("Time in seconds before explosion after ignition.")] [SerializeField, Min(0f)]
+    // Static cache to avoid repeated FindObjectsOfType calls
+    private static Dictionary<InteractorHandedness, XRBaseInteractor> _interactorMap;
+    private static bool _mapInitialized;
+
+    [Header("Fuse")] [Tooltip("Time in seconds before explosion after ignition.")] [SerializeField] [Min(0f)]
     private float fuseTime = 3f;
 
     [Tooltip("Where on the dynamite the fuse starts.")] [SerializeField]
@@ -21,7 +21,7 @@ public class Dynamite : MonoBehaviour
     [Tooltip("Where on the dynamite the fuse ends.")] [SerializeField]
     private Transform fuseEndPoint;
 
-    [Tooltip("Blast radius in world units.")] [SerializeField, Range(0.1f, 20f)]
+    [Tooltip("Blast radius in world units.")] [SerializeField] [Range(0.1f, 20f)]
     private float blastRadius = 3f;
 
     [Header("Visual Effects")] [Tooltip("Spawned on explode.")] [SerializeField]
@@ -49,16 +49,12 @@ public class Dynamite : MonoBehaviour
 
     private AudioSource _audioSource;
     private Coroutine _fuseRoutine;
-    private Rigidbody _rb;
-    private bool _isSinking;
     private XRGrabInteractable _grab;
+    private bool _isSinking;
+    private Rigidbody _rb;
     private GameObject _zippoInstance;
 
-    // Static cache to avoid repeated FindObjectsOfType calls
-    private static Dictionary<InteractorHandedness, XRBaseInteractor> _interactorMap;
-    private static bool _mapInitialized;
-
-    void Awake()
+    private void Awake()
     {
         _audioSource = GetComponent<AudioSource>();
         _rb = GetComponent<Rigidbody>();
@@ -67,15 +63,22 @@ public class Dynamite : MonoBehaviour
         _grab.selectExited.AddListener(OnReleased);
     }
 
-    void Start()
+    private void Start()
     {
         if (lit) Ignite();
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         _grab.selectEntered.RemoveListener(OnGrabbed);
         _grab.selectExited.RemoveListener(OnReleased);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (_isSinking) return;
+        if (other.CompareTag("Water"))
+            StartCoroutine(HandleWaterSink(other));
     }
 
     private void OnGrabbed(SelectEnterEventArgs args)
@@ -85,9 +88,7 @@ public class Dynamite : MonoBehaviour
         {
             _interactorMap = new Dictionary<InteractorHandedness, XRBaseInteractor>();
             foreach (var interactor in FindObjectsOfType<XRBaseInteractor>())
-            {
                 _interactorMap[interactor.handedness] = interactor;
-            }
 
             _mapInitialized = true;
         }
@@ -104,10 +105,10 @@ public class Dynamite : MonoBehaviour
         if (_interactorMap.TryGetValue(otherHand, out var otherInteractor) && otherInteractor != null)
         {
             _zippoInstance = Instantiate(zippoPrefab, otherInteractor.attachTransform);
-            
+
             _zippoInstance.transform.localPosition = new Vector3(-1.25f, -3.2f, 38.17f);
             _zippoInstance.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-            _zippoInstance.transform.localScale    = new Vector3(34f, 34f, 34f);
+            _zippoInstance.transform.localScale = new Vector3(34f, 34f, 34f);
         }
         else
         {
@@ -125,13 +126,6 @@ public class Dynamite : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (_isSinking) return;
-        if (other.CompareTag("Water"))
-            StartCoroutine(HandleWaterSink(other));
-    }
-
     private IEnumerator HandleWaterSink(Collider water)
     {
         _isSinking = true;
@@ -142,8 +136,8 @@ public class Dynamite : MonoBehaviour
 
         // Freeze at the water surface
         _rb.isKinematic = true;
-        Vector3 pos = transform.position;
-        float surfY = water.transform.position.y;
+        var pos = transform.position;
+        var surfY = water.transform.position.y;
         transform.position = new Vector3(pos.x, surfY, pos.z);
 
         // Wait before sinking
@@ -158,13 +152,13 @@ public class Dynamite : MonoBehaviour
     }
 
     /// <summary>
-    /// Starts the fuse and schedules the explosion.
+    ///     Starts the fuse and schedules the explosion.
     /// </summary>
     public void Ignite()
     {
         if (_fuseRoutine != null) return; // already lit
 
-        // 1) spawn & move the fuse VFX
+        // spawn & move the fuse VFX
         if (fuseVFX && fuseStartPoint != null && fuseEndPoint != null)
         {
             var fuseGo = Instantiate(fuseVFX, fuseStartPoint.position, fuseStartPoint.rotation, transform);
@@ -173,19 +167,19 @@ public class Dynamite : MonoBehaviour
             _ = StartCoroutine(MoveFuseVFX(fuseGo.transform));
         }
 
-        // 2) play fuse sound
+        // play fuse sound
         if (fuseSound)
             _audioSource.PlayOneShot(fuseSound);
 
-        // 3) schedule explosion
+        // schedule explosion
         _fuseRoutine = StartCoroutine(FuseCountdown());
     }
 
     private IEnumerator MoveFuseVFX(Transform fx)
     {
-        Vector3 start = fuseStartPoint.localPosition;
-        Vector3 end = fuseEndPoint.localPosition;
-        float elapsed = 0f;
+        var start = fuseStartPoint.localPosition;
+        var end = fuseEndPoint.localPosition;
+        var elapsed = 0f;
 
         while (elapsed < fuseTime)
         {
@@ -206,7 +200,7 @@ public class Dynamite : MonoBehaviour
     }
 
     /// <summary>
-    /// Triggers the explosion VFX, sound, and destroys the dynamite.
+    ///     Triggers the explosion VFX, sound, and destroys the dynamite.
     /// </summary>
     public void Explode()
     {
@@ -223,8 +217,12 @@ public class Dynamite : MonoBehaviour
         foreach (var hit in hits)
         {
             if (hit.CompareTag("FishingZone"))
-            {
+                // TODO faire apparaître le poisson correspondant
                 Destroy(hit.gameObject);
+            
+            if (hit.TryGetComponent<Explodable>(out var explodable))
+            {
+                Destroy(explodable.gameObject);
             }
         }
 
