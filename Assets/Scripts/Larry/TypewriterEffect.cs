@@ -17,12 +17,16 @@ public class TypewriterEffect : MonoBehaviour
 
     private Vector3 initialBouncePos;
     private bool isTyping = false;
+
+    private Coroutine coroutine;
     
     public string fullText { get; set; }
 
     public void StartTyping()
     {
-        StartCoroutine(TypeText());
+        if (coroutine != null) StopCoroutine(coroutine);
+        coroutine = StartCoroutine(TypeText());
+        
         if (larryMustache != null)
             initialBouncePos = larryMustache.localPosition;
     }

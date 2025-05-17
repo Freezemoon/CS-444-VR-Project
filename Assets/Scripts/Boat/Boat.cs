@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Game;
 using UnityEngine;
 
 public class Boat : MonoBehaviour
@@ -127,6 +128,7 @@ public class Boat : MonoBehaviour
     
     public void EngineButtonOn()
     {
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.AccelerateBoat);
         if (engine == false)
         {
             engine = true; // Turn on the engine

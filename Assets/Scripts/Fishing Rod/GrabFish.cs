@@ -24,7 +24,7 @@ public class GrabFish : MonoBehaviour
 
     private void OnGrab(SelectEnterEventArgs args)
     {
-        GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroDropFishInBucket);
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.DropFishInBucket);
         Destroy(GetComponent<ConfigurableJoint>());
         FishingGame.instance.ResetGameWhenFishIsGrabbedByUser();
     }

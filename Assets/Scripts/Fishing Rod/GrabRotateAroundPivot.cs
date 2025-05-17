@@ -132,7 +132,7 @@ public class GrabRotateAroundPivot : MonoBehaviour
             
             if (canReachMinLength && _currentLockedLineLength <= lineLengthMin * 1.1f)
             {
-                GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroAimBubble);
+                GameManager.instance.SetDialogueState(GameManager.DialogueState.AimBubble);
                 OnReelReachedMinLength?.Invoke();
             }
             

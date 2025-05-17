@@ -12,8 +12,11 @@ public class DialogueTrrigger : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
-        
-        larry.position = larryNewPos.position;
+
+        if (larryNewPos && larry)
+        {
+            larry.position = larryNewPos.position;
+        }
         GameManager.instance.SetDialogueState(dialogueState);
         gameObject.SetActive(false);
     }

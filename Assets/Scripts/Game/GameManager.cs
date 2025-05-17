@@ -42,18 +42,21 @@ namespace Game
 
         public enum DialogueState
         {
-            IntroStart,
-            IntroFishingRodGrabbed,
-            IntroReel,
-            IntroAimBubble,
-            IntroWaitingFish,
-            IntroPullFight,
-            IntroReelFight,
-            IntroAlternatePullReel,
-            IntroGrabFish,
-            IntroDropFishInBucket,
-            IntroHopOnBoat,
-            IntroPressStartBoat,
+            Start,
+            FishingRodGrabbed,
+            Reel,
+            AimBubble,
+            WaitingFish,
+            PullFight,
+            ReelFight,
+            AlternatePullReel,
+            GrabFish,
+            DropFishInBucket,
+            HopOnBoat,
+            PressStartBoat,
+            AccelerateBoat,
+            ReverseBoat,
+            MeetBehindSmallIsland,
         }
 
         private float _currentTextTime;
@@ -75,35 +78,42 @@ namespace Game
         private List<TextEntry> larryTexts = new()
         {
             new TextEntry {
-                text = "Hey! Psst… you! Yeah, you. Over here. Look around the fishing dock… in the water!",
+                text = "Hey! Psst… you!\n" +
+                       "Yeah, you.\n" +
+                       "Over here.\n" +
+                       "Look around the fishing dock… in the water!",
                 isDisplayable = false,
                 activateNextText = true
             },
             new TextEntry
             {
-                text = "There you are! Finally, someone with a face that screams “I know how to hold a fishing rod!” " +
+                text = "There you are!\n" +
+                       "Finally, someone with a face that screams “I know how to hold a fishing rod!”\n" +
                        "…Or at least, someone who’s willing to fake it.",
                 isDisplayable = false,
                 activateNextText = true
             },
             new TextEntry
             {
-                text = "I’m Larry. I live here. And lately… it’s been a bit crowded in my lake. Too many fish. " +
-                       "Not enough personal space. You get it, right?",
+                text = "I’m Larry. I live here.\n" +
+                       "And lately… it’s been a bit crowded in my lake. Too many fish. " +
+                       "Not enough personal space.\n" +
+                       "You get it, right?",
                 isDisplayable = false,
                 activateNextText = true
             },
             new TextEntry
             {
-                text = "So! I need your help. You're gonna do a little fishing. Help clear some space. " +
+                text = "So! I need your help.\n" +
+                       "You're gonna do a little fishing. Help clear some space.\n" +
                        "Don't worry — I’ll walk you through everything.",
                 isDisplayable = false,
                 activateNextText = true
             },
             new TextEntry
             {
-                text = "First things first. Turn around and look near the edge of the dock. " +
-                       "See that fishing rod? That beauty right there? " +
+                text = "First things first. Turn around and look near the edge of the dock.\n" +
+                       "See that fishing rod? That beauty right there?\n" +
                        "That’s yours now. Pick it up with your right hand.",
                 isDisplayable = false,
                 activateNextText = false
@@ -112,9 +122,9 @@ namespace Game
             // IntroFishingRodGrabbed
             new TextEntry
             {
-                text = "Okay, time for the fun part. Hold the select button. " +
-                       "Throw like you’re tossing a paper airplane. " +
-                       "Then let go to launch the bait. " +
+                text = "Okay, time for the fun part. Hold the select button.\n" +
+                       "Throw like you’re tossing a paper airplane.\n" +
+                       "Then let go to launch the bait.\n" +
                        "Aim anywhere — just try it out!",
                 isDisplayable = false,
                 activateNextText = false
@@ -122,9 +132,9 @@ namespace Game
             // IntroReel
             new TextEntry
             {
-                text = "Time to reel it back. " +
-                       "Grab the handle with your left hand. " +
-                       "Make sure you're turning the right way — it matters!" +
+                text = "Time to reel it back.\n" +
+                       "Grab the handle with your left hand.\n" +
+                       "Make sure you're turning the right way — it matters!\n" +
                        "Keep reeling until the bait's back to you.",
                 isDisplayable = false,
                 activateNextText = false
@@ -132,9 +142,9 @@ namespace Game
             // IntroAimBubble
             new TextEntry
             {
-                text = "Nice! Now cast again, but look for bubbles on the water. " +
-                       "See them? That means a fish is lurking below. " +
-                       "Maybe even one of my neighbors. " +
+                text = "Nice! Now cast again, but look for bubbles on the water.\n" +
+                       "See them? That means a fish is lurking below.\n" +
+                       "Maybe even one of my neighbors.\n" +
                        "Toss your bait right into that bubbly spot.",
                 isDisplayable = false,
                 activateNextText = false
@@ -142,14 +152,17 @@ namespace Game
             // IntroWaitingFish
             new TextEntry
             {
-                text = "Now… wait. Patience is key. Fish are shy. Like me on Mondays.",
+                text = "Now… wait. Patience is key.\n" +
+                       "Fish are shy.\n" +
+                       "Like me on Mondays.",
                 isDisplayable = false,
                 activateNextText = false
             },
             // IntroPullFight
             new TextEntry
             {
-                text = "Whoa! You got a bite! Quick — pull back! Show that fish who's boss! " +
+                text = "Whoa! You got a bite! Quick — pull back!\n" +
+                       "Show that fish who's boss!\n" +
                        "Keep pulling... don’t let go yet!",
                 isDisplayable = false,
                 activateNextText = false
@@ -165,8 +178,8 @@ namespace Game
             // IntroAlternatePullReel
             new TextEntry
             {
-                text = "Now keep going — pull, then reel, then pull again. " +
-                       "Just keep alternating until the fish gives up. " +
+                text = "Now keep going — pull, then reel, then pull again.\n" +
+                       "Just keep alternating until the fish gives up.\n" +
                        "You'll feel it when it's done fighting!",
                 isDisplayable = false,
                 activateNextText = false
@@ -174,8 +187,8 @@ namespace Game
             // IntroGrabFish
             new TextEntry
             {
-                text = "Nice catch! You did it! " +
-                       "Now, while holding the rod, grab the fish with your left hand. " +
+                text = "Nice catch! You did it!\n" +
+                       "Now, grab the fish.\n" +
                        "Don’t be shy — it won’t bite.",
                 isDisplayable = false,
                 activateNextText = false
@@ -183,23 +196,116 @@ namespace Game
             // IntroDropFishInBucket
             new TextEntry
             {
-                text = "Then drop it in a bucket like the one near the boat. " +
-                       "That’s your storage. Like a fridge… but splashier.",
+                text = "Then drop it in a bucket like the one here on the piece of wood.\n" +
+                       "That’s your storage.\n" +
+                       "Like a fridge… but splashier.",
                 isDisplayable = false,
                 activateNextText = false
             },
             // IntroHopOnBoat
             new TextEntry
             {
-                text = "Wanna explore? Hop on the boat — I’ll meet you there!",
+                text = "Wanna explore?\n" +
+                       "See the dock a bit further away, on the right, with the boat?\n" +
+                       "Hop on the boat — I’ll meet you there!",
                 isDisplayable = false,
                 activateNextText = false
             },
             // 15
-            // IntroPressStartBoat
+            // PressStartBoat
             new TextEntry
             {
-                text = "Surprised? I swim fast... Now press the on/off button to start the boat engine.",
+                text = "Surprised? I swim fast...\n" +
+                       "Now press the on/off button to start the boat engine.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // AccelerateBoat
+            new TextEntry
+            {
+                text = "Grab the boat handle. Hold the select button to accelerate.\n" +
+                       "Want to steer?\n" +
+                       "Move the handle left to go right. Move it right to go left.\n" +
+                       "Yeah, it’s weird. You’ll get used to it.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // ReverseBoat
+            new TextEntry
+            {
+                text = "Need to go backward? There’s a reverse button for that.\n" +
+                       "Just in case you bump into a rock. Or a duck.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "Now go explore the lake a bit.\n" +
+                       "Look for fishing spots — you’ll know them by the bubbles.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "Oh, by the way —\n" +
+                       "If you ever lose your fishing rod… just press A.\n" +
+                       "Could save you a swim.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            // 20
+            new TextEntry
+            {
+                text = "When you’re ready…\n" +
+                       "Meet me behind the small island in the middle of the lake.\n" +
+                       "I’ll be waiting!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // MeetBehindSmallIsland
+            new TextEntry
+            {
+                text = "Hey, you made it!\n" +
+                       "How’s the fishing? Getting the hang of it?\n" +
+                       "Caught anything particularly annoying yet? Heh.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "See that big rock over there, blocking the access to the rest of the lake?\n" +
+                       "Yeah… that’s a problem.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "It’s blocking the way to the big part of the lake — that’s where I live.\n" +
+                       "Way more fish over there… and way less space for me. Not ideal.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "Buuut I have an idea.\n" +
+                       "Head back to the fishing dock. There’s a little shop nearby.\n" +
+                       "You can sell your fish there — and maybe buy a few… tools.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            // 25
+            new TextEntry
+            {
+                text = "Dynamite, for example.\n" +
+                       "Totally legal. Totally safe.\n" +
+                       "And hey — they might help with fishing too.\n" +
+                       "Haha! Anyway...",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "Let me know when you're all stocked up!",
                 isDisplayable = false,
                 activateNextText = true
             },
@@ -227,7 +333,8 @@ namespace Game
             larryTexts[0].isDisplayable = true;
             _isCurrentTextDisplay = true;
             typewriterEffectCanvas.SetActive(false);
-            _neededTextTime = 6;
+            _neededTextTime = 0;
+            _currentTextIndex = -1;
         }
 
         /// <summary>
@@ -280,7 +387,7 @@ namespace Game
             if (!larryTexts[_currentTextIndex].isDisplayable) return;
             
             typewriterEffectCanvas.SetActive(true);
-            larryTextButton.SetActive(larryTexts[_currentTextIndex].activateNextText);
+            larryTextButton.SetActive(false);
             typewriterEffect.fullText = larryTexts[_currentTextIndex].text;
             typewriterEffect.StartTyping();
 
@@ -312,6 +419,7 @@ namespace Game
         {
             if (!isMumbleEnabled) return;
             larryAudioSource.Pause();
+            larryTextButton.SetActive(larryTexts[_currentTextIndex-1].activateNextText);
         }
 
         public void SetDialogueState(DialogueState state, bool canSetToPrevDialogue = false)
@@ -320,42 +428,51 @@ namespace Game
             int index = 0;
             switch (state)
             {
-                case DialogueState.IntroStart:
+                case DialogueState.Start:
                     index = 0;
                     break;
-                case DialogueState.IntroFishingRodGrabbed:
+                case DialogueState.FishingRodGrabbed:
                     index = 5;
                     break;
-                case DialogueState.IntroReel:
+                case DialogueState.Reel:
                     index = 6;
                     break;
-                case DialogueState.IntroAimBubble:
+                case DialogueState.AimBubble:
                     index = 7;
                     Instantiate(spawnFishPrefab, initSpawnFishPos.position, Quaternion.identity);
                     break;
-                case DialogueState.IntroWaitingFish:
+                case DialogueState.WaitingFish:
                     index = 8;
                     break;
-                case DialogueState.IntroPullFight:
+                case DialogueState.PullFight:
                     index = 9;
                     break;
-                case DialogueState.IntroReelFight:
+                case DialogueState.ReelFight:
                     index = 10;
                     break;
-                case DialogueState.IntroAlternatePullReel:
+                case DialogueState.AlternatePullReel:
                     index = 11;
                     break;
-                case DialogueState.IntroGrabFish:
+                case DialogueState.GrabFish:
                     index = 12;
                     break;
-                case DialogueState.IntroDropFishInBucket:
+                case DialogueState.DropFishInBucket:
                     index = 13;
                     break;
-                case DialogueState.IntroHopOnBoat:
+                case DialogueState.HopOnBoat:
                     index = 14;
                     break;
-                case DialogueState.IntroPressStartBoat:
+                case DialogueState.PressStartBoat:
                     index = 15;
+                    break;
+                case DialogueState.AccelerateBoat:
+                    index = 16;
+                    break;
+                case DialogueState.ReverseBoat:
+                    index = 17;
+                    break;
+                case DialogueState.MeetBehindSmallIsland:
+                    index = 21;
                     break;
             }
 

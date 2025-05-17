@@ -10,6 +10,7 @@ public class FishingRodCaster : MonoBehaviour
 {
     [Header("Input")]
     public InputActionReference castAction; // Reference to trigger action (Press & Release)
+    public InputActionReference aButtonAction;
     public XRGrabInteractable rodInteractable;
 
     [Header("Transforms")]
@@ -56,6 +57,7 @@ public class FishingRodCaster : MonoBehaviour
         
         castAction.action.started += _onCastStarted;
         castAction.action.canceled += _onCastCanceled;
+        aButtonAction.action.started += OnAButtonPressed;
 
         GrabRotateAroundPivot.OnReelReachedMinLength += OnReelReachedMinLength;
         
@@ -69,6 +71,7 @@ public class FishingRodCaster : MonoBehaviour
     {
         castAction.action.started -= _onCastStarted;
         castAction.action.canceled -= _onCastCanceled;
+        aButtonAction.action.started -= OnAButtonPressed;
         
         GrabRotateAroundPivot.OnReelReachedMinLength -= OnReelReachedMinLength;
         
@@ -100,7 +103,7 @@ public class FishingRodCaster : MonoBehaviour
     
     private void OnGrabbedFishingRod(SelectEnterEventArgs args)
     {
-        GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroFishingRodGrabbed);
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.FishingRodGrabbed);
         _isHeld = true;
     }
 
@@ -114,6 +117,12 @@ public class FishingRodCaster : MonoBehaviour
         Vector3 current = controllerTransform.position;
         _handVelocity = (current - _previousPos) / Time.deltaTime;
         _previousPos = current;
+    }
+    
+    private void OnAButtonPressed(InputAction.CallbackContext context)
+    {
+        transform.position = controllerTransform.position;
+        transform.rotation = Quaternion.Euler(Vector3.forward);
     }
 
     private void StartHoldingToThrowBait()
@@ -135,7 +144,7 @@ public class FishingRodCaster : MonoBehaviour
         if (!_isHeld) return;
         if (!_isHolding) return;
         
-        GameManager.instance.SetDialogueState(GameManager.DialogueState.IntroReel);
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.Reel);
         _isHolding = false;
         _isBaitAtInitPos = false;
         
