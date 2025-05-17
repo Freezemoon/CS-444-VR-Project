@@ -424,7 +424,6 @@ namespace Game
 
         public void SetDialogueState(DialogueState state, bool canSetToPrevDialogue = false)
         {
-            Debug.Log(state);
             int index = 0;
             switch (state)
             {
@@ -439,7 +438,6 @@ namespace Game
                     break;
                 case DialogueState.AimBubble:
                     index = 7;
-                    Instantiate(spawnFishPrefab, initSpawnFishPos.position, Quaternion.identity);
                     break;
                 case DialogueState.WaitingFish:
                     index = 8;
@@ -478,6 +476,9 @@ namespace Game
 
             if (index >= _currentTextIndex || canSetToPrevDialogue)
             {
+                if (state == DialogueState.AimBubble)
+                    Instantiate(spawnFishPrefab, initSpawnFishPos.position, Quaternion.identity);
+                
                 _currentTextIndex = index;
                 larryTexts[_currentTextIndex].isDisplayable = true;
                 _currentTextTime = 0;

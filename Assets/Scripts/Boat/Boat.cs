@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Game;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Boat : MonoBehaviour
 {
@@ -11,87 +12,87 @@ public class Boat : MonoBehaviour
 
     public AudioClip engineStartClip;
     public AudioClip engineLoopClip;
-    private AudioSource engineAudioSource;
 
-    public GameObject OnOffIndicatorLamp;
+    public GameObject onOffIndicatorLamp;
     public GameObject reverseIndicatorLamp;
     
-    private bool engine = false;
-    private int reverse = 1; // 1 = forward, -1 = reverse
-    private float speed = 0f;
-    private float currentSpeed = 0f;
+    private AudioSource _engineAudioSource;
+    private bool _engine;
+    private int _reverse = 1; // 1 = forward, -1 = reverse
+    private float _speed;
+    private float _currentSpeed;
     
     // Fields for collision-based movement restriction
-    private float pushForce = 1.2f;
-    private List<Vector3> activePushDirections = new List<Vector3>();
+    private const float PushForce = 1.2f;
+    private readonly List<Vector3> _activePushDirections = new();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
         leverTransform.GetComponent<BoatHandle>().OnThrottleChanged += UpdateThrottle;
 
-        OnOffIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
+        onOffIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
         reverseIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
 
-        engineAudioSource = gameObject.AddComponent<AudioSource>();
-        engineAudioSource.loop = true;
-        engineAudioSource.playOnAwake = false;
-        engineAudioSource.clip = engineLoopClip;
+        _engineAudioSource = gameObject.AddComponent<AudioSource>();
+        _engineAudioSource.loop = true;
+        _engineAudioSource.playOnAwake = false;
+        _engineAudioSource.clip = engineLoopClip;
     }
 
     // Update is called once per frame
-    private void Update()
+    private void FixedUpdate()
     {
         Quaternion boatToHandle = Quaternion.Inverse(transform.rotation) * leverTransform.rotation;
         float localAngle = boatToHandle.eulerAngles.y;
         if (localAngle > 180f) localAngle -= 360f;
-        if (engine == true)
+        
+        if (!_engine) return;
+        
+        _currentSpeed = Mathf.MoveTowards(_currentSpeed, _speed, accelerationRate * Time.fixedDeltaTime);
+            
+        Vector3 moveDirection = -transform.right * _reverse;
+            
+        if (_activePushDirections.Count > 0)
         {
-            currentSpeed = Mathf.MoveTowards(currentSpeed, speed, accelerationRate * Time.deltaTime);
-            
-            Vector3 moveDirection = -transform.right * reverse;
-            
-            if (activePushDirections.Count > 0)
+            Vector3 totalPush = Vector3.zero;
+            foreach (var dir in _activePushDirections)
             {
-                Vector3 totalPush = Vector3.zero;
-                foreach (var dir in activePushDirections)
-                {
-                    totalPush += dir;
-                }
-
-                totalPush = totalPush.normalized;
-                moveDirection += totalPush * pushForce;
-                moveDirection = moveDirection.normalized;
+                totalPush += dir;
             }
 
-            transform.position += moveDirection * currentSpeed * Time.deltaTime;
+            totalPush = totalPush.normalized;
+            moveDirection += totalPush * PushForce;
+            moveDirection = moveDirection.normalized;
+        }
 
-            if (currentSpeed > 0f)
-            {
-                float turnSpeed = localAngle * turnSensitivity; // How fast the boat turns
-                transform.Rotate(0, - turnSpeed * Time.deltaTime, 0);
-            }
-            if (speed == 0f)
-            {
-                engineAudioSource.volume = 0.7f;
-                engineAudioSource.pitch = 1f;
-            }
-            else if (reverse == -1)
-            {
-                engineAudioSource.volume = 1f;
-                engineAudioSource.pitch = 0.7f;
-            }
-            else
-            {
-                engineAudioSource.volume = 1f;
-                engineAudioSource.pitch = 1.5f;
-            }
+        transform.position += moveDirection * _currentSpeed * Time.fixedDeltaTime;
+        
+        if (_currentSpeed > 0f)
+        {
+            float turnSpeed = localAngle * turnSensitivity; // How fast the boat turns
+            transform.Rotate(0, - turnSpeed * Time.fixedDeltaTime , 0);
+        }
+        if (_speed == 0f)
+        {
+            _engineAudioSource.volume = 0.7f;
+            _engineAudioSource.pitch = 1f;
+        }
+        else if (_reverse == -1)
+        {
+            _engineAudioSource.volume = 1f;
+            _engineAudioSource.pitch = 0.7f;
+        }
+        else
+        {
+            _engineAudioSource.volume = 1f;
+            _engineAudioSource.pitch = 1.5f;
         }
     }
 
     private void UpdateThrottle(float value)
     {
-        speed = value * speedMultiplier; // Value goes from 0 to 1 based on trigger press
+        _speed = value * speedMultiplier; // Value goes from 0 to 1 based on trigger press
     }
 
     private void OnTriggerEnter(Collider other)
@@ -100,7 +101,7 @@ public class Boat : MonoBehaviour
         {
             Vector3 contactPoint = other.ClosestPoint(transform.position);
             Vector3 dir = (transform.position - contactPoint).normalized;
-            activePushDirections.Add(dir);
+            _activePushDirections.Add(dir);
         }
         else if (other.CompareTag("Player"))
         {
@@ -117,7 +118,7 @@ public class Boat : MonoBehaviour
             Vector3 dir = (transform.position - contactPoint).normalized;
 
             // Remove approximate match from list
-            activePushDirections.RemoveAll(d => Vector3.Angle(d, dir) < 10f); // Angle threshold to remove correct one
+            _activePushDirections.RemoveAll(d => Vector3.Angle(d, dir) < 10f); // Angle threshold to remove correct one
         }
         else if (other.CompareTag("Player"))
         {
@@ -129,36 +130,36 @@ public class Boat : MonoBehaviour
     public void EngineButtonOn()
     {
         GameManager.instance.SetDialogueState(GameManager.DialogueState.AccelerateBoat);
-        if (engine == false)
+        if (_engine == false)
         {
-            engine = true; // Turn on the engine
-            OnOffIndicatorLamp.GetComponent<MeshRenderer>().enabled = true;
+            _engine = true; // Turn on the engine
+            onOffIndicatorLamp.GetComponent<MeshRenderer>().enabled = true;
 
             AudioSource.PlayClipAtPoint(engineStartClip, transform.position);
-            engineAudioSource.Play();
+            _engineAudioSource.Play();
             Debug.Log("Engine is on and reverse is off"); 
         }
         else
         {
-            engine = false;
-            OnOffIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
+            _engine = false;
+            onOffIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
 
-            engineAudioSource.Stop();
+            _engineAudioSource.Stop();
             Debug.Log("Engine is off"); 
         }
     }
 
     public void EngineButtonReverse()
     {
-        if (reverse == 1)
+        if (_reverse == 1)
         {
-            reverse = -1; // Turn on the reverse
+            _reverse = -1; // Turn on the reverse
             reverseIndicatorLamp.GetComponent<MeshRenderer>().enabled = true;
             Debug.Log("Reverse is on");
         }
         else
         {
-            reverse = 1;
+            _reverse = 1;
             reverseIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
             Debug.Log("Reverse is off"); 
         }

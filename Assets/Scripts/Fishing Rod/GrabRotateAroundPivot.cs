@@ -35,6 +35,8 @@ public class GrabRotateAroundPivot : MonoBehaviour
     
     private float _currentLockedLineLengthMax;
 
+    private Vector3 _initPos;
+
     private void OnEnable()
     {
         _handlerGrab = GetComponent<XRGrabInteractable>();
@@ -50,13 +52,13 @@ public class GrabRotateAroundPivot : MonoBehaviour
 
     private void Start()
     {
+        // _initPos = transform.localPosition;
+        
         Vector3 planeNormal = handlerPivotTransform.TransformDirection(_localNormalPlanePivot).normalized;
         Vector3 toStick = transform.position - handlerPivotTransform.position;
         Vector3 projected = Vector3.ProjectOnPlane(toStick, planeNormal);
 
         _grabbedRadius = projected.magnitude;
-        
-        Debug.Log(_grabbedRadius);
         
         _currentLockedLineLengthMax = _lockedLineLengthMax;
         
@@ -66,7 +68,6 @@ public class GrabRotateAroundPivot : MonoBehaviour
     private void OnGrab(SelectEnterEventArgs args)
     {
         _interactorAttachTransform = args.interactorObject.GetAttachTransform(_handlerGrab);
-
         
         if (FishingGame.instance.gameState == FishingGame.GameState.Pulling)
         {
@@ -117,6 +118,8 @@ public class GrabRotateAroundPivot : MonoBehaviour
 
         if (_interactorAttachTransform && handlerPivotTransform)
         {
+            // _initPos = transform.localPosition;
+            
             Vector3 planeNormal = handlerPivotTransform.TransformDirection(_localNormalPlanePivot).normalized;
 
             // Vector from pivot to current hand position, projected on plane
@@ -137,6 +140,10 @@ public class GrabRotateAroundPivot : MonoBehaviour
             }
             
             _previousDirectionOnPlane = projectedHand;
+        }
+        else
+        {
+            // transform.localPosition = _initPos;
         }
         
         CheckMaxLineLength(toBait);
