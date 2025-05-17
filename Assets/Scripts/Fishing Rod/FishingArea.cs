@@ -5,10 +5,17 @@ public class FishingArea : MonoBehaviour
 {
     public Color _defaultColor = Color.green;
     public Color _enterColor = Color.red;
+    public event Action<FishingArea> onDeath;
 
     private void Start()
     {
         FishingRodExit();
+    }
+    
+    void OnDestroy()
+    {
+        // tell anyone who’s listening that we’re about to die
+        onDeath?.Invoke(this);
     }
     
     private void FishingRodExit()

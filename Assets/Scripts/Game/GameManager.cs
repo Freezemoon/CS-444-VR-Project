@@ -365,6 +365,8 @@ namespace Game
 
         private void Start()
         {
+            // Initial spawn
+            SpawnOnWater();
             larryTexts[0].isDisplayable = true;
             _isCurrentTextDisplay = true;
             typewriterEffectCanvas.SetActive(false);
@@ -398,11 +400,13 @@ namespace Game
                 Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
 
                 // raycast down against only the water collider
-                var ray = new Ray(origin, Vector3.down);
-                if (waterCollider.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
+                if (waterCollider.Raycast(new Ray(origin, Vector3.down), out RaycastHit hit, Mathf.Infinity))
                 {
                     Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
-                    Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
+                    var fishGo = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
+                    var notifier = fishGo.GetComponent<FishingArea>();
+                    if (notifier != null)
+                        notifier.onDeath += OnFishDestroyed;
                 }
                 else
                 {
@@ -539,6 +543,44 @@ namespace Game
             }
         }
 
+        
+        /// <summary>
+        /// Called when a fish with FishDeathNotifier is destroyed; spawns a replacement.
+        /// </summary>
+        private void OnFishDestroyed(FishingArea deadFish)
+        {
+            // Unsubscribe
+            deadFish.onDeath -= OnFishDestroyed;
+            // Spawn a single replacement
+            SpawnOne();
+        }
+        
+        /// <summary>
+        /// Spawns a single fish at a random point on the waterCollider.
+        /// </summary>
+        private void SpawnOne()
+        {
+            if (waterCollider == null || spawnPrefab == null)
+                return;
+
+            var bounds = waterCollider.bounds;
+            while (true)
+            {
+                float x = Random.Range(bounds.min.x, bounds.max.x);
+                float z = Random.Range(bounds.min.z, bounds.max.z);
+                Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
+                if (waterCollider.Raycast(new Ray(origin, Vector3.down), out RaycastHit hit, Mathf.Infinity))
+                {
+                    Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
+                    var fishGo = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
+                    var notifier = fishGo.GetComponent<FishingArea>();
+                    if (notifier != null)
+                        notifier.onDeath += OnFishDestroyed;
+                    break;
+                }
+            }
+        }
+        
         public int GetMoney() => State.Money;
         public void AddMoney(int amount) => State.Money += amount;
 
