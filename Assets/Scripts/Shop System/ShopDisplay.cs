@@ -30,12 +30,8 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _shoppingCartText;
     [SerializeField] private Button _buyButton;
     [SerializeField] private TextMeshProUGUI _buyButtonText;
-    [SerializeField] private List<TextMeshProUGUI> _componentsPrice;
+    [SerializeField] private TextMeshProUGUI[] _componentsPrice = new TextMeshProUGUI[7];
     [SerializeField] private List<GameObject> _cartContent;
-
-    [SerializeField] private GameObject _itemListContentPanel;
-    [SerializeField] private GameObject _shoppingCartContentPanel;
-    [SerializeField] private GameObject _inventoryContentPanel;
 
     private int _basketTotal;
 
@@ -50,16 +46,40 @@ public class ShopDisplay : MonoBehaviour
             return;
         } else
         {
-            foreach (var item in _cartContent)
-            {
-                item.SetActive(false);
+            for (int i = 0; i < 7; i++){
+                var item = _cartContent[i];
+                if(item.activeSelf){
+                    item.SetActive(false);
+                }
+                switch (i) 
+                {
+                    case 0:
+                        GameManager.instance.AddComponent1Amount(10); 
+                        break;
+                    case 1:
+                        GameManager.instance.AddComponent2Amount(10);
+                        break;
+                    case 2:
+                        GameManager.instance.AddComponent3Amount(10);
+                        break;
+                    case 3:
+                        GameManager.instance.AddComponent4Amount(10);
+                        break;
+                    case 4:
+                        GameManager.instance.AddComponent5Amount(10);
+                        break;
+                    case 5:
+                        GameManager.instance.AddComponent6Amount(10);
+                        break;
+                    default: 
+                        GameManager.instance.AddDynamiteAmount(10);
+                        break;
+                }
             }
-
             _basketTotalText.SetText("Shopping Cart Total: ");
             GameManager.instance.AddMoney(-basketTotal);
             _basketTotalInteger.SetText("0");
             RefreshPlayerTotal();
-            //still need to add bought components into inventory
         }
 
     }
