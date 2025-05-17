@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -80,7 +81,14 @@ namespace Game
 
         public int GetBucketValue() => State.BucketValue;
         public void AddToBucket(int value) => State.BucketValue += value;
-        
+
+        public void SellBucket()
+        {
+            State.Money += State.BucketValue;
+            State.BucketValue = 0;
+        }
+
+        public void BuyCart(int amount) => State.Money -= amount;
         public void ChangeFishingRod(FishingRodStats fishingRod) => State.CurrentRod = fishingRod;
         public FishingRodStats GetPlayerRod() => State.CurrentRod;
         
