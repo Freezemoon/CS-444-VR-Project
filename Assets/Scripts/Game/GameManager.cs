@@ -80,8 +80,7 @@ namespace Game
             new TextEntry {
                 text = "Hey! Psst… you!\n" +
                        "Yeah, you.\n" +
-                       "Over here.\n" +
-                       "Look around the fishing dock… in the water!",
+                       "Over here.",
                 isDisplayable = false,
                 activateNextText = true
             },
@@ -112,7 +111,7 @@ namespace Game
             },
             new TextEntry
             {
-                text = "First things first. Turn around and look near the edge of the dock.\n" +
+                text = "First things first. Turn around and look near the rock on the right.\n" +
                        "See that fishing rod? That beauty right there?\n" +
                        "That’s yours now. Pick it up with your right hand.",
                 isDisplayable = false,
@@ -274,7 +273,8 @@ namespace Game
             new TextEntry
             {
                 text = "See that big rock over there, blocking the access to the rest of the lake?\n" +
-                       "Yeah… that’s a problem.",
+                       "Yeah… not great. You and your boat can’t get through.\n" +
+						"Us fish? Oh, we’ve got our sneaky ways around it.",
                 isDisplayable = false,
                 activateNextText = true
             },
