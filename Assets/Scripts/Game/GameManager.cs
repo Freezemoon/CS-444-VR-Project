@@ -32,7 +32,7 @@ namespace Game
         [SerializeField] private GameObject spawnPrefab;
 
         [Tooltip("Number of instances to spawn")]
-        [SerializeField] private int spawnCount = 3;
+        [SerializeField] private int spawnCount = 5;
 
         [Tooltip("How high above the water to place the spawn")]
         [SerializeField] private float heightAbove;
@@ -373,6 +373,17 @@ namespace Game
             _neededTextTime = 0;
             currentTextIndex = -1;
         }
+        
+        /// <summary>
+        /// Called when a fish with FishDeathNotifier is destroyed; spawns a replacement.
+        /// </summary>
+        private void OnFishDestroyed(FishingArea deadFish)
+        {
+            // Unsubscribe
+            deadFish.onDeath -= OnFishDestroyed;
+            // Spawn a single replacement
+            SpawnOne();
+        }
 
         /// <summary>
         /// Permet de spawn les poissons sur une surface taggée avec "Water".
@@ -394,14 +405,20 @@ namespace Game
             var bounds = waterCollider.bounds;
             for (int i = 0; i < spawnCount; i++)
             {
-                // pick a random XZ inside the water’s world‐space bounds
                 float x = Random.Range(bounds.min.x, bounds.max.x);
                 float z = Random.Range(bounds.min.z, bounds.max.z);
                 Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
 
-                // raycast down against only the water collider
-                if (waterCollider.Raycast(new Ray(origin, Vector3.down), out RaycastHit hit, Mathf.Infinity))
+                Ray ray = new Ray(origin, Vector3.down);
+                if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
                 {
+                    // skip hits that aren’t the water surface
+                    if (hit.collider != waterCollider)
+                    {
+                        i--;
+                        continue;
+                    }
+
                     Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
                     var fishGo = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
                     var notifier = fishGo.GetComponent<FishingArea>();
@@ -410,7 +427,8 @@ namespace Game
                 }
                 else
                 {
-                    i--; // retry if the random point missed the mesh
+                    // missed everything, retry
+                    i--;
                 }
             }
         }
@@ -545,17 +563,6 @@ namespace Game
 
         
         /// <summary>
-        /// Called when a fish with FishDeathNotifier is destroyed; spawns a replacement.
-        /// </summary>
-        private void OnFishDestroyed(FishingArea deadFish)
-        {
-            // Unsubscribe
-            deadFish.onDeath -= OnFishDestroyed;
-            // Spawn a single replacement
-            SpawnOne();
-        }
-        
-        /// <summary>
         /// Spawns a single fish at a random point on the waterCollider.
         /// </summary>
         private void SpawnOne()
@@ -569,8 +576,13 @@ namespace Game
                 float x = Random.Range(bounds.min.x, bounds.max.x);
                 float z = Random.Range(bounds.min.z, bounds.max.z);
                 Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
-                if (waterCollider.Raycast(new Ray(origin, Vector3.down), out RaycastHit hit, Mathf.Infinity))
+
+                Ray ray = new Ray(origin, Vector3.down);
+                if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
                 {
+                    if (hit.collider != waterCollider)
+                        continue;
+
                     Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
                     var fishGo = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
                     var notifier = fishGo.GetComponent<FishingArea>();
