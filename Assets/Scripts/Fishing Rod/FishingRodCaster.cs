@@ -122,7 +122,7 @@ public class FishingRodCaster : MonoBehaviour
     private void OnAButtonPressed(InputAction.CallbackContext context)
     {
         transform.position = controllerTransform.position;
-        transform.rotation = Quaternion.Euler(Vector3.right);
+        transform.rotation = Quaternion.Euler(Vector3.right * -90f);
     }
 
     private void StartHoldingToThrowBait()
