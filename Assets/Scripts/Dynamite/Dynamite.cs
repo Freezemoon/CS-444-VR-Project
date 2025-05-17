@@ -53,6 +53,7 @@ public class Dynamite : MonoBehaviour
     private bool _isSinking;
     private Rigidbody _rb;
     private GameObject _zippoInstance;
+    private Transform _xrOrigin;
 
     private void Awake()
     {
@@ -61,6 +62,11 @@ public class Dynamite : MonoBehaviour
         _grab = GetComponent<XRGrabInteractable>();
         _grab.selectEntered.AddListener(OnGrabbed);
         _grab.selectExited.AddListener(OnReleased);
+        
+        var go = GameObject.Find("XR Origin custom");
+        if (go == null) Debug.LogError("XR Origin not found!");
+        else      _xrOrigin = go.transform;
+        
     }
 
     private void Start()
@@ -77,7 +83,7 @@ public class Dynamite : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (_isSinking) return;
-        if (other.CompareTag("Water"))
+        if (other.CompareTag("WaterFishingLimit"))
             StartCoroutine(HandleWaterSink(other));
     }
 
@@ -100,20 +106,29 @@ public class Dynamite : MonoBehaviour
         var otherHand = grabbingHand == InteractorHandedness.Left
             ? InteractorHandedness.Right
             : InteractorHandedness.Left;
+        
+        
+        string handNode = otherHand == InteractorHandedness.Left 
+            ? "Left" 
+            : "Right";
+        
+        Transform visual = _xrOrigin
+            .Find($"Camera Offset/{handNode} Controller/{handNode} Controller Visual/UniversalController/Controller_Base");
 
-        // Try to get the interactor for the other hand
-        if (_interactorMap.TryGetValue(otherHand, out var otherInteractor) && otherInteractor != null)
+        if (visual == null)
         {
-            _zippoInstance = Instantiate(zippoPrefab, otherInteractor.attachTransform);
-
-            _zippoInstance.transform.localPosition = new Vector3(-1.25f, -3.2f, 38.17f);
-            _zippoInstance.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-            _zippoInstance.transform.localScale = new Vector3(34f, 34f, 34f);
+            Debug.LogWarning($"Couldn’t find controller visual game object");
+            return;
         }
-        else
-        {
-            Debug.LogWarning($"No interactor found for hand: {otherHand}");
-        }
+        
+        _zippoInstance = Instantiate(
+            zippoPrefab,
+            visual.position,
+            visual.rotation,
+            visual
+        );
+        _zippoInstance.transform.localPosition = Vector3.zero;
+        _zippoInstance.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
     }
 
     private void OnReleased(SelectExitEventArgs args)
