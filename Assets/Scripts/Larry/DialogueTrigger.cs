@@ -13,11 +13,16 @@ public class DialogueTrrigger : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
+        GameManager.instance.SetDialogueState(dialogueState);
+        ValidateDialogue();
+    }
+
+    public void ValidateDialogue()
+    {
         if (larryNewPos && larry)
         {
             larry.position = larryNewPos.position;
         }
-        GameManager.instance.SetDialogueState(dialogueState);
         gameObject.SetActive(false);
     }
 }

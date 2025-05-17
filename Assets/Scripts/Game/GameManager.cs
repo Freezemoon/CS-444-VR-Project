@@ -24,6 +24,9 @@ namespace Game
         public AudioClip larrySoundMumble;
         public GameObject larryTextButton;
 
+        [Header("DialogueTiggers")]
+        public DialogueTrrigger dialogueTriggerDynamiteBought;
+
         [Header("Spawning Settings")]
         [Tooltip("The prefab to spawn on the water surface")]
         [SerializeField] private GameObject spawnPrefab;
@@ -57,6 +60,8 @@ namespace Game
             AccelerateBoat,
             ReverseBoat,
             MeetBehindSmallIsland,
+            DynamiteBought,
+            RockDynamite,
         }
 
         private float _currentTextTime;
@@ -77,6 +82,7 @@ namespace Game
 
         private List<TextEntry> larryTexts = new()
         {
+            // Start
             new TextEntry {
                 text = "Hey! Psst… you!\n" +
                        "Yeah, you.\n" +
@@ -118,7 +124,7 @@ namespace Game
                 activateNextText = false
             },
             // 5
-            // IntroFishingRodGrabbed
+            // FishingRodGrabbed
             new TextEntry
             {
                 text = "Okay, time for the fun part. Hold the select button.\n" +
@@ -128,7 +134,7 @@ namespace Game
                 isDisplayable = false,
                 activateNextText = false
             },
-            // IntroReel
+            // Reel
             new TextEntry
             {
                 text = "Time to reel it back.\n" +
@@ -138,7 +144,7 @@ namespace Game
                 isDisplayable = false,
                 activateNextText = false
             },
-            // IntroAimBubble
+            // AimBubble
             new TextEntry
             {
                 text = "Nice! Now cast again, but look for bubbles on the water.\n" +
@@ -148,7 +154,7 @@ namespace Game
                 isDisplayable = false,
                 activateNextText = false
             },
-            // IntroWaitingFish
+            // WaitingFish
             new TextEntry
             {
                 text = "Now… wait. Patience is key.\n" +
@@ -157,7 +163,7 @@ namespace Game
                 isDisplayable = false,
                 activateNextText = false
             },
-            // IntroPullFight
+            // PullFight
             new TextEntry
             {
                 text = "Whoa! You got a bite! Quick — pull back!\n" +
@@ -167,14 +173,14 @@ namespace Game
                 activateNextText = false
             },
             // 10
-            // IntroReelFight
+            // ReelFight
             new TextEntry
             {
                 text = "Alright — now reel it in!",
                 isDisplayable = false,
                 activateNextText = false
             },
-            // IntroAlternatePullReel
+            // AlternatePullReel
             new TextEntry
             {
                 text = "Now keep going — pull, then reel, then pull again.\n" +
@@ -183,7 +189,7 @@ namespace Game
                 isDisplayable = false,
                 activateNextText = false
             },
-            // IntroGrabFish
+            // GrabFish
             new TextEntry
             {
                 text = "Nice catch! You did it!\n" +
@@ -192,7 +198,7 @@ namespace Game
                 isDisplayable = false,
                 activateNextText = false
             },
-            // IntroDropFishInBucket
+            // DropFishInBucket
             new TextEntry
             {
                 text = "Then drop it in a bucket like the one here on the piece of wood.\n" +
@@ -201,7 +207,7 @@ namespace Game
                 isDisplayable = false,
                 activateNextText = false
             },
-            // IntroHopOnBoat
+            // HopOnBoat
             new TextEntry
             {
                 text = "Wanna explore?\n" +
@@ -247,7 +253,7 @@ namespace Game
             new TextEntry
             {
                 text = "Oh, by the way —\n" +
-                       "If you ever lose your fishing rod… just press A.\n" +
+                       "If you ever lose your fishing rod… just press the A button on your right controller.\n" +
                        "Could save you a swim.",
                 isDisplayable = false,
                 activateNextText = true
@@ -307,8 +313,37 @@ namespace Game
             {
                 text = "Let me know when you're all stocked up!",
                 isDisplayable = false,
+                activateNextText = false
+            },
+            // DynamiteBought
+            // TODO: When the player buys a dynamite, the dialogue should change to this one.
+            new TextEntry
+            {
+                text = "Nice! You found the dynamite!\n" +
+                       "Now head back to that big rock — I’ll meet you there and explain what’s next.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // RockDynamite
+            new TextEntry
+            {
+                text = "Hey again!\n" +
+                       "Alright, now open your inventory — that’s the X button on your left controller.\n" +
+                       "Select the dynamite.",
+                isDisplayable = false,
                 activateNextText = true
             },
+            new TextEntry
+            {
+                text = "Okay, listen carefully now!\n" +
+                       "First, grab the dynamite with one hand.\n" +
+                       "Then, use the lighter in your other hand to light the fuse.\n" +
+                       "Once it starts burning… aim for the rock — and toss it!",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            
+            
             new TextEntry
             {
                 text = "OK, Alex has to do the rest of the dialogue, see you soon my fisherman friend!",
@@ -472,12 +507,22 @@ namespace Game
                 case DialogueState.MeetBehindSmallIsland:
                     index = 21;
                     break;
+                case DialogueState.DynamiteBought:
+                    index = 27;
+                    break;
             }
 
             if (index >= _currentTextIndex || canSetToPrevDialogue)
             {
-                if (state == DialogueState.AimBubble)
-                    Instantiate(spawnFishPrefab, initSpawnFishPos.position, Quaternion.identity);
+                switch (state)
+                {
+                    case DialogueState.AimBubble:
+                        Instantiate(spawnFishPrefab, initSpawnFishPos.position, Quaternion.identity);
+                        break;
+                    case DialogueState.DynamiteBought:
+                        dialogueTriggerDynamiteBought.ValidateDialogue();
+                        break;
+                }
                 
                 _currentTextIndex = index;
                 larryTexts[_currentTextIndex].isDisplayable = true;
