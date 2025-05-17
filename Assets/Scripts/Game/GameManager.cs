@@ -32,7 +32,7 @@ namespace Game
         [SerializeField] private GameObject spawnPrefab;
 
         [Tooltip("Number of instances to spawn")]
-        [SerializeField] private int spawnCount = 3;
+        [SerializeField] private int spawnCount = 5;
 
         [Tooltip("How high above the water to place the spawn")]
         [SerializeField] private float heightAbove;
@@ -41,7 +41,15 @@ namespace Game
         [Tooltip("Collider of the water surface to spawn on")]
         [SerializeField] private Collider waterCollider;
         
-        public GameState State = new();
+        [Header("Medium/Hard Spawning Settings")]
+        [Tooltip("Prefab to spawn in medium‐difficulty zone.")]
+        [SerializeField] private GameObject mediumSpawnPrefab;
+        [Tooltip("Prefab to spawn in hard‐difficulty zone.")]
+        [SerializeField] private GameObject hardSpawnPrefab;
+        [Tooltip("Collider of the hard‐zone surface to spawn on.")]
+        [SerializeField] private Collider hardZoneCollider;
+        [Tooltip("How many medium/hard fish to keep alive at once.")]
+        [SerializeField] private int hardSpawnCount = 5;
 
         public int currentTextIndex { get; private set; }
 
@@ -365,11 +373,25 @@ namespace Game
 
         private void Start()
         {
+            // Initial spawn
+            SpawnOnWater();
+            SpawnOnHardZone();
             larryTexts[0].isDisplayable = true;
             _isCurrentTextDisplay = true;
             typewriterEffectCanvas.SetActive(false);
             _neededTextTime = 0;
             currentTextIndex = -1;
+        }
+        
+        /// <summary>
+        /// Called when a fish with FishDeathNotifier is destroyed; spawns a replacement.
+        /// </summary>
+        private void OnFishDestroyed(FishingArea deadFish)
+        {
+            // Unsubscribe
+            deadFish.onDeath -= OnFishDestroyed;
+            // Spawn a single replacement
+            SpawnOne();
         }
 
         /// <summary>
@@ -392,21 +414,30 @@ namespace Game
             var bounds = waterCollider.bounds;
             for (int i = 0; i < spawnCount; i++)
             {
-                // pick a random XZ inside the water’s world‐space bounds
                 float x = Random.Range(bounds.min.x, bounds.max.x);
                 float z = Random.Range(bounds.min.z, bounds.max.z);
                 Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
 
-                // raycast down against only the water collider
-                var ray = new Ray(origin, Vector3.down);
-                if (waterCollider.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
+                Ray ray = new Ray(origin, Vector3.down);
+                if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
                 {
+                    // skip hits that aren’t the water surface
+                    if (hit.collider != waterCollider)
+                    {
+                        i--;
+                        continue;
+                    }
+
                     Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
-                    Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
+                    var fishGo = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
+                    var notifier = fishGo.GetComponent<FishingArea>();
+                    if (notifier != null)
+                        notifier.onDeath += OnFishDestroyed;
                 }
                 else
                 {
-                    i--; // retry if the random point missed the mesh
+                    // missed everything, retry
+                    i--;
                 }
             }
         }
@@ -539,6 +570,85 @@ namespace Game
             }
         }
 
+        
+        /// <summary>
+        /// Spawns a single fish at a random point on the waterCollider.
+        /// </summary>
+        private void SpawnOne()
+        {
+            if (waterCollider == null || spawnPrefab == null)
+                return;
+
+            var bounds = waterCollider.bounds;
+            while (true)
+            {
+                float x = Random.Range(bounds.min.x, bounds.max.x);
+                float z = Random.Range(bounds.min.z, bounds.max.z);
+                Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
+
+                Ray ray = new Ray(origin, Vector3.down);
+                if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
+                {
+                    if (hit.collider != waterCollider)
+                        continue;
+
+                    Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
+                    var fishGo = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
+                    var notifier = fishGo.GetComponent<FishingArea>();
+                    if (notifier != null)
+                        notifier.onDeath += OnFishDestroyed;
+                    break;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Spawns medium or hard prefabs at random points on hardZoneCollider.
+        /// </summary>
+        public void SpawnOnHardZone()
+        {
+            if (hardZoneCollider == null || spawnPrefab == null)
+                return;
+
+            var bounds = hardZoneCollider.bounds;
+            for (int i = 0; i < hardSpawnCount; i++)
+                SpawnOneHard(bounds);
+        }
+
+        private void SpawnOneHard(Bounds bounds)
+        {
+            while (true)
+            {
+                float x = Random.Range(bounds.min.x, bounds.max.x);
+                float z = Random.Range(bounds.min.z, bounds.max.z);
+                Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
+                Ray ray = new Ray(origin, Vector3.down);
+
+                if (Physics.Raycast(ray, out var hit, Mathf.Infinity) && hit.collider == hardZoneCollider)
+                {
+                    // choose medium or hard prefab at random
+                    var prefab = Random.value < 0.65f ? mediumSpawnPrefab : hardSpawnPrefab;
+                    if (prefab == null) break;
+
+                    Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
+                    var go = Instantiate(prefab, spawnPos, Quaternion.identity);
+                    var notifier = go.GetComponent<FishingArea>();
+                    if (notifier != null)
+                        notifier.onDeath += OnHardFishDestroyed;
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// When one medium/hard fish dies, spawn a replacement in the hard zone.
+        /// </summary>
+        private void OnHardFishDestroyed(FishingArea deadFish)
+        {
+            deadFish.onDeath -= OnHardFishDestroyed;
+            SpawnOneHard(hardZoneCollider.bounds);
+        }
+        
         public int GetMoney() => State.Money;
         public void AddMoney(int amount) => State.Money += amount;
 
