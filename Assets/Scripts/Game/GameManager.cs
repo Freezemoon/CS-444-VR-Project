@@ -43,6 +43,8 @@ namespace Game
         
         public GameState State = new();
 
+        public int currentTextIndex { get; private set; }
+
         public enum DialogueState
         {
             Start,
@@ -68,8 +70,6 @@ namespace Game
         private float _neededTextTime;
 
         private bool _isCurrentTextDisplay;
-
-        private int _currentTextIndex;
         
         private bool isMumbleEnabled;
         
@@ -369,7 +369,7 @@ namespace Game
             _isCurrentTextDisplay = true;
             typewriterEffectCanvas.SetActive(false);
             _neededTextTime = 0;
-            _currentTextIndex = -1;
+            currentTextIndex = -1;
         }
 
         /// <summary>
@@ -415,20 +415,20 @@ namespace Game
         {
             _currentTextTime += Time.deltaTime;
             
-            if (_currentTextIndex < 0 || _currentTextIndex >= larryTexts.Count) return;
+            if (currentTextIndex < 0 || currentTextIndex >= larryTexts.Count) return;
 
             if (_currentTextTime <= _neededTextTime) return;
 
-            if (!larryTexts[_currentTextIndex].isDisplayable) return;
+            if (!larryTexts[currentTextIndex].isDisplayable) return;
             
             typewriterEffectCanvas.SetActive(true);
             larryTextButton.SetActive(false);
-            typewriterEffect.fullText = larryTexts[_currentTextIndex].text;
+            typewriterEffect.fullText = larryTexts[currentTextIndex].text;
             typewriterEffect.StartTyping();
 
-            if (_currentTextIndex < larrySounds.Count && larrySounds[_currentTextIndex])
+            if (currentTextIndex < larrySounds.Count && larrySounds[currentTextIndex])
             {
-                larryAudioSource.clip = larrySounds[_currentTextIndex];
+                larryAudioSource.clip = larrySounds[currentTextIndex];
                 isMumbleEnabled = false;
             }
             else
@@ -438,13 +438,13 @@ namespace Game
             }
             larryAudioSource.Play();
             
-            _currentTextIndex++;
+            currentTextIndex++;
         }
 
         public void ConfirmDialogue()
         {
-            if (_currentTextIndex >= larryTexts.Count) return;
-            larryTexts[_currentTextIndex].isDisplayable = larryTexts[_currentTextIndex-1].activateNextText;
+            if (currentTextIndex >= larryTexts.Count) return;
+            larryTexts[currentTextIndex].isDisplayable = larryTexts[currentTextIndex-1].activateNextText;
             
             _currentTextTime = 0;
             _neededTextTime = 0;
@@ -454,7 +454,15 @@ namespace Game
         {
             if (!isMumbleEnabled) return;
             larryAudioSource.Pause();
-            larryTextButton.SetActive(larryTexts[_currentTextIndex-1].activateNextText);
+            larryTextButton.SetActive(larryTexts[currentTextIndex-1].activateNextText);
+        }
+
+        public void restartFishingTutoIfLostBeforeGrabFish()
+        {
+            if (currentTextIndex < 12)
+            {
+                SetDialogueState(DialogueState.AimBubble, true);
+            }
         }
 
         public void SetDialogueState(DialogueState state, bool canSetToPrevDialogue = false)
@@ -512,7 +520,7 @@ namespace Game
                     break;
             }
 
-            if (index >= _currentTextIndex || canSetToPrevDialogue)
+            if (index >= currentTextIndex || canSetToPrevDialogue)
             {
                 switch (state)
                 {
@@ -524,8 +532,8 @@ namespace Game
                         break;
                 }
                 
-                _currentTextIndex = index;
-                larryTexts[_currentTextIndex].isDisplayable = true;
+                currentTextIndex = index;
+                larryTexts[currentTextIndex].isDisplayable = true;
                 _currentTextTime = 0;
                 _neededTextTime = 0;
             }
