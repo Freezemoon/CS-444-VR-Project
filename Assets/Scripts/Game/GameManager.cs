@@ -627,7 +627,7 @@ namespace Game
                 if (Physics.Raycast(ray, out var hit, Mathf.Infinity) && hit.collider == hardZoneCollider)
                 {
                     // choose medium or hard prefab at random
-                    var prefab = Random.value < 0.5f ? mediumSpawnPrefab : hardSpawnPrefab;
+                    var prefab = Random.value < 0.65f ? mediumSpawnPrefab : hardSpawnPrefab;
                     if (prefab == null) break;
 
                     Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
