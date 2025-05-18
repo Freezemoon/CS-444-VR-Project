@@ -24,6 +24,8 @@ namespace Game
         public AudioClip larrySoundMumble;
         public GameObject larryTextButton;
 
+        public GameState State = new();
+
         [Header("DialogueTiggers")]
         public DialogueTrrigger dialogueTriggerDynamiteBought;
 
