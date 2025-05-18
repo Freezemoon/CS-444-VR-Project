@@ -686,6 +686,7 @@ namespace Game
 
         public int GetDynamiteAmount() => State.DynamiteAmount;
         public void AddDynamiteAmount(int amount) => State.DynamiteAmount += amount;
+
         
     }
 }

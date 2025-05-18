@@ -1,10 +1,7 @@
 using Game;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class ShopDisplay : MonoBehaviour
@@ -23,6 +20,8 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private Image _itemPreviewSprite;
     [SerializeField] private TextMeshProUGUI _itemPreviewDescription;
     [SerializeField] private TextMeshProUGUI _itemPreviewStat;
+    [SerializeField] private TextMeshProUGUI _itemPreviewText;
+    [SerializeField] private List<GameObject> _itemPreviewObjects;
 
     [Header("Shopping Cart")]
     [SerializeField] private TextMeshProUGUI _basketTotalText;
@@ -33,13 +32,11 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] _componentsPrice = new TextMeshProUGUI[7];
     [SerializeField] private List<GameObject> _cartContent;
 
-    private int _basketTotal;
 
     public void BuyItems()
     {
-        var basketTotal = 0;
-        int.TryParse(_basketTotalInteger.text, out basketTotal);
-        if (GameManager.instance.GetMoney() == 0 || GameManager.instance.GetMoney() < _basketTotal)
+        int.TryParse(_basketTotalInteger.text, out int basketTotal);
+        if (GameManager.instance.GetMoney() == 0 || GameManager.instance.GetMoney() < basketTotal)
         {
             _basketTotalText.SetText("Not enough money !");
             _basketTotalInteger.SetText("");
@@ -48,37 +45,42 @@ public class ShopDisplay : MonoBehaviour
         {
             for (int i = 0; i < 7; i++){
                 var item = _cartContent[i];
-                if(item.activeSelf){
-                    item.SetActive(false);
-                }
-                switch (i) 
+                if (item.activeSelf)
                 {
-                    case 0:
-                        GameManager.instance.AddComponent1Amount(10); 
-                        break;
-                    case 1:
-                        GameManager.instance.AddComponent2Amount(10);
-                        break;
-                    case 2:
-                        GameManager.instance.AddComponent3Amount(10);
-                        break;
-                    case 3:
-                        GameManager.instance.AddComponent4Amount(10);
-                        break;
-                    case 4:
-                        GameManager.instance.AddComponent5Amount(10);
-                        break;
-                    case 5:
-                        GameManager.instance.AddComponent6Amount(10);
-                        break;
-                    default: 
-                        GameManager.instance.AddDynamiteAmount(10);
-                        break;
+                    item.SetActive(false);
+
+                    switch (i)
+                    {
+                        case 0:
+                            GameManager.instance.AddComponent1Amount(10);
+                            break;
+                        case 1:
+                            GameManager.instance.AddComponent2Amount(10);
+                            break;
+                        case 2:
+                            GameManager.instance.AddComponent3Amount(10);
+                            break;
+                        case 3:
+                            GameManager.instance.AddComponent4Amount(10);
+                            break;
+                        case 4:
+                            GameManager.instance.AddComponent5Amount(10);
+                            break;
+                        case 5:
+                            GameManager.instance.AddComponent6Amount(10);
+                            break;
+                        default:
+                            GameManager.instance.AddDynamiteAmount(10);
+                            break;
+                    }
                 }
             }
             _basketTotalText.SetText("Shopping Cart Total: ");
             GameManager.instance.AddMoney(-basketTotal);
             _basketTotalInteger.SetText("0");
+            _itemPreviewText.gameObject.SetActive(true);
+            _itemPreviewText.SetText("Thanks for shopping with us !");
+            DeactivateAllActives(_itemPreviewObjects);
             RefreshPlayerTotal();
         }
 
@@ -88,6 +90,7 @@ public class ShopDisplay : MonoBehaviour
     {
         GameManager.instance.AddMoney(GameManager.instance.GetBucketValue());
         RefreshPlayerTotal();
+        RefreshCartTotal(); // in case the text was still "not enough money"
         _inventoryTotalText.SetText("Total inventory : 0G");
     }
     public void Start()
@@ -95,31 +98,40 @@ public class ShopDisplay : MonoBehaviour
         RefreshCartTotal();
         RefreshInventoryTotal();
         RefreshPlayerTotal();
+
     }
 
     public void RefreshPlayerTotal()
     {
-        _playerGoldText.SetText($"You currently have: {GameManager.instance.GetMoney()}");
+        _playerGoldText.SetText($"You currently have: {GameManager.instance.GetMoney()}G");
     }
 
     public void RefreshInventoryTotal()
     {
-        _inventoryTotalText.SetText("Total inventory : " + GameManager.instance.GetBucketValue() + "G");
+        _inventoryTotalText.SetText($"Total inventory : {GameManager.instance.GetBucketValue()}G");
     }
 
     public void RefreshCartTotal()
     {
         var shoppingCartSum = 0;
-        var temp = 0;
         foreach (var item in _componentsPrice)
         {
             if (item.IsActive())
             {
-                int.TryParse(item.text, out temp);
+                int.TryParse(item.text, out int temp);
                 shoppingCartSum += temp;
             }
         }
         _basketTotalText.SetText("Shopping Cart Total: ");
-        _basketTotalInteger.SetText(shoppingCartSum.ToString());
+        _basketTotalInteger.SetText($"{shoppingCartSum}");
+    }
+
+    private void DeactivateAllActives(List<GameObject> list)
+    {
+        foreach (var item in list)
+        {
+            item.SetActive(false);
+        }
+
     }
 }

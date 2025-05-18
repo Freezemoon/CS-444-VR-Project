@@ -3,7 +3,7 @@ using Game;
 namespace Game
 {
     /// <summary>
-    /// Permet de stoquer l'état du jeu
+    /// Permet de stocker l'état du jeu
     /// </summary>
     public class GameState
     {
