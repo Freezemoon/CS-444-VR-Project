@@ -71,6 +71,15 @@ namespace Game
             MeetBehindSmallIsland,
             DynamiteBought,
             RockDynamite,
+            DynamiteSpawned,
+            ThrowDynamite,
+            RockExploded,
+            WelcomeHome,
+            SecondIslandMeetLarry,
+            CraftBaits,
+            EquipBait,
+            ReadyToFishMore,
+            Victory,
         }
 
         private float _currentTextTime;
@@ -323,7 +332,7 @@ namespace Game
                 activateNextText = false
             },
             // DynamiteBought
-            // TODO: When the player buys a dynamite, the dialogue should change to this one.
+            // TODO: When the player buys a dynamite
             new TextEntry
             {
                 text = "Nice! You found the dynamite!\n" +
@@ -332,14 +341,17 @@ namespace Game
                 activateNextText = false
             },
             // RockDynamite
+            // TODO: When the player goes to the rock with at least one dynamite in his inventory
             new TextEntry
             {
                 text = "Hey again!\n" +
                        "Alright, now open your inventory — that’s the X button on your left controller.\n" +
                        "Select the dynamite.",
                 isDisplayable = false,
-                activateNextText = true
+                activateNextText = false
             },
+            // DynamiteSpawned
+            // TODO: When the player spawns a dynamite
             new TextEntry
             {
                 text = "Okay, listen carefully now!\n" +
@@ -347,13 +359,139 @@ namespace Game
                        "Then, use the lighter in your other hand to light the fuse.\n" +
                        "Once it starts burning… aim for the rock — and toss it!",
                 isDisplayable = false,
-                activateNextText = true
+                activateNextText = false
             },
-            
-            
+            // 30
+            // ThrowDynamite
+            // TODO: When the player lighted a dynamite
             new TextEntry
             {
-                text = "OK, Alex has to do the rest of the dialogue, see you soon my fisherman friend!",
+                text = "Do it! Throw the dynamite at the rock! QUICK!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // RockExploded
+            // TODO: When the player exploded the rock with a dynamite
+            new TextEntry
+            {
+                text = "Boom! Good job!\n" +
+                       "You cleared the way — you can now reach the other side of the lake.\n" +
+                       "Let’s meet over there!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // WelcomeHome
+            // TODO: When the player reaches the other side of the lake
+            new TextEntry
+            {
+                text = "Welcome home! Haha.\n" +
+                       "This is my side of the lake — but beware: the fish here are a bit tougher.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "Catch a few and meet me again near the small island —\n" +
+                       "just by the bridge and the little house in the middle of this lake.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // SecondIslandMeetLarry
+            // TODO: When the player meet Larry near the second island
+            new TextEntry
+            {
+                text = "So, they’re harder to fish, huh?",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            // 35
+            new TextEntry
+            {
+                text = "Well, now’s the perfect time to tell you: there are better baits at the shop.\n" +
+                       "Yep — the same shop near the dock where you bought the dynamites.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "Those baits will make fishing a whole lot easier.\n" +
+                       "Sell the fish you’ve caught so far, and buy yourself some upgrades.\n" +
+                       "See you back there soon!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // CraftBaits
+            // TODO: When the player buys a bait
+            new TextEntry
+            {
+                text = "Oh! You found the baits!\n" +
+                       "There are tons of combos — and yep, you gotta craft them.\n" +
+                       "Just grab a piece in each hand and snap ’em together. Easy!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // EquipBait
+            // TODO: When the player needs to equip a bait
+            new TextEntry
+            {
+                text = "Great job! Your first custom bait!\n" +
+                       "Now open your inventory again — X button, left controller —\n" +
+                       "and select the bait you just crafted.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // ReadyToFishMore
+            // TODO: When the player equiped his bait
+            new TextEntry
+            {
+                text = "Perfect! You're all set now.\n" +
+                       "Go out and fish some more!",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            // 40
+            new TextEntry
+            {
+                text = "Catch 5 of each kind of fish — that should clear a good patch of space for me.\n" +
+                       "Go on, partner — you’ve got this!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // Victory
+            // TODO: When the player caught 5 of each kind of fish
+            new TextEntry
+            {
+                text = "Hey! You did it!\n" +
+                       "You caught at least five of each kind — I can finally stretch again!\n" +
+                       "Ahhh… feels so much better already.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "You’ve helped me out more than you know.\n" +
+                       "That’s everything I needed — your mission’s complete!",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "If you want, stick around and fish some more — totally up to you.\n" +
+                       "But from here on out, it’s all extra. I’m heading home!",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "You’re free to explore, fish, or craft just for fun now.\n" +
+                       "Or take a break — your work here is done, hero of the lake!",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            // 45
+            new TextEntry
+            {
+                text = "Alright... bye now! Swim safe!",
                 isDisplayable = false,
                 activateNextText = false
             }
@@ -486,7 +624,7 @@ namespace Game
 
         public void restartFishingTutoIfLostBeforeGrabFish()
         {
-            if (currentTextIndex < 12)
+            if (currentTextIndex <= 12)
             {
                 SetDialogueState(DialogueState.AimBubble, true);
             }
@@ -545,10 +683,54 @@ namespace Game
                 case DialogueState.DynamiteBought:
                     index = 27;
                     break;
+                case DialogueState.RockDynamite:
+                    index = 28;
+                    break;
+                case DialogueState.DynamiteSpawned:
+                    index = 29;
+                    break;
+                case DialogueState.ThrowDynamite:
+                    index = 30;
+                    break;
+                case DialogueState.RockExploded:
+                    index = 31;
+                    break;
+                case DialogueState.WelcomeHome:
+                    index = 32;
+                    break;
+                case DialogueState.SecondIslandMeetLarry:
+                    index = 34;
+                    break;
+                case DialogueState.CraftBaits:
+                    index = 37;
+                    break;
+                case DialogueState.EquipBait:
+                    index = 38;
+                    break;
+                case DialogueState.ReadyToFishMore:
+                    index = 39;
+                    break;
+                case DialogueState.Victory:
+                    index = 41;
+                    break;
             }
 
             if (index >= currentTextIndex || canSetToPrevDialogue)
             {
+                currentTextIndex = index;
+                
+                if (canSetToPrevDialogue)
+                {
+                    for (int i = currentTextIndex + 1; i < larryTexts.Count; i++)
+                    {
+                        larryTexts[i].isDisplayable = false;
+                    }
+                }
+                
+                larryTexts[currentTextIndex].isDisplayable = true;
+                _currentTextTime = 0;
+                _neededTextTime = 0;
+                
                 switch (state)
                 {
                     case DialogueState.AimBubble:
@@ -558,11 +740,6 @@ namespace Game
                         dialogueTriggerDynamiteBought.ValidateDialogue();
                         break;
                 }
-                
-                currentTextIndex = index;
-                larryTexts[currentTextIndex].isDisplayable = true;
-                _currentTextTime = 0;
-                _neededTextTime = 0;
             }
         }
 

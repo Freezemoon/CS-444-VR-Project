@@ -25,18 +25,41 @@ public class FishingGame : MonoBehaviour
     [Header("Haptics")]
     public HapticImpulsePlayer rightHandHaptics;
     public HapticImpulsePlayer leftHandHaptics;
-    // public List<int> minPullList = new List<int>();
-    public int minPull = 3;
-    public int maxPull = 6;
-    public float minWaitingFishTime = 2.5f;
-    public float maxWaitingFishTime = 10;
-    public float maxPullingTimeBeforeLose = 10;
-    public float maxReelingTimeBeforeLose = 10;
-    public float minReelLength = 1.5f;
-    public float maxReelLength = 3;
-    public int minPhaseBeforeWin = 3;
-    public int maxPhaseBeforeWin = 7;
+    
+    [Header("Game Parameters")]
+    public float maxPullingTimeBeforeLose = 12;
+    public float maxReelingTimeBeforeLose = 15;
     public float reelForceMultiplierDivisor = 10;
+    
+    [Header("Easy")]
+    public int minPullEasy = 2;
+    public int maxPullEasy = 3;
+    public float minWaitingFishTimeEasy = 5;
+    public float maxWaitingFishTimeEasy = 8;
+    public float minReelLengthEasy = 0.3f;
+    public float maxReelLengthEasy = 0.5f;
+    public int minPhaseBeforeWinEasy = 3;
+    public int maxPhaseBeforeWinEasy = 4;
+    
+    [Header("Medium")]
+    public int minPullMedium = 2;
+    public int maxPullMedium = 4;
+    public float minWaitingFishTimeMedium = 7;
+    public float maxWaitingFishTimeMedium = 10;
+    public float minReelLengthMedium = 0.4f;
+    public float maxReelLengthMedium = 0.8f;
+    public int minPhaseBeforeWinMedium = 2;
+    public int maxPhaseBeforeWinMedium = 5;
+    
+    [Header("Hard")]
+    public int minPullHard = 4;
+    public int maxPullHard = 6;
+    public float minWaitingFishTimeHard = 9;
+    public float maxWaitingFishTimeHard = 12;
+    public float minReelLengthHard = 0.8f;
+    public float maxReelLengthHard = 1.5f;
+    public int minPhaseBeforeWinHard = 4;
+    public int maxPhaseBeforeWinHard = 6;
     
     public enum GameState
     {
@@ -125,32 +148,29 @@ public class FishingGame : MonoBehaviour
                 if (_currentWaitingFishTime >= _neededWaitingFishTime)
                 {
                     GameObject fishPrefab = null;
-                    Vector3 offset = Vector3.zero;
                     switch (difficulty)
                     {
                         case Difficulty.Easy:
                             fishPrefab = easyFishPrefab;
-                            // offset;
                             break;
                         case Difficulty.Medium:
                             fishPrefab = mediumFishPrefab;
-                            // offset = 1.2f;
                             break;
                         case Difficulty.Hard:
                             fishPrefab = hardFishPrefab;
-                            // offset = 1.2f;
                             break;
                     }
                     _currentFish = Instantiate(fishPrefab, baitFishAttach.position, Quaternion.identity);
                     _currentFish.GetComponent<XRGrabInteractable>().enabled = false;
                     _currentFish.GetComponent<Rigidbody>().useGravity = false;
+                    
                     Physics.IgnoreCollision(baitFishAttach.parent.GetComponent<Collider>(), _currentFish.GetComponent<Collider>());
                     ConfigurableJoint currentFishJoin = _currentFish.GetComponent<ConfigurableJoint>();
+                    
                     currentFishJoin.connectedBody = baitFishAttach.parent.GetComponent<Rigidbody>();
-                    currentFishJoin.anchor = offset;
+                    currentFishJoin.anchor = Vector3.left * 0.3f;
                     currentFishJoin.connectedAnchor = new Vector3(0, 0, 0);
                     
-                    _neededWaitingFishTime = Random.Range(minWaitingFishTime, maxWaitingFishTime);
                     StartPulling();
                     break;
                 }
@@ -164,7 +184,6 @@ public class FishingGame : MonoBehaviour
                 
                 if (_currentPhaseTimeBeforeLose >= _neededPhaseTimeBeforeLose)
                 {
-                    Debug.Log("Lose3");
                     LoseGame();
                 }
 
@@ -191,12 +210,48 @@ public class FishingGame : MonoBehaviour
         _wasBaitAlreadyInWaterThisRound = false;
         gameState = GameState.WaitingFish;
         
-        rightHandHaptics.SendHapticImpulse(0.8f, 0.5f);
-
+        rightHandHaptics.SendHapticImpulse(0.8f, 1.6f);
+        
         _currentWaitingFishTime = 0;
+        
+        float minWaitingFishTime = 0;
+        float maxWaitingFishTime = 0;
+        switch (difficulty)
+        {
+            case Difficulty.Easy:
+                minWaitingFishTime = minWaitingFishTimeEasy;
+                maxWaitingFishTime = maxWaitingFishTimeEasy;
+                break;
+            case Difficulty.Medium:
+                minWaitingFishTime = minWaitingFishTimeMedium;
+                maxWaitingFishTime = maxWaitingFishTimeMedium;
+                break;
+            case Difficulty.Hard:
+                minWaitingFishTime = minWaitingFishTimeHard;
+                maxWaitingFishTime = maxWaitingFishTimeHard;
+                break;
+        }
         _neededWaitingFishTime = Random.Range(minWaitingFishTime, maxWaitingFishTime);
-
+        
         _currentPhaseBeforeWin = 0;
+
+        int minPhaseBeforeWin = 0;
+        int maxPhaseBeforeWin = 0;
+        switch (difficulty)
+        {
+            case Difficulty.Easy:
+                minPhaseBeforeWin = minPhaseBeforeWinEasy;
+                maxPhaseBeforeWin = maxPhaseBeforeWinEasy;
+                break;
+            case Difficulty.Medium:
+                minPhaseBeforeWin = minPhaseBeforeWinMedium;
+                maxPhaseBeforeWin = maxPhaseBeforeWinMedium;
+                break;
+            case Difficulty.Hard:
+                minPhaseBeforeWin = minPhaseBeforeWinHard;
+                maxPhaseBeforeWin = maxPhaseBeforeWinHard;
+                break;
+        }
         _neededPhaseBeforeWin = Random.Range(minPhaseBeforeWin, maxPhaseBeforeWin + 1);
     }
 
@@ -204,7 +259,6 @@ public class FishingGame : MonoBehaviour
     {
         if (gameState == GameState.WaitingFish)
         {
-            Debug.Log("Lose2");
             LoseGame();
         }
     }
@@ -230,7 +284,7 @@ public class FishingGame : MonoBehaviour
         
         _currentReel += amount;
 
-        if (!(_currentReel >= _neededReel)) return false;
+        if (_currentReel < _neededReel) return false;
         
         NextGamePhase();
         
@@ -257,6 +311,24 @@ public class FishingGame : MonoBehaviour
         rightHandHaptics.SendHapticImpulse(0.8f, 0.8f);
         
         _currentPull = 0;
+        
+        int minPull = 0;
+        int maxPull = 0;
+        switch (difficulty)
+        {
+            case Difficulty.Easy:
+                minPull = minPullEasy;
+                maxPull = maxPullEasy;
+                break;
+            case Difficulty.Medium:
+                minPull = minPullMedium;    
+                maxPull = maxPullMedium;
+                break;
+            case Difficulty.Hard:
+                minPull = minPullHard;
+                maxPull = maxPullHard;
+                break;
+        }
         _neededPull = Random.Range(minPull, maxPull + 1);
         
         _currentPhaseTimeBeforeLose = 0;
@@ -271,6 +343,24 @@ public class FishingGame : MonoBehaviour
         leftHandHaptics.SendHapticImpulse(0.8f, 0.8f);
         
         _currentReel = 0;
+        
+        float minReelLength = 0;
+        float maxReelLength = 0;
+        switch (difficulty)
+        {
+            case Difficulty.Easy:
+                minReelLength = minReelLengthEasy;
+                maxReelLength = maxReelLengthEasy;
+                break;
+            case Difficulty.Medium:
+                minReelLength = minReelLengthMedium;
+                maxReelLength = maxReelLengthMedium;
+                break;
+            case Difficulty.Hard:
+                minReelLength = minReelLengthHard;
+                maxReelLength = maxReelLengthHard;
+                break;
+        }
         _neededReel = Random.Range(minReelLength, maxReelLength);
         
         _currentPhaseTimeBeforeLose = 0;

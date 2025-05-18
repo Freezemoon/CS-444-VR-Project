@@ -107,7 +107,6 @@ public class GrabRotateAroundPivot : MonoBehaviour
             // If the locked line length is bigger than max, then lose the game
             if (_currentLockedLineLength > _currentLockedLineLengthMax)
             {
-                Debug.Log("Lose1");
                 FishingGame.instance.LoseGame();
             }
         }
