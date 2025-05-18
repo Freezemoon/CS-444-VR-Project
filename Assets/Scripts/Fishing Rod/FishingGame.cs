@@ -17,7 +17,9 @@ public class FishingGame : MonoBehaviour
     public AudioSource loseAudioSource;
     public AudioSource victoryAudioSource;
     
-    public GameObject fishPrefab;
+    public GameObject easyFishPrefab;
+    public GameObject mediumFishPrefab;
+    public GameObject hardFishPrefab;
     public Transform baitFishAttach;
 
     [Header("Haptics")]
@@ -122,16 +124,30 @@ public class FishingGame : MonoBehaviour
                 // Check if fish can spawn
                 if (_currentWaitingFishTime >= _neededWaitingFishTime)
                 {
-                    difficulty = (Difficulty)Enum.GetValues(typeof(Difficulty)).GetValue(
-                        Random.Range(0, Enum.GetValues(typeof(Difficulty)).Length));
-                    
+                    GameObject fishPrefab = null;
+                    Vector3 offset = Vector3.zero;
+                    switch (difficulty)
+                    {
+                        case Difficulty.Easy:
+                            fishPrefab = easyFishPrefab;
+                            // offset;
+                            break;
+                        case Difficulty.Medium:
+                            fishPrefab = mediumFishPrefab;
+                            // offset = 1.2f;
+                            break;
+                        case Difficulty.Hard:
+                            fishPrefab = hardFishPrefab;
+                            // offset = 1.2f;
+                            break;
+                    }
                     _currentFish = Instantiate(fishPrefab, baitFishAttach.position, Quaternion.identity);
                     _currentFish.GetComponent<XRGrabInteractable>().enabled = false;
                     _currentFish.GetComponent<Rigidbody>().useGravity = false;
                     Physics.IgnoreCollision(baitFishAttach.parent.GetComponent<Collider>(), _currentFish.GetComponent<Collider>());
                     ConfigurableJoint currentFishJoin = _currentFish.GetComponent<ConfigurableJoint>();
                     currentFishJoin.connectedBody = baitFishAttach.parent.GetComponent<Rigidbody>();
-                    currentFishJoin.anchor = Vector3.left * 1.1f;
+                    currentFishJoin.anchor = offset;
                     currentFishJoin.connectedAnchor = new Vector3(0, 0, 0);
                     
                     _neededWaitingFishTime = Random.Range(minWaitingFishTime, maxWaitingFishTime);
@@ -148,6 +164,7 @@ public class FishingGame : MonoBehaviour
                 
                 if (_currentPhaseTimeBeforeLose >= _neededPhaseTimeBeforeLose)
                 {
+                    Debug.Log("Lose3");
                     LoseGame();
                 }
 
@@ -187,6 +204,7 @@ public class FishingGame : MonoBehaviour
     {
         if (gameState == GameState.WaitingFish)
         {
+            Debug.Log("Lose2");
             LoseGame();
         }
     }

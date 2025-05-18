@@ -4,7 +4,7 @@ public class Explodable : MonoBehaviour
 {
     [SerializeField] private AudioClip destroySfx;
 
-    private void OnDestroy()
+    public void PlaySound()
     {
         if (destroySfx != null)
             AudioSource.PlayClipAtPoint(destroySfx, transform.position);

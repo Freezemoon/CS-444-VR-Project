@@ -98,7 +98,8 @@ public class GrabRotateAroundPivot : MonoBehaviour
     private void UpdateMaxLineLengthAndReelForceMultiplier()
     {
         // If game is started the max length of the line and the reel force are increased 
-        if (FishingGame.instance.gameState == FishingGame.GameState.Reeling)
+        if (FishingGame.instance.gameState == FishingGame.GameState.Reeling ||
+            FishingGame.instance.gameState == FishingGame.GameState.Pulling)
         {
             _currentLockedLineLengthMax = _lockedLineLengthMax + _lockedLineLengthMaxAddForGame;
             _currentReelForceMultiplier = reelForceMultiplier / FishingGame.instance.reelForceMultiplierDivisor;
@@ -106,6 +107,7 @@ public class GrabRotateAroundPivot : MonoBehaviour
             // If the locked line length is bigger than max, then lose the game
             if (_currentLockedLineLength > _currentLockedLineLengthMax)
             {
+                Debug.Log("Lose1");
                 FishingGame.instance.LoseGame();
             }
         }

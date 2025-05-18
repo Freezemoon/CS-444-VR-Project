@@ -572,7 +572,7 @@ namespace Game
         /// </summary>
         private void SpawnOne()
         {
-            if (waterCollider == null || spawnPrefab == null)
+            if (!waterCollider || !spawnPrefab)
                 return;
 
             var bounds = waterCollider.bounds;
@@ -590,9 +590,9 @@ namespace Game
 
                     Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
                     var fishGo = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
-                    var notifier = fishGo.GetComponent<FishingArea>();
-                    if (notifier != null)
-                        notifier.onDeath += OnFishDestroyed;
+                    var area = fishGo.GetComponent<FishingArea>();
+                    if (area)
+                        area.onDeath += OnFishDestroyed;
                     break;
                 }
             }
@@ -647,7 +647,8 @@ namespace Game
         private void OnHardFishDestroyed(FishingArea deadFish)
         {
             deadFish.onDeath -= OnHardFishDestroyed;
-            SpawnOneHard(hardZoneCollider.bounds);
+            if (hardZoneCollider)
+                SpawnOneHard(hardZoneCollider.bounds);
         }
         
         public int GetMoney() => State.Money;

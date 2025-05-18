@@ -5,6 +5,8 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public class GrabFish : MonoBehaviour
 {
+    public FishingGame.Difficulty difficulty;
+    
     private XRGrabInteractable _grabInteractable;
 
     void Awake()

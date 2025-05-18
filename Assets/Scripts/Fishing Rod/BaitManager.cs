@@ -19,6 +19,8 @@ public class BaitManager : MonoBehaviour
             if (FishingGame.instance.canBaitGoInWater &&
                 FishingGame.instance.gameState == FishingGame.GameState.WaitingFish)
             {
+                // Destroy FishingZone
+                other.GetComponent<FishingArea>().BeforeDestroy();
                 Destroy(other.gameObject);
             }
         }

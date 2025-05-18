@@ -18,22 +18,6 @@ public class FishingArea : MonoBehaviour
         FishingRodExit();
     }
     
-    void OnDestroy()
-    {
-        // tell anyone who’s listening that we’re about to die
-        onDeath?.Invoke(this);
-    }
-    
-    private void FishingRodExit()
-    {
-        GetComponent<Renderer>().material.color = _defaultColor;
-    }
-    
-    private void FishingRodEnter()
-    {
-        GetComponent<Renderer>().material.color = _enterColor;
-    }
-    
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("FishingBait")) return;
@@ -58,5 +42,21 @@ public class FishingArea : MonoBehaviour
         FishingRodExit();
 
         FishingGame.instance.ExitFishingArea();
+    }
+
+    public void BeforeDestroy()
+    {
+        // tell anyone who’s listening that we’re about to die
+        onDeath?.Invoke(this);
+    }
+    
+    private void FishingRodExit()
+    {
+        GetComponent<Renderer>().material.color = _defaultColor;
+    }
+    
+    private void FishingRodEnter()
+    {
+        GetComponent<Renderer>().material.color = _enterColor;
     }
 }
