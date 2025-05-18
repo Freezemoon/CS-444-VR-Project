@@ -1,4 +1,5 @@
 using Game;
+using NUnit.Framework;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -21,7 +22,7 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _itemPreviewDescription;
     [SerializeField] private TextMeshProUGUI _itemPreviewStat;
     [SerializeField] private TextMeshProUGUI _itemPreviewText;
-    [SerializeField] private List<GameObject> _itemPreviewObjects;
+    [SerializeField] private GameObject[] _itemPreviewObjects = new GameObject[7];
 
     [Header("Shopping Cart")]
     [SerializeField] private TextMeshProUGUI _basketTotalText;
@@ -30,7 +31,7 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private Button _buyButton;
     [SerializeField] private TextMeshProUGUI _buyButtonText;
     [SerializeField] private TextMeshProUGUI[] _componentsPrice = new TextMeshProUGUI[7];
-    [SerializeField] private List<GameObject> _cartContent;
+    [SerializeField] private GameObject[] _cartContent = new GameObject[7];
 
 
     public void BuyItems()
@@ -80,7 +81,7 @@ public class ShopDisplay : MonoBehaviour
             _basketTotalInteger.SetText("0");
             _itemPreviewText.gameObject.SetActive(true);
             _itemPreviewText.SetText("Thanks for shopping with us !");
-            DeactivateAllActives(_itemPreviewObjects);
+            foreach (var item in _itemPreviewObjects) item.SetActive(false); // remove any preview UI to display thanks 
             RefreshPlayerTotal();
         }
 
@@ -124,14 +125,5 @@ public class ShopDisplay : MonoBehaviour
         }
         _basketTotalText.SetText("Shopping Cart Total: ");
         _basketTotalInteger.SetText($"{shoppingCartSum}");
-    }
-
-    private void DeactivateAllActives(List<GameObject> list)
-    {
-        foreach (var item in list)
-        {
-            item.SetActive(false);
-        }
-
     }
 }
