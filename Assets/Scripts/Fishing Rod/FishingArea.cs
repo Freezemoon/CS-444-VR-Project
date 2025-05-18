@@ -1,31 +1,21 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class FishingArea : MonoBehaviour
 {
     public Color _defaultColor = Color.green;
     public Color _enterColor = Color.red;
     public event Action<FishingArea> onDeath;
+    
+    [Header("Area Settings")]
+    [Tooltip("What difficulty this fishing area is.")]
+    [field: SerializeField]
+    public FishingGame.Difficulty areaDifficulty { get; set; } = FishingGame.Difficulty.Easy;
 
     private void Start()
     {
         FishingRodExit();
-    }
-    
-    void OnDestroy()
-    {
-        // tell anyone who’s listening that we’re about to die
-        onDeath?.Invoke(this);
-    }
-    
-    private void FishingRodExit()
-    {
-        GetComponent<Renderer>().material.color = _defaultColor;
-    }
-    
-    private void FishingRodEnter()
-    {
-        GetComponent<Renderer>().material.color = _enterColor;
     }
     
     private void OnTriggerEnter(Collider other)
@@ -34,6 +24,8 @@ public class FishingArea : MonoBehaviour
         
         if (FishingGame.instance.gameState != FishingGame.GameState.NotStarted &&
             FishingGame.instance.gameState != FishingGame.GameState.WaitingFish) return;
+        
+        FishingGame.instance.difficulty = areaDifficulty;
         
         FishingRodEnter();
 
@@ -50,5 +42,21 @@ public class FishingArea : MonoBehaviour
         FishingRodExit();
 
         FishingGame.instance.ExitFishingArea();
+    }
+
+    public void BeforeDestroy()
+    {
+        // tell anyone who’s listening that we’re about to die
+        onDeath?.Invoke(this);
+    }
+    
+    private void FishingRodExit()
+    {
+        GetComponent<Renderer>().material.color = _defaultColor;
+    }
+    
+    private void FishingRodEnter()
+    {
+        GetComponent<Renderer>().material.color = _enterColor;
     }
 }

@@ -25,6 +25,8 @@ namespace Game
         public AudioClip larrySoundMumble;
         public GameObject larryTextButton;
 
+        public GameState State = new();
+
         [Header("DialogueTiggers")]
         public DialogueTrrigger dialogueTriggerDynamiteBought;
 
@@ -43,10 +45,6 @@ namespace Game
         [SerializeField] private Collider waterCollider;
         
         [Header("Medium/Hard Spawning Settings")]
-        [Tooltip("Prefab to spawn in medium‐difficulty zone.")]
-        [SerializeField] private GameObject mediumSpawnPrefab;
-        [Tooltip("Prefab to spawn in hard‐difficulty zone.")]
-        [SerializeField] private GameObject hardSpawnPrefab;
         [Tooltip("Collider of the hard‐zone surface to spawn on.")]
         [SerializeField] private Collider hardZoneCollider;
         [Tooltip("How many medium/hard fish to keep alive at once.")]
@@ -73,6 +71,15 @@ namespace Game
             MeetBehindSmallIsland,
             DynamiteBought,
             RockDynamite,
+            DynamiteSpawned,
+            ThrowDynamite,
+            RockExploded,
+            WelcomeHome,
+            SecondIslandMeetLarry,
+            CraftBaits,
+            EquipBait,
+            ReadyToFishMore,
+            Victory,
         }
 
         private float _currentTextTime;
@@ -325,7 +332,7 @@ namespace Game
                 activateNextText = false
             },
             // DynamiteBought
-            // TODO: When the player buys a dynamite, the dialogue should change to this one.
+            // TODO: When the player buys a dynamite
             new TextEntry
             {
                 text = "Nice! You found the dynamite!\n" +
@@ -334,14 +341,17 @@ namespace Game
                 activateNextText = false
             },
             // RockDynamite
+            // TODO: When the player goes to the rock with at least one dynamite in his inventory
             new TextEntry
             {
                 text = "Hey again!\n" +
                        "Alright, now open your inventory — that’s the X button on your left controller.\n" +
                        "Select the dynamite.",
                 isDisplayable = false,
-                activateNextText = true
+                activateNextText = false
             },
+            // DynamiteSpawned
+            // TODO: When the player spawns a dynamite
             new TextEntry
             {
                 text = "Okay, listen carefully now!\n" +
@@ -349,13 +359,139 @@ namespace Game
                        "Then, use the lighter in your other hand to light the fuse.\n" +
                        "Once it starts burning… aim for the rock — and toss it!",
                 isDisplayable = false,
-                activateNextText = true
+                activateNextText = false
             },
-            
-            
+            // 30
+            // ThrowDynamite
+            // TODO: When the player lighted a dynamite
             new TextEntry
             {
-                text = "OK, Alex has to do the rest of the dialogue, see you soon my fisherman friend!",
+                text = "Do it! Throw the dynamite at the rock! QUICK!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // RockExploded
+            // TODO: When the player exploded the rock with a dynamite
+            new TextEntry
+            {
+                text = "Boom! Good job!\n" +
+                       "You cleared the way — you can now reach the other side of the lake.\n" +
+                       "Let’s meet over there!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // WelcomeHome
+            // TODO: When the player reaches the other side of the lake
+            new TextEntry
+            {
+                text = "Welcome home! Haha.\n" +
+                       "This is my side of the lake — but beware: the fish here are a bit tougher.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "Catch a few and meet me again near the small island —\n" +
+                       "just by the bridge and the little house in the middle of this lake.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // SecondIslandMeetLarry
+            // TODO: When the player meet Larry near the second island
+            new TextEntry
+            {
+                text = "So, they’re harder to fish, huh?",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            // 35
+            new TextEntry
+            {
+                text = "Well, now’s the perfect time to tell you: there are better baits at the shop.\n" +
+                       "Yep — the same shop near the dock where you bought the dynamites.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "Those baits will make fishing a whole lot easier.\n" +
+                       "Sell the fish you’ve caught so far, and buy yourself some upgrades.\n" +
+                       "See you back there soon!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // CraftBaits
+            // TODO: When the player buys a bait
+            new TextEntry
+            {
+                text = "Oh! You found the baits!\n" +
+                       "There are tons of combos — and yep, you gotta craft them.\n" +
+                       "Just grab a piece in each hand and snap ’em together. Easy!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // EquipBait
+            // TODO: When the player needs to equip a bait
+            new TextEntry
+            {
+                text = "Great job! Your first custom bait!\n" +
+                       "Now open your inventory again — X button, left controller —\n" +
+                       "and select the bait you just crafted.",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // ReadyToFishMore
+            // TODO: When the player equiped his bait
+            new TextEntry
+            {
+                text = "Perfect! You're all set now.\n" +
+                       "Go out and fish some more!",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            // 40
+            new TextEntry
+            {
+                text = "Catch 5 of each kind of fish — that should clear a good patch of space for me.\n" +
+                       "Go on, partner — you’ve got this!",
+                isDisplayable = false,
+                activateNextText = false
+            },
+            // Victory
+            // TODO: When the player caught 5 of each kind of fish
+            new TextEntry
+            {
+                text = "Hey! You did it!\n" +
+                       "You caught at least five of each kind — I can finally stretch again!\n" +
+                       "Ahhh… feels so much better already.",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "You’ve helped me out more than you know.\n" +
+                       "That’s everything I needed — your mission’s complete!",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "If you want, stick around and fish some more — totally up to you.\n" +
+                       "But from here on out, it’s all extra. I’m heading home!",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            new TextEntry
+            {
+                text = "You’re free to explore, fish, or craft just for fun now.\n" +
+                       "Or take a break — your work here is done, hero of the lake!",
+                isDisplayable = false,
+                activateNextText = true
+            },
+            // 45
+            new TextEntry
+            {
+                text = "Alright... bye now! Swim safe!",
                 isDisplayable = false,
                 activateNextText = false
             }
@@ -396,13 +532,7 @@ namespace Game
         }
 
         /// <summary>
-        /// Permet de spawn les poissons sur une surface taggée avec "Water".
-        /// Système random très simple pour le moment.
-        /// TODO pour affiner le système later :
-        /// - Prendre en compte la position du joueur pour pas spawn les préfabs trop loin
-        /// - Faire en sorte que quand un poisson est pêché, un respawn un nouveau random. Le but du spawn
-        /// count devient donc de maintenir un nombre fix d'instance de poisson à pêcher en tout temps
-        /// - Prendre en compte les zones innaccessible du lac pour pas spawn là bas (plusieurs tags?)
+        /// Permet de générer le spawn initial des zones de pêche.
         /// </summary>
         /// <summary>
         /// Spawn spawnCount copies of spawnPrefab at random points on waterCollider.
@@ -417,7 +547,7 @@ namespace Game
             {
                 float x = Random.Range(bounds.min.x, bounds.max.x);
                 float z = Random.Range(bounds.min.z, bounds.max.z);
-                Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
+                Vector3 origin = new Vector3(x, bounds.max.y + 500f, z);
 
                 Ray ray = new Ray(origin, Vector3.down);
                 if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
@@ -431,9 +561,12 @@ namespace Game
 
                     Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
                     var fishGo = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
-                    var notifier = fishGo.GetComponent<FishingArea>();
-                    if (notifier != null)
-                        notifier.onDeath += OnFishDestroyed;
+                    var area   = fishGo.GetComponent<FishingArea>();
+                    if (area != null)
+                    {
+                        area.areaDifficulty = FishingGame.Difficulty.Easy;
+                        area.onDeath += OnFishDestroyed;
+                    }
                 }
                 else
                 {
@@ -491,7 +624,7 @@ namespace Game
 
         public void restartFishingTutoIfLostBeforeGrabFish()
         {
-            if (currentTextIndex < 12)
+            if (currentTextIndex <= 12)
             {
                 SetDialogueState(DialogueState.AimBubble, true);
             }
@@ -550,10 +683,54 @@ namespace Game
                 case DialogueState.DynamiteBought:
                     index = 27;
                     break;
+                case DialogueState.RockDynamite:
+                    index = 28;
+                    break;
+                case DialogueState.DynamiteSpawned:
+                    index = 29;
+                    break;
+                case DialogueState.ThrowDynamite:
+                    index = 30;
+                    break;
+                case DialogueState.RockExploded:
+                    index = 31;
+                    break;
+                case DialogueState.WelcomeHome:
+                    index = 32;
+                    break;
+                case DialogueState.SecondIslandMeetLarry:
+                    index = 34;
+                    break;
+                case DialogueState.CraftBaits:
+                    index = 37;
+                    break;
+                case DialogueState.EquipBait:
+                    index = 38;
+                    break;
+                case DialogueState.ReadyToFishMore:
+                    index = 39;
+                    break;
+                case DialogueState.Victory:
+                    index = 41;
+                    break;
             }
 
             if (index >= currentTextIndex || canSetToPrevDialogue)
             {
+                currentTextIndex = index;
+                
+                if (canSetToPrevDialogue)
+                {
+                    for (int i = currentTextIndex + 1; i < larryTexts.Count; i++)
+                    {
+                        larryTexts[i].isDisplayable = false;
+                    }
+                }
+                
+                larryTexts[currentTextIndex].isDisplayable = true;
+                _currentTextTime = 0;
+                _neededTextTime = 0;
+                
                 switch (state)
                 {
                     case DialogueState.AimBubble:
@@ -563,11 +740,6 @@ namespace Game
                         dialogueTriggerDynamiteBought.ValidateDialogue();
                         break;
                 }
-                
-                currentTextIndex = index;
-                larryTexts[currentTextIndex].isDisplayable = true;
-                _currentTextTime = 0;
-                _neededTextTime = 0;
             }
         }
 
@@ -577,7 +749,7 @@ namespace Game
         /// </summary>
         private void SpawnOne()
         {
-            if (waterCollider == null || spawnPrefab == null)
+            if (!waterCollider || !spawnPrefab)
                 return;
 
             var bounds = waterCollider.bounds;
@@ -585,7 +757,7 @@ namespace Game
             {
                 float x = Random.Range(bounds.min.x, bounds.max.x);
                 float z = Random.Range(bounds.min.z, bounds.max.z);
-                Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
+                Vector3 origin = new Vector3(x, bounds.max.y + 500f, z);
 
                 Ray ray = new Ray(origin, Vector3.down);
                 if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
@@ -595,9 +767,9 @@ namespace Game
 
                     Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
                     var fishGo = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
-                    var notifier = fishGo.GetComponent<FishingArea>();
-                    if (notifier != null)
-                        notifier.onDeath += OnFishDestroyed;
+                    var area = fishGo.GetComponent<FishingArea>();
+                    if (area)
+                        area.onDeath += OnFishDestroyed;
                     break;
                 }
             }
@@ -622,20 +794,25 @@ namespace Game
             {
                 float x = Random.Range(bounds.min.x, bounds.max.x);
                 float z = Random.Range(bounds.min.z, bounds.max.z);
-                Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
+                Vector3 origin = new Vector3(x, bounds.max.y + 500f, z);
                 Ray ray = new Ray(origin, Vector3.down);
 
                 if (Physics.Raycast(ray, out var hit, Mathf.Infinity) && hit.collider == hardZoneCollider)
                 {
-                    // choose medium or hard prefab at random
-                    var prefab = Random.value < 0.65f ? mediumSpawnPrefab : hardSpawnPrefab;
-                    if (prefab == null) break;
+                    // decide difficulty: 65% medium, 35% hard
+                    var difficulty = Random.value < 0.65f
+                        ? FishingGame.Difficulty.Medium
+                        : FishingGame.Difficulty.Hard;
 
                     Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
-                    var go = Instantiate(prefab, spawnPos, Quaternion.identity);
-                    var notifier = go.GetComponent<FishingArea>();
-                    if (notifier != null)
-                        notifier.onDeath += OnHardFishDestroyed;
+                    var go = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
+
+                    var area = go.GetComponent<FishingArea>();
+                    if (area != null)
+                    {
+                        area.areaDifficulty = difficulty;
+                        area.onDeath += OnHardFishDestroyed;
+                    }
                     break;
                 }
             }
@@ -647,7 +824,8 @@ namespace Game
         private void OnHardFishDestroyed(FishingArea deadFish)
         {
             deadFish.onDeath -= OnHardFishDestroyed;
-            SpawnOneHard(hardZoneCollider.bounds);
+            if (hardZoneCollider)
+                SpawnOneHard(hardZoneCollider.bounds);
         }
         
         public int GetMoney() => State.Money;

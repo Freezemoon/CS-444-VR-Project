@@ -41,9 +41,6 @@ public class FishingRodCaster : MonoBehaviour
     private Quaternion _prevHandRotation;
     private float _backwardPitchSpeed;
     
-    private System.Action<InputAction.CallbackContext> _onCastStarted;
-    private System.Action<InputAction.CallbackContext> _onCastCanceled;
-
     private void Start()
     {
         OnReelReachedMinLength();
@@ -51,12 +48,8 @@ public class FishingRodCaster : MonoBehaviour
 
     private void OnEnable()
     {
-        // Store callbacks so we can unsubscribe later
-        _onCastStarted = _ => StartHoldingToThrowBait();
-        _onCastCanceled = _ => ReleaseAndCastBait();
-        
-        castAction.action.started += _onCastStarted;
-        castAction.action.canceled += _onCastCanceled;
+        castAction.action.started += StartHoldingToThrowBait;
+        castAction.action.canceled += ReleaseAndCastBait;
         aButtonAction.action.started += OnAButtonPressed;
 
         GrabRotateAroundPivot.OnReelReachedMinLength += OnReelReachedMinLength;
@@ -69,8 +62,8 @@ public class FishingRodCaster : MonoBehaviour
 
     private void OnDisable()
     {
-        castAction.action.started -= _onCastStarted;
-        castAction.action.canceled -= _onCastCanceled;
+        castAction.action.started -= StartHoldingToThrowBait;
+        castAction.action.canceled -= ReleaseAndCastBait;
         aButtonAction.action.started -= OnAButtonPressed;
         
         GrabRotateAroundPivot.OnReelReachedMinLength -= OnReelReachedMinLength;
@@ -123,9 +116,11 @@ public class FishingRodCaster : MonoBehaviour
     {
         transform.position = controllerTransform.position;
         transform.rotation = Quaternion.Euler(Vector3.right * -90f);
+        
+        baitTransform.position = baitInitPosTransform.position;
     }
 
-    private void StartHoldingToThrowBait()
+    private void StartHoldingToThrowBait(InputAction.CallbackContext context)
     {
         if (!_isHeld) return;
         if (!_isBaitAtInitPos) return;
@@ -139,7 +134,7 @@ public class FishingRodCaster : MonoBehaviour
         baitTransform.position = baitInitPosTransform.position;
     }
 
-    private void ReleaseAndCastBait()
+    private void ReleaseAndCastBait(InputAction.CallbackContext context)
     {
         if (!_isHeld) return;
         if (!_isHolding) return;

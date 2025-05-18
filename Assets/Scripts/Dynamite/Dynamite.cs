@@ -237,6 +237,7 @@ public class Dynamite : MonoBehaviour
             
             if (hit.TryGetComponent<Explodable>(out var explodable))
             {
+                explodable.PlaySound();
                 Destroy(explodable.gameObject);
             }
         }
