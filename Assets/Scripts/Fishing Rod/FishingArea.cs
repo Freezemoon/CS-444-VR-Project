@@ -1,11 +1,17 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class FishingArea : MonoBehaviour
 {
     public Color _defaultColor = Color.green;
     public Color _enterColor = Color.red;
     public event Action<FishingArea> onDeath;
+    
+    [Header("Area Settings")]
+    [Tooltip("What difficulty this fishing area is.")]
+    [field: SerializeField]
+    public FishingGame.Difficulty areaDifficulty { get; set; } = FishingGame.Difficulty.Easy;
 
     private void Start()
     {
@@ -34,6 +40,8 @@ public class FishingArea : MonoBehaviour
         
         if (FishingGame.instance.gameState != FishingGame.GameState.NotStarted &&
             FishingGame.instance.gameState != FishingGame.GameState.WaitingFish) return;
+        
+        FishingGame.instance.difficulty = areaDifficulty;
         
         FishingRodEnter();
 

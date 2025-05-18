@@ -45,10 +45,6 @@ namespace Game
         [SerializeField] private Collider waterCollider;
         
         [Header("Medium/Hard Spawning Settings")]
-        [Tooltip("Prefab to spawn in medium‐difficulty zone.")]
-        [SerializeField] private GameObject mediumSpawnPrefab;
-        [Tooltip("Prefab to spawn in hard‐difficulty zone.")]
-        [SerializeField] private GameObject hardSpawnPrefab;
         [Tooltip("Collider of the hard‐zone surface to spawn on.")]
         [SerializeField] private Collider hardZoneCollider;
         [Tooltip("How many medium/hard fish to keep alive at once.")]
@@ -398,13 +394,7 @@ namespace Game
         }
 
         /// <summary>
-        /// Permet de spawn les poissons sur une surface taggée avec "Water".
-        /// Système random très simple pour le moment.
-        /// TODO pour affiner le système later :
-        /// - Prendre en compte la position du joueur pour pas spawn les préfabs trop loin
-        /// - Faire en sorte que quand un poisson est pêché, un respawn un nouveau random. Le but du spawn
-        /// count devient donc de maintenir un nombre fix d'instance de poisson à pêcher en tout temps
-        /// - Prendre en compte les zones innaccessible du lac pour pas spawn là bas (plusieurs tags?)
+        /// Permet de générer le spawn initial des zones de pêche.
         /// </summary>
         /// <summary>
         /// Spawn spawnCount copies of spawnPrefab at random points on waterCollider.
@@ -419,7 +409,7 @@ namespace Game
             {
                 float x = Random.Range(bounds.min.x, bounds.max.x);
                 float z = Random.Range(bounds.min.z, bounds.max.z);
-                Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
+                Vector3 origin = new Vector3(x, bounds.max.y + 500f, z);
 
                 Ray ray = new Ray(origin, Vector3.down);
                 if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
@@ -433,9 +423,12 @@ namespace Game
 
                     Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
                     var fishGo = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
-                    var notifier = fishGo.GetComponent<FishingArea>();
-                    if (notifier != null)
-                        notifier.onDeath += OnFishDestroyed;
+                    var area   = fishGo.GetComponent<FishingArea>();
+                    if (area != null)
+                    {
+                        area.areaDifficulty = FishingGame.Difficulty.Easy;
+                        area.onDeath += OnFishDestroyed;
+                    }
                 }
                 else
                 {
@@ -587,7 +580,7 @@ namespace Game
             {
                 float x = Random.Range(bounds.min.x, bounds.max.x);
                 float z = Random.Range(bounds.min.z, bounds.max.z);
-                Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
+                Vector3 origin = new Vector3(x, bounds.max.y + 500f, z);
 
                 Ray ray = new Ray(origin, Vector3.down);
                 if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
@@ -624,20 +617,25 @@ namespace Game
             {
                 float x = Random.Range(bounds.min.x, bounds.max.x);
                 float z = Random.Range(bounds.min.z, bounds.max.z);
-                Vector3 origin = new Vector3(x, bounds.max.y + 15f, z);
+                Vector3 origin = new Vector3(x, bounds.max.y + 500f, z);
                 Ray ray = new Ray(origin, Vector3.down);
 
                 if (Physics.Raycast(ray, out var hit, Mathf.Infinity) && hit.collider == hardZoneCollider)
                 {
-                    // choose medium or hard prefab at random
-                    var prefab = Random.value < 0.65f ? mediumSpawnPrefab : hardSpawnPrefab;
-                    if (prefab == null) break;
+                    // decide difficulty: 65% medium, 35% hard
+                    var difficulty = Random.value < 0.65f
+                        ? FishingGame.Difficulty.Medium
+                        : FishingGame.Difficulty.Hard;
 
                     Vector3 spawnPos = hit.point + Vector3.up * heightAbove;
-                    var go = Instantiate(prefab, spawnPos, Quaternion.identity);
-                    var notifier = go.GetComponent<FishingArea>();
-                    if (notifier != null)
-                        notifier.onDeath += OnHardFishDestroyed;
+                    var go = Instantiate(spawnPrefab, spawnPos, Quaternion.identity);
+
+                    var area = go.GetComponent<FishingArea>();
+                    if (area != null)
+                    {
+                        area.areaDifficulty = difficulty;
+                        area.onDeath += OnHardFishDestroyed;
+                    }
                     break;
                 }
             }
