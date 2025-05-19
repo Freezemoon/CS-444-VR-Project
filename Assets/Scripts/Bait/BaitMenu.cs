@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.InputSystem;
 
 public class BaitMenu : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class BaitMenu : MonoBehaviour
     public TextMeshProUGUI baitCountText8;
     public TextMeshProUGUI baitCountText9;
 
+    [Tooltip("Drag in the XRI Left Interaction → X Button action here")]
+    public InputActionReference toggleMenuAction;
+
     private int nbOfBaits1 = 1; // Change this to the number of baits in inventory
     private int nbOfBaits2 = 3;
     private int nbOfBaits3 = 2;
@@ -23,16 +27,17 @@ public class BaitMenu : MonoBehaviour
     private int nbOfBaits7 = 2;
     private int nbOfBaits8 = 1;
     private int nbOfBaits9 = 0;
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
+    
 
     void OnEnable()
     {
+        // wire up the Input Action
+        if (toggleMenuAction != null)
+        {
+            toggleMenuAction.action.performed += OnToggleMenu;
+            toggleMenuAction.action.Enable();
+        }
+        
         // Update the bait count text when the menu is enabled
         baitCountText1.text = "In stock: x" + nbOfBaits1;
         baitCountText2.text = "In stock: x" + nbOfBaits2;
@@ -44,11 +49,20 @@ public class BaitMenu : MonoBehaviour
         baitCountText8.text = "In stock: x" + nbOfBaits8;
         baitCountText9.text = "In stock: x" + nbOfBaits9;
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    private void OnDisable()
     {
-        
+        if (toggleMenuAction != null)
+        {
+            toggleMenuAction.action.performed -= OnToggleMenu;
+            toggleMenuAction.action.Disable();
+        }
+    }
+    
+    private void OnToggleMenu(InputAction.CallbackContext ctx)
+    {
+        // flip the menu on/off
+        menuUI.SetActive(!menuUI.activeSelf);
     }
     
     public void OnBaitButtonClick1()

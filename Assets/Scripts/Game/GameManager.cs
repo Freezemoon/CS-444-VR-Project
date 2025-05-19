@@ -2,9 +2,13 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
+using UnityEngine.XR;
+using CommonUsages = UnityEngine.XR.CommonUsages;
+using InputDevice = UnityEngine.XR.InputDevice;
 using Random = UnityEngine.Random;
 
 namespace Game
@@ -604,6 +608,13 @@ namespace Game
             larryAudioSource.Play();
             
             currentTextIndex++;
+        }
+        
+        // ReSharper disable Unity.PerformanceAnalysis
+        private void OnYButtonPressed()
+        {
+            Debug.Log("X was pressed!");
+            // … your logic here …
         }
 
         public void ConfirmDialogue()
