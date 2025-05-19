@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class ShopDisplay : MonoBehaviour
@@ -24,6 +26,17 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _itemPreviewStat;
     [SerializeField] private TextMeshProUGUI _itemPreviewText;
     [SerializeField] private GameObject[] _itemPreviewObjects = new GameObject[7];
+    
+    [Header("Components prefabs.")]
+    [SerializeField] private GameObject redHook;
+    [SerializeField] private GameObject blueHook;
+    [SerializeField] private GameObject greenHook;
+    [SerializeField] private GameObject redCork;
+    [SerializeField] private GameObject blueCork;
+    [SerializeField] private GameObject greenCork;
+    
+    [Header("Component spawn location.")]
+    [SerializeField] private GameObject componentSpawnLocation;
 
     [Header("Shopping Cart")]
     [SerializeField] private TextMeshProUGUI _basketTotalText;
@@ -31,15 +44,29 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _shoppingCartText;
     [SerializeField] private Button _buyButton;
     [SerializeField] private TextMeshProUGUI _buyButtonText;
-    [SerializeField] private TextMeshProUGUI[] _componentsPrice = new TextMeshProUGUI[7];
-    [SerializeField] private GameObject[] _cartContent = new GameObject[7];
+    [SerializeField] private GameObject _cartBlueHookPrefab;
+    [SerializeField] private GameObject _cartRedHookPrefab;
+    [SerializeField] private GameObject _cartGreenHookPrefab;
+    [SerializeField] private GameObject _cartRedCorkPrefab;
+    [SerializeField] private GameObject _cartBlueCorkPrefab;
+    [SerializeField] private GameObject _cartGreenCorkPrefab;
     [SerializeField] private GameObject _cartDynamitePrefab;
-
-
-    [Header("Price and quantity sold")]
-    [SerializeField] private int _dynamitePrice = 100;
-    [SerializeField]private int _dynamiteBuyQuantity = 1;
     
+    [Header("Price and quantity sold")]
+    [SerializeField] private int redCorkPrice = 60;
+    [SerializeField] private int blueCorkPrice = 20;
+    [SerializeField] private int greenCorkPrice = 40;
+    [SerializeField] private int redHookPrice = 50;
+    [SerializeField] private int blueHookPrice = 30;
+    [SerializeField] private int greenHookPrice = 10;
+    [SerializeField] private int dynamitePrice = 100;
+
+    private int _redCorksInCart;
+    private int _blueCorksInCart;
+    private int _greenCorksInCart;
+    private int _redHooksInCart;
+    private int _blueHooksInCart;
+    private int _greenHooksInCart;
     private int _dynamitesInCart;
 
 
@@ -52,39 +79,6 @@ public class ShopDisplay : MonoBehaviour
             _basketTotalInteger.SetText("");
             return;
         }
-        
-        //TODO Please not like this
-        /*
-        for (int i = 0; i < 7; i++){
-            var item = _cartContent[i];
-            if (item.activeSelf)
-            {
-                item.SetActive(false);
-
-                switch (i)
-                {
-                    case 0:
-                        GameManager.instance.AddComponent1Amount(10);
-                        break;
-                    case 1:
-                        GameManager.instance.AddComponent2Amount(10);
-                        break;
-                    case 2:
-                        GameManager.instance.AddComponent3Amount(10);
-                        break;
-                    case 3:
-                        GameManager.instance.AddComponent4Amount(10);
-                        break;
-                    case 4:
-                        GameManager.instance.AddComponent5Amount(10);
-                        break;
-                    case 5:
-                        GameManager.instance.AddComponent6Amount(10);
-                        break;
-                }
-            }
-        }
-        */
 
         if (_dynamitesInCart != 0) GameManager.instance.AddDynamiteAmount(_dynamitesInCart);
 
@@ -131,15 +125,93 @@ public class ShopDisplay : MonoBehaviour
         _inventoryTotalText.SetText($"Total inventory : {GameManager.instance.GetBucketValue()}G");
     }
 
+    public void AddBlueHookInCart()
+    {
+        _blueHooksInCart++;
+        RefreshCartTotal();
+    }
+
+    public void RemoveBlueHookInCart()
+    {
+        _blueHooksInCart--;
+        if (_blueHooksInCart <= 0) _blueHooksInCart = 0;
+        RefreshCartTotal();
+    }
+    
+    public void AddGreenHookInCart()
+    {
+        _greenHooksInCart++;
+        RefreshCartTotal();
+    }
+
+    public void RemoveGreenHookInCart()
+    {
+        _greenHooksInCart--;
+        if (_greenHooksInCart <= 0) _greenHooksInCart = 0;
+        RefreshCartTotal();
+    }
+
+    public void AddRedHookInCart()
+    {
+        _redHooksInCart++;
+        RefreshCartTotal();
+    }
+
+    public void RemoveRedHookInCart()
+    {
+        _redHooksInCart--;
+        if (_redHooksInCart <= 0) _redHooksInCart = 0;
+        RefreshCartTotal();
+    }
+
+    public void AddBlueCorkInCart()
+    {
+        _blueCorksInCart++;
+        RefreshCartTotal();
+    }
+
+    public void RemoveBlueCorkInCart()
+    {
+        _blueCorksInCart--;
+        if (_blueCorksInCart <= 0) _blueCorksInCart = 0;
+        RefreshCartTotal();
+    }
+
+    public void AddGreenCorkInCart()
+    {
+        _greenCorksInCart++;
+        RefreshCartTotal();
+    }
+
+    public void RemoveGreenCorkInCart()
+    {
+        _greenCorksInCart--;
+        if (_greenCorksInCart <= 0) _greenCorksInCart = 0;
+        RefreshCartTotal();
+    }
+
+    public void AddRedCorkInCart()
+    {
+        _redCorksInCart++;
+        RefreshCartTotal();
+    }
+
+    public void RemoveRedCorkInCart()
+    {
+        _redCorksInCart--;
+        if (_redCorksInCart <= 0) _redCorksInCart = 0;
+        RefreshCartTotal();
+    }
+
     public void AddDynamiteToCart()
     {
-        _dynamitesInCart += _dynamiteBuyQuantity;
+        _dynamitesInCart ++;
         RefreshCartTotal();
     }
     
     public void RemoveDynamiteFromCart()
     {
-        _dynamitesInCart -= _dynamiteBuyQuantity;
+        _dynamitesInCart --;
         if (_dynamitesInCart <= 0) _dynamitesInCart = 0;
         RefreshCartTotal();
     }
@@ -147,32 +219,59 @@ public class ShopDisplay : MonoBehaviour
     public void RefreshCartTotal()
     {
         var shoppingCartSum = 0;
-        // TODO update this nightmare
-        /*
-        var shoppingCartSum = 0;
-        foreach (var item in _componentsPrice)
+        
+        if (_blueHooksInCart != 0)
         {
-            if (item.IsActive())
-            {
-                int.TryParse(item.text, out int temp);
-                shoppingCartSum += temp;
-            }
+            UpdateCartPrefab(_cartBlueHookPrefab, blueHookPrice,_blueHooksInCart);
+            _cartBlueHookPrefab.SetActive(true);
+            shoppingCartSum += _blueHooksInCart * blueHookPrice;
         }
+        else _cartBlueHookPrefab.SetActive(false);
 
-        _basketTotalText.SetText("Shopping Cart Total: ");
-        _basketTotalInteger.SetText($"{shoppingCartSum}");
-        */
+        if (_blueCorksInCart != 0)
+        {
+            UpdateCartPrefab(_cartBlueCorkPrefab, blueCorkPrice, _blueCorksInCart);
+            _cartBlueCorkPrefab.SetActive(true);
+            shoppingCartSum += _blueCorksInCart * blueCorkPrice;
+        }
+        else _cartBlueCorkPrefab.SetActive(false);
+
+        if (_greenHooksInCart != 0)
+        {
+            UpdateCartPrefab(_cartGreenHookPrefab, greenHookPrice, _greenHooksInCart);
+            _cartGreenHookPrefab.SetActive(true);
+            shoppingCartSum += _greenHooksInCart * greenHookPrice;
+        }
+        else _cartGreenHookPrefab.SetActive(false);
+
+        if (_greenCorksInCart != 0)
+        {
+            UpdateCartPrefab(_cartGreenCorkPrefab, greenCorkPrice, _greenCorksInCart);
+            _cartGreenCorkPrefab.SetActive(true);
+            shoppingCartSum += _greenCorksInCart * greenCorkPrice;
+        }  else _cartGreenCorkPrefab.SetActive(false);
+
+        if (_redHooksInCart != 0)
+        {
+            UpdateCartPrefab(_cartRedHookPrefab, redHookPrice, _redHooksInCart);
+            _cartRedHookPrefab.SetActive(true);
+            shoppingCartSum += _redHooksInCart * redHookPrice;
+        }  else _cartRedHookPrefab.SetActive(false);
+
+        if (_redCorksInCart != 0)
+        {
+            UpdateCartPrefab(_cartRedCorkPrefab, redCorkPrice, _redCorksInCart);
+            _cartRedCorkPrefab.SetActive(true);
+            shoppingCartSum += _redCorksInCart * redCorkPrice;
+        }  else _cartRedCorkPrefab.SetActive(false);
 
         if (_dynamitesInCart != 0)
         {
-            UpdateCartPrefab(_cartDynamitePrefab, _dynamitePrice,_dynamitesInCart);
+            UpdateCartPrefab(_cartDynamitePrefab, dynamitePrice,_dynamitesInCart);
             _cartDynamitePrefab.SetActive(true);
-            shoppingCartSum += _dynamitesInCart * _dynamitePrice;
+            shoppingCartSum += _dynamitesInCart * dynamitePrice;
         }
-        else
-        {
-            _cartDynamitePrefab.SetActive(false);
-        }
+        else _cartDynamitePrefab.SetActive(false);
         
         _basketTotalText.SetText("Shopping Cart Total: ");
         _basketTotalInteger.SetText($"{shoppingCartSum}");
