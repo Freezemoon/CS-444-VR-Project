@@ -7,7 +7,7 @@ namespace Game
     /// </summary>
     public class GameState
     {
-        public int BucketValue = 20; // valeur des poissons pas encore cash in
+        public int BucketValue = 1000; // valeur des poissons pas encore cash in
         public int Money = 0; // monnaie actuelle en posession du joueur
         public FishingRodStats CurrentRod = FishingRodLibrary.Basic; // Canne actuelle du joueur
         public int Component1Amount = 0;
@@ -16,6 +16,17 @@ namespace Game
         public int Component4Amount = 0;
         public int Component5Amount = 0;
         public int Component6Amount = 0;
+
+        public int BBBaitCount;
+        public int BGBaitCount;
+        public int BRBaitCount;
+        public int GBBaitCount;
+        public int GGBaitCount;
+        public int GRBaitCount;
+        public int RBBaitCount;
+        public int RGBaitCount;
+        public int RRBaitCount;
+        
         public int DynamiteAmount = 0;
     }
 }

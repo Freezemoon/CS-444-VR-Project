@@ -1,6 +1,7 @@
 using Game;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,6 +33,14 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _buyButtonText;
     [SerializeField] private TextMeshProUGUI[] _componentsPrice = new TextMeshProUGUI[7];
     [SerializeField] private GameObject[] _cartContent = new GameObject[7];
+    [SerializeField] private GameObject _cartDynamitePrefab;
+
+
+    [Header("Price and quantity sold")]
+    [SerializeField] private int _dynamitePrice = 100;
+    [SerializeField]private int _dynamiteBuyQuantity = 1;
+    
+    private int _dynamitesInCart;
 
 
     public void BuyItems()
@@ -42,49 +51,59 @@ public class ShopDisplay : MonoBehaviour
             _basketTotalText.SetText("Not enough money !");
             _basketTotalInteger.SetText("");
             return;
-        } else
-        {
-            for (int i = 0; i < 7; i++){
-                var item = _cartContent[i];
-                if (item.activeSelf)
-                {
-                    item.SetActive(false);
+        }
+        
+        //TODO Please not like this
+        /*
+        for (int i = 0; i < 7; i++){
+            var item = _cartContent[i];
+            if (item.activeSelf)
+            {
+                item.SetActive(false);
 
-                    switch (i)
-                    {
-                        case 0:
-                            GameManager.instance.AddComponent1Amount(10);
-                            break;
-                        case 1:
-                            GameManager.instance.AddComponent2Amount(10);
-                            break;
-                        case 2:
-                            GameManager.instance.AddComponent3Amount(10);
-                            break;
-                        case 3:
-                            GameManager.instance.AddComponent4Amount(10);
-                            break;
-                        case 4:
-                            GameManager.instance.AddComponent5Amount(10);
-                            break;
-                        case 5:
-                            GameManager.instance.AddComponent6Amount(10);
-                            break;
-                        default:
-                            GameManager.instance.AddDynamiteAmount(10);
-                            break;
-                    }
+                switch (i)
+                {
+                    case 0:
+                        GameManager.instance.AddComponent1Amount(10);
+                        break;
+                    case 1:
+                        GameManager.instance.AddComponent2Amount(10);
+                        break;
+                    case 2:
+                        GameManager.instance.AddComponent3Amount(10);
+                        break;
+                    case 3:
+                        GameManager.instance.AddComponent4Amount(10);
+                        break;
+                    case 4:
+                        GameManager.instance.AddComponent5Amount(10);
+                        break;
+                    case 5:
+                        GameManager.instance.AddComponent6Amount(10);
+                        break;
                 }
             }
-            _basketTotalText.SetText("Shopping Cart Total: ");
-            GameManager.instance.AddMoney(-basketTotal);
-            _basketTotalInteger.SetText("0");
-            _itemPreviewText.gameObject.SetActive(true);
-            _itemPreviewText.SetText("Thanks for shopping with us !");
-            foreach (var item in _itemPreviewObjects) item.SetActive(false); // remove any preview UI to display thanks 
-            RefreshPlayerTotal();
         }
+        */
 
+        if (_dynamitesInCart != 0) GameManager.instance.AddDynamiteAmount(_dynamitesInCart);
+
+        ResetCart();
+        
+        _basketTotalText.SetText("Shopping Cart Total: ");
+        GameManager.instance.AddMoney(-basketTotal);
+        _basketTotalInteger.SetText("0");
+        _itemPreviewText.gameObject.SetActive(true);
+        _itemPreviewText.SetText("Thanks for shopping with us !");
+        foreach (var item in _itemPreviewObjects) item.SetActive(false); // remove any preview UI to display thanks 
+        RefreshPlayerTotal();
+
+    }
+
+    private void ResetCart()
+    {
+        _dynamitesInCart = 0;
+        _cartDynamitePrefab.SetActive(false);
     }
 
     public void SellFish()
@@ -112,8 +131,24 @@ public class ShopDisplay : MonoBehaviour
         _inventoryTotalText.SetText($"Total inventory : {GameManager.instance.GetBucketValue()}G");
     }
 
+    public void AddDynamiteToCart()
+    {
+        _dynamitesInCart += _dynamiteBuyQuantity;
+        RefreshCartTotal();
+    }
+    
+    public void RemoveDynamiteFromCart()
+    {
+        _dynamitesInCart -= _dynamiteBuyQuantity;
+        if (_dynamitesInCart <= 0) _dynamitesInCart = 0;
+        RefreshCartTotal();
+    }
+
     public void RefreshCartTotal()
     {
+        var shoppingCartSum = 0;
+        // TODO update this nightmare
+        /*
         var shoppingCartSum = 0;
         foreach (var item in _componentsPrice)
         {
@@ -123,7 +158,36 @@ public class ShopDisplay : MonoBehaviour
                 shoppingCartSum += temp;
             }
         }
+
         _basketTotalText.SetText("Shopping Cart Total: ");
         _basketTotalInteger.SetText($"{shoppingCartSum}");
+        */
+
+        if (_dynamitesInCart != 0)
+        {
+            UpdateCartPrefab(_cartDynamitePrefab, _dynamitePrice,_dynamitesInCart);
+            _cartDynamitePrefab.SetActive(true);
+            shoppingCartSum += _dynamitesInCart * _dynamitePrice;
+        }
+        else
+        {
+            _cartDynamitePrefab.SetActive(false);
+        }
+        
+        _basketTotalText.SetText("Shopping Cart Total: ");
+        _basketTotalInteger.SetText($"{shoppingCartSum}");
+    }
+
+    private void UpdateCartPrefab(GameObject cartPrefab, int price, int quantity)
+    {
+        cartPrefab.transform
+            .Find("ItemAmount")
+            .GetComponent<TextMeshProUGUI>()
+            .text = $"{quantity}X";
+        
+        cartPrefab.transform
+            .Find("ItemPrice")
+            .GetComponent<TextMeshProUGUI>()
+            .text = $"{quantity * price}";
     }
 }
