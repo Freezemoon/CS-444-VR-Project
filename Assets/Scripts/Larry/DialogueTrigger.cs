@@ -13,6 +13,16 @@ public class DialogueTrrigger : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
+        switch (dialogueState)
+        {
+            case GameManager.DialogueState.RockDynamite:
+                if (GameManager.instance.State.DynamiteAmount <= 0)
+                {
+                    return;
+                }
+                break;
+        }
+        
         GameManager.instance.SetDialogueState(dialogueState);
         ValidateDialogue();
     }

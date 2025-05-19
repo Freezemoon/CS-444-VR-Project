@@ -147,6 +147,8 @@ public class FishingGame : MonoBehaviour
                 // Check if fish can spawn
                 if (_currentWaitingFishTime >= _neededWaitingFishTime)
                 {
+                    rightHandHaptics.SendHapticImpulse(0.8f, 2);
+                    
                     GameObject fishPrefab = null;
                     switch (difficulty)
                     {
