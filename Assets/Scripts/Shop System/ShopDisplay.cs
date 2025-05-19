@@ -77,7 +77,11 @@ public class ShopDisplay : MonoBehaviour
 
         SpawnComponents();
 
-        if (_dynamitesInCart != 0) GameManager.instance.AddDynamiteAmount(_dynamitesInCart);
+        if (_dynamitesInCart > 0)
+        {
+            GameManager.instance.AddDynamiteAmount(_dynamitesInCart);
+            GameManager.instance.SetDialogueState(GameManager.DialogueState.DynamiteBought);   
+        }
 
         ResetCart();
         
@@ -88,7 +92,6 @@ public class ShopDisplay : MonoBehaviour
         _itemPreviewText.SetText("Thanks for shopping with us !");
         foreach (var item in _itemPreviewObjects) item.SetActive(false); // remove any preview UI to display thanks 
         RefreshPlayerTotal();
-
     }
 
     private void ResetCart()
