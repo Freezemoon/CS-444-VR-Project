@@ -1,0 +1,17 @@
+Thank you for purchasing this pack! 
+
+Creator: TexTheMess
+Name: Nature Low-Poly Pack
+
+To change model materials 
+
+1. Go to the NatureModels/FBX folder.
+
+2. Click on the model you want to change.
+
+3. In the inspector drag and drop the materials of your liking
+
+
+This pack will be updated over time as I create more low poly nature items! Hope you enjoy
+
+Feel free to contact me in the discord community http://www.discord.zexiegaming.com

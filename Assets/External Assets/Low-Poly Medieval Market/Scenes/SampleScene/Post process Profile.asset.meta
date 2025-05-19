@@ -11,5 +11,6 @@ AssetOrigin:
   productId: 262473
   packageName: Low-Poly Medieval Market
   packageVersion: 1.1
-  assetPath: Assets/Low-Poly Medieval Market/Scenes/SampleScene/Post process Profile.asset
+  assetPath: Assets/External Assets/Low-Poly Medieval Market/Scenes/SampleScene/Post
+    process Profile.asset
   uploadId: 617661

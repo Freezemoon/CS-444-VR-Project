@@ -135,5 +135,6 @@ AssetOrigin:
   productId: 262473
   packageName: Low-Poly Medieval Market
   packageVersion: 1.1
-  assetPath: Assets/Low-Poly Medieval Market/Textures/Bakery market texture.tif
+  assetPath: Assets/External Assets/Low-Poly Medieval Market/Textures/Bakery market
+    texture.tif
   uploadId: 617661

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bd183304c46bd1c47bac7ff59bf0aa12
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 209273
+  packageName: Simple Forest Pack
+  packageVersion: 1.1
+  assetPath: Assets/Forest Pack/Scenes/SampleSceneSettings.lighting
+  uploadId: 475017
