@@ -80,6 +80,8 @@ public class ShopDisplay : MonoBehaviour
             return;
         }
 
+        SpawnComponents();
+
         if (_dynamitesInCart != 0) GameManager.instance.AddDynamiteAmount(_dynamitesInCart);
 
         ResetCart();
@@ -96,8 +98,75 @@ public class ShopDisplay : MonoBehaviour
 
     private void ResetCart()
     {
+        _blueHooksInCart = 0;
+        _cartBlueHookPrefab.SetActive(false);
+        
+        _blueCorksInCart = 0;
+        _cartBlueCorkPrefab.SetActive(false);
+        
+        _greenHooksInCart = 0;
+        _cartGreenHookPrefab.SetActive(false);
+        
+        _greenCorksInCart = 0;
+        _cartGreenCorkPrefab.SetActive(false);
+        
+        _redHooksInCart = 0;
+        _cartRedHookPrefab.SetActive(false);
+        
+        _redCorksInCart = 0;
+        _cartRedCorkPrefab.SetActive(false);
+        
         _dynamitesInCart = 0;
         _cartDynamitePrefab.SetActive(false);
+    }
+
+    private void SpawnComponents()
+    {
+        SpawnComponent(blueHook, _blueHooksInCart);
+        SpawnComponent(blueCork, _blueCorksInCart);
+        SpawnComponent(greenHook, _greenHooksInCart);
+        SpawnComponent(greenCork, _greenCorksInCart);
+        SpawnComponent(redHook, _redHooksInCart);
+        SpawnComponent(redCork, _redCorksInCart);
+    }
+
+    private void SpawnComponent(GameObject component, int amount)
+    {
+        if (componentSpawnLocation == null) return;
+        var box = componentSpawnLocation.GetComponent<BoxCollider>();
+        if (box == null)
+        {
+            Debug.LogWarning("No BoxCollider on componentSpawnLocation!");
+            return;
+        }
+
+        var bounds = box.bounds;
+        // compute padding in world‐units
+        float padX = bounds.size.x * 0.35f;
+        float padZ = bounds.size.z * 0.35f;
+
+        // inner min/max
+        float minX = bounds.min.x + padX;
+        float maxX = bounds.max.x - padX;
+        float minZ = bounds.min.z + padZ;
+        float maxZ = bounds.max.z - padZ;
+
+        for (int i = 0; i < amount; i++)
+        {
+            float x = Random.Range(minX, maxX);
+            float z = Random.Range(minZ, maxZ);
+            // a small random height above the top face
+            float y = bounds.max.y + Random.Range(0.02f, 0.1f);
+
+            var pos = new Vector3(x, y, z);
+            var rot = Quaternion.Euler(
+                Random.Range(0f, 360f),
+                Random.Range(0f, 360f),
+                Random.Range(0f, 360f)
+            );
+
+            Instantiate(component, pos, rot);
+        }
     }
 
     public void SellFish()
