@@ -53,6 +53,12 @@ namespace Game
         [SerializeField] private Collider hardZoneCollider;
         [Tooltip("How many medium/hard fish to keep alive at once.")]
         [SerializeField] private int hardSpawnCount = 5;
+        
+        [Header("Fish value")]
+        [Tooltip("This sets the value of each fish.")]
+        [SerializeField] private int easyFishValue = 50;
+        [SerializeField] private int mediumFishValue = 70;
+        [SerializeField] private int hardFishValue = 100;
 
         public int currentTextIndex { get; private set; }
 
@@ -876,6 +882,27 @@ namespace Game
         public int GetDynamiteAmount() => State.DynamiteAmount;
         public void AddDynamiteAmount(int amount) => State.DynamiteAmount += amount;
 
-        
+        public void HandleCaughtFish(FishingGame.Difficulty diff)
+        {
+            switch (diff)
+            {
+                case FishingGame.Difficulty.Easy:
+                    AddToBucket(easyFishValue);
+                    State.EasyFishCought++;
+                    break;
+                
+                case FishingGame.Difficulty.Medium:
+                    AddToBucket(mediumFishValue);
+                    State.MediumFishCought++;
+                    break;
+                case FishingGame.Difficulty.Hard:
+                    break;
+            }
+
+            Debug.Log($"The player bucketed a fish! The bucket value is now {GetBucketValue()}. Easy caught : " +
+                      $"{State.EasyFishCought}, " +
+                      $"Medium caught : {State.MediumFishCought}, " +
+                      $"Hard caught : {State.HardFishCought}.");
+        }
     }
 }

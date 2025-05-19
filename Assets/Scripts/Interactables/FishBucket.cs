@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Game;
 using UnityEngine;
@@ -18,8 +19,12 @@ public class FishBucket : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
+        
+        // Update the bucket value properly as well as the type cought
         if (!other.CompareTag("Fish"))
             return;
+        
+        GameManager.instance.HandleCaughtFish(other.GetComponent<GrabFish>().difficulty);
 
         GameManager.instance.SetDialogueState(GameManager.DialogueState.HopOnBoat);
         // Duplicate the fish
