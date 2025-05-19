@@ -852,24 +852,6 @@ namespace Game
         public void ChangeFishingRod(FishingRodStats fishingRod) => State.CurrentRod = fishingRod;
         public FishingRodStats GetPlayerRod() => State.CurrentRod;
 
-        public int GetComponent1Amount() => State.Component1Amount;
-        public void AddComponent1Amount(int amount) => State.Component1Amount += amount;
-
-        public int GetComponent2Amount() => State.Component2Amount;
-        public void AddComponent2Amount(int amount) => State.Component2Amount += amount;
-
-        public int GetComponent3Amount() => State.Component3Amount;
-        public void AddComponent3Amount(int amount) => State.Component3Amount += amount;
-
-        public int GetComponent4Amount() => State.Component4Amount;
-        public void AddComponent4Amount(int amount) => State.Component4Amount += amount;
-
-        public int GetComponent5Amount() => State.Component5Amount;
-        public void AddComponent5Amount(int amount) => State.Component5Amount += amount;
-
-        public int GetComponent6Amount() => State.Component6Amount;
-        public void AddComponent6Amount(int amount) => State.Component6Amount += amount;
-
         public int GetDynamiteAmount() => State.DynamiteAmount;
         public void AddDynamiteAmount(int amount) => State.DynamiteAmount += amount;
 
