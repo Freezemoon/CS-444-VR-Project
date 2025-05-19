@@ -171,7 +171,9 @@ public class ShopDisplay : MonoBehaviour
 
     public void SellFish()
     {
-        GameManager.instance.AddMoney(GameManager.instance.GetBucketValue());
+        int bucketValue = GameManager.instance.GetBucketValue();
+        GameManager.instance.AddMoney(bucketValue);
+        GameManager.instance.AddToBucket(-bucketValue);
         RefreshPlayerTotal();
         RefreshCartTotal(); // in case the text was still "not enough money"
         _inventoryTotalText.SetText("Total inventory : 0G");
