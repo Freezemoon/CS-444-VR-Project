@@ -34,6 +34,10 @@ public class BaitMenu : MonoBehaviour
     [Tooltip("Drag in the XRI Left Interaction → X Button action here")]
     public InputActionReference toggleMenuAction;
 
+    [Tooltip("Transform where the dynamite should spawn")]
+    [SerializeField] private Transform dynamiteSpawnPoint;
+    [SerializeField] private GameObject dynamitePrefab;
+
     void OnEnable()
     {
         // wire up the Input Action
@@ -135,7 +139,12 @@ public class BaitMenu : MonoBehaviour
     
     public void OnDynamiteButtonClick()
     {
-        // TODO
+        Instantiate(
+            dynamitePrefab,
+            dynamiteSpawnPoint.position,
+            dynamiteSpawnPoint.rotation
+        );
+        GameManager.instance.AddDynamiteAmount(-1);
         menuUI.SetActive(false);
     }
 }
