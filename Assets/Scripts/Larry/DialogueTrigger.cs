@@ -8,7 +8,6 @@ public class DialogueTrrigger : MonoBehaviour
     public Transform larryNewPos;
     public Transform larry;
     
-
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
@@ -23,8 +22,8 @@ public class DialogueTrrigger : MonoBehaviour
                 break;
         }
         
-        GameManager.instance.SetDialogueState(dialogueState);
-        ValidateDialogue();
+        if (GameManager.instance.SetDialogueState(dialogueState))
+            ValidateDialogue();
     }
 
     public void ValidateDialogue()

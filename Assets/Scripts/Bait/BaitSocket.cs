@@ -16,6 +16,8 @@ public class BaitSocket : MonoBehaviour
 
     private void OnSocketConnected(SelectEnterEventArgs args)
     {
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.EquipBait);
+        
         GameObject insertedObject = args.interactableObject.transform.gameObject;
         GameObject socketObject = gameObject;
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Game;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -172,6 +173,8 @@ public class Dynamite : MonoBehaviour
     public void Ignite()
     {
         if (_fuseRoutine != null) return; // already lit
+        
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.ThrowDynamite);
 
         // spawn & move the fuse VFX
         if (fuseVFX && fuseStartPoint != null && fuseEndPoint != null)

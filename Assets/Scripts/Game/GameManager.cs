@@ -20,6 +20,8 @@ namespace Game
         public AudioClip larrySoundMumble;
         public GameObject larryTextButton;
 
+        public Transform larry;
+
         public GameState State = new();
 
         [Header("DialogueTiggers")]
@@ -52,6 +54,8 @@ namespace Game
         [SerializeField] private int hardFishValue = 100;
 
         public int currentTextIndex { get; private set; }
+        
+        public Vector3 lastFishSpawnerPosition;
 
         public enum DialogueState
         {
@@ -333,7 +337,6 @@ namespace Game
                 activateNextText = false
             },
             // DynamiteBought
-            // TODO: When the player buys a dynamite
             new TextEntry
             {
                 text = "Nice! You found the dynamite!\n" +
@@ -342,7 +345,6 @@ namespace Game
                 activateNextText = false
             },
             // RockDynamite
-            // TODO: When the player goes to the rock with at least one dynamite in his inventory
             new TextEntry
             {
                 text = "Hey again!\n" +
@@ -352,7 +354,6 @@ namespace Game
                 activateNextText = false
             },
             // DynamiteSpawned
-            // TODO: When the player spawns a dynamite
             new TextEntry
             {
                 text = "Okay, listen carefully now!\n" +
@@ -364,7 +365,6 @@ namespace Game
             },
             // 30
             // ThrowDynamite
-            // TODO: When the player lighted a dynamite
             new TextEntry
             {
                 text = "Do it! Throw the dynamite at the rock! QUICK!",
@@ -372,7 +372,6 @@ namespace Game
                 activateNextText = false
             },
             // RockExploded
-            // TODO: When the player exploded the rock with a dynamite
             new TextEntry
             {
                 text = "Boom! Good job!\n" +
@@ -382,7 +381,6 @@ namespace Game
                 activateNextText = false
             },
             // WelcomeHome
-            // TODO: When the player reaches the other side of the lake
             new TextEntry
             {
                 text = "Welcome home! Haha.\n" +
@@ -398,7 +396,6 @@ namespace Game
                 activateNextText = false
             },
             // SecondIslandMeetLarry
-            // TODO: When the player meet Larry near the second island
             new TextEntry
             {
                 text = "So, they’re harder to fish, huh?",
@@ -422,17 +419,16 @@ namespace Game
                 activateNextText = false
             },
             // CraftBaits
-            // TODO: When the player buys a bait
             new TextEntry
             {
                 text = "Oh! You found the baits!\n" +
                        "There are tons of combos — and yep, you gotta craft them.\n" +
-                       "Just grab a piece in each hand and snap ’em together. Easy!",
+                       "Grab a piece in each hand, snap ’em together, then let go — " +
+                       "it’ll go straight to your inventory!",
                 isDisplayable = false,
                 activateNextText = false
             },
             // EquipBait
-            // TODO: When the player needs to equip a bait
             new TextEntry
             {
                 text = "Great job! Your first custom bait!\n" +
@@ -442,7 +438,6 @@ namespace Game
                 activateNextText = false
             },
             // ReadyToFishMore
-            // TODO: When the player equiped his bait
             new TextEntry
             {
                 text = "Perfect! You're all set now.\n" +
@@ -520,16 +515,43 @@ namespace Game
             _neededTextTime = 0;
             currentTextIndex = -1;
         }
-        
-        /// <summary>
-        /// Called when a fish with FishDeathNotifier is destroyed; spawns a replacement.
-        /// </summary>
-        private void OnFishDestroyed(FishingArea deadFish)
+
+        private void Update()
         {
-            // Unsubscribe
-            deadFish.onDeath -= OnFishDestroyed;
-            // Spawn a single replacement
-            SpawnOne();
+            // Update victory
+            if (State.EasyFishCought >= 5 && State.MediumFishCought >= 5 && State.HardFishCought >= 5)
+            {
+                larry.position = lastFishSpawnerPosition;
+                SetDialogueState(DialogueState.Victory);
+            }
+            
+            // Update typewriter
+            _currentTextTime += Time.deltaTime;
+            
+            if (currentTextIndex < 0 || currentTextIndex >= larryTexts.Count) return;
+
+            if (_currentTextTime <= _neededTextTime) return;
+
+            if (!larryTexts[currentTextIndex].isDisplayable) return;
+            
+            typewriterEffectCanvas.SetActive(true);
+            larryTextButton.SetActive(false);
+            typewriterEffect.fullText = larryTexts[currentTextIndex].text;
+            typewriterEffect.StartTyping();
+
+            if (currentTextIndex < larrySounds.Count && larrySounds[currentTextIndex])
+            {
+                larryAudioSource.clip = larrySounds[currentTextIndex];
+                isMumbleEnabled = false;
+            }
+            else
+            {
+                larryAudioSource.clip = larrySoundMumble;
+                isMumbleEnabled = true;
+            }
+            larryAudioSource.Play();
+            
+            currentTextIndex++;
         }
 
         /// <summary>
@@ -577,43 +599,6 @@ namespace Game
             }
         }
 
-        private void Update()
-        {
-            _currentTextTime += Time.deltaTime;
-            
-            if (currentTextIndex < 0 || currentTextIndex >= larryTexts.Count) return;
-
-            if (_currentTextTime <= _neededTextTime) return;
-
-            if (!larryTexts[currentTextIndex].isDisplayable) return;
-            
-            typewriterEffectCanvas.SetActive(true);
-            larryTextButton.SetActive(false);
-            typewriterEffect.fullText = larryTexts[currentTextIndex].text;
-            typewriterEffect.StartTyping();
-
-            if (currentTextIndex < larrySounds.Count && larrySounds[currentTextIndex])
-            {
-                larryAudioSource.clip = larrySounds[currentTextIndex];
-                isMumbleEnabled = false;
-            }
-            else
-            {
-                larryAudioSource.clip = larrySoundMumble;
-                isMumbleEnabled = true;
-            }
-            larryAudioSource.Play();
-            
-            currentTextIndex++;
-        }
-        
-        // ReSharper disable Unity.PerformanceAnalysis
-        private void OnYButtonPressed()
-        {
-            Debug.Log("X was pressed!");
-            // … your logic here …
-        }
-
         public void ConfirmDialogue()
         {
             if (currentTextIndex >= larryTexts.Count) return;
@@ -630,7 +615,7 @@ namespace Game
             larryTextButton.SetActive(larryTexts[currentTextIndex-1].activateNextText);
         }
 
-        public void restartFishingTutoIfLostBeforeGrabFish()
+        public void RestartFishingTutoIfLostBeforeGrabFish()
         {
             if (currentTextIndex <= 12)
             {
@@ -638,7 +623,7 @@ namespace Game
             }
         }
 
-        public void SetDialogueState(DialogueState state, bool canSetToPrevDialogue = false)
+        public bool SetDialogueState(DialogueState state, bool canSetToPrevDialogue = false)
         {
             int index = 0;
             switch (state)
@@ -748,7 +733,22 @@ namespace Game
                         dialogueTriggerDynamiteBought.ValidateDialogue();
                         break;
                 }
+
+                return true;
             }
+
+            return false;
+        }
+        
+        /// <summary>
+        /// Called when a fish with FishDeathNotifier is destroyed; spawns a replacement.
+        /// </summary>
+        private void OnFishDestroyed(FishingArea deadFish)
+        {
+            // Unsubscribe
+            deadFish.onDeath -= OnFishDestroyed;
+            // Spawn a single replacement
+            SpawnOne();
         }
 
         

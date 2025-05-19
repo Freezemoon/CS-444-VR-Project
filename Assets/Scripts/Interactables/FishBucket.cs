@@ -19,7 +19,6 @@ public class FishBucket : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        
         // Update the bucket value properly as well as the type cought
         if (!other.CompareTag("Fish"))
             return;

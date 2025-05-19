@@ -43,6 +43,7 @@ public class BaitMenu : MonoBehaviour
     [SerializeField] private GameObject rodPrefab;
     
     [Header("Baits prefabs")]
+    [SerializeField] private Transform DefaultPrefab;
     [SerializeField] private Transform BBPrefab;
     [SerializeField] private Transform BGPrefab;
     [SerializeField] private Transform BRPrefab;
@@ -54,6 +55,8 @@ public class BaitMenu : MonoBehaviour
     [SerializeField] private Transform RRPrefab;
 
     private FishingRodCaster _caster;
+    
+    private Transform _selectedBait;
     
 
     void OnEnable()
@@ -113,60 +116,57 @@ public class BaitMenu : MonoBehaviour
         UpdateUI();
         menuUI.SetActive(!menuUI.activeSelf);
     }
+
+    private void OnBaitButtonClickGeneral(Transform selectedBait)
+    {
+        DefaultPrefab.gameObject.SetActive(false);
+        
+        if (_selectedBait)
+            _selectedBait.gameObject.SetActive(false);
+        
+        _selectedBait = selectedBait;
+        _selectedBait.gameObject.SetActive(true);
+        
+        menuUI.SetActive(false);
+        
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.ReadyToFishMore);
+    }
     
     public void OnBaitButtonClick1()
     {
-        // _caster.baitTransform = BBPrefab;
-        // _caster.baitRb = BBPrefab.GetComponent<Rigidbody>();
-        menuUI.SetActive(false);
+        OnBaitButtonClickGeneral(BBPrefab);
     }
     public void OnBaitButtonClick2()
     {
-        // _caster.baitTransform = BGPrefab;
-        // _caster.baitRb = BGPrefab.GetComponent<Rigidbody>();
-        menuUI.SetActive(false);
+        OnBaitButtonClickGeneral(BGPrefab);
     }
     public void OnBaitButtonClick3()
     {
-        // _caster.baitTransform = BRPrefab;
-        // _caster.baitRb = BRPrefab.GetComponent<Rigidbody>();
-        menuUI.SetActive(false);
+        OnBaitButtonClickGeneral(BRPrefab);
     }
     public void OnBaitButtonClick4()
     {
-        // _caster.baitTransform = GBPrefab;
-        // _caster.baitRb = GBPrefab.GetComponent<Rigidbody>();
-        menuUI.SetActive(false);
+        OnBaitButtonClickGeneral(GBPrefab);
     }
     public void OnBaitButtonClick5()
     {
-        // _caster.baitTransform = GGPrefab;
-        // _caster.baitRb = GGPrefab.GetComponent<Rigidbody>();
-        menuUI.SetActive(false);
+        OnBaitButtonClickGeneral(GGPrefab);
     }
     public void OnBaitButtonClick6()
     {
-        // _caster.GetComponent<FishingRodCaster>().baitTransform = GRPrefab;
-        // _caster.baitRb = GRPrefab.GetComponent<Rigidbody>();
-        menuUI.SetActive(false);
+        OnBaitButtonClickGeneral(GRPrefab);
     }
     public void OnBaitButtonClick7()
     {
-        // _caster.baitTransform = RBPrefab;
-        // _caster.baitRb = RBPrefab.GetComponent<Rigidbody>();
-        menuUI.SetActive(false);
+        OnBaitButtonClickGeneral(RBPrefab);
     }
     public void OnBaitButtonClick8()
     {
-        // _caster.baitTransform = RGPrefab;
-        // _caster.baitRb = RGPrefab.GetComponent<Rigidbody>();
-        menuUI.SetActive(false);
+        OnBaitButtonClickGeneral(RGPrefab);
     }
     public void OnBaitButtonClick9()
     {
-        // _caster.baitTransform = GGPrefab;
-        // _caster.baitRb = GGPrefab.GetComponent<Rigidbody>();
-        menuUI.SetActive(false);
+        OnBaitButtonClickGeneral(GGPrefab);
     }
     
     public void OnDynamiteButtonClick()
@@ -178,5 +178,7 @@ public class BaitMenu : MonoBehaviour
         );
         GameManager.instance.AddDynamiteAmount(-1);
         menuUI.SetActive(false);
+        
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.DynamiteSpawned);
     }
 }

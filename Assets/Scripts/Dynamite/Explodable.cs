@@ -1,3 +1,4 @@
+using Game;
 using UnityEngine;
 
 public class Explodable : MonoBehaviour
@@ -6,7 +7,12 @@ public class Explodable : MonoBehaviour
 
     public void PlaySound()
     {
-        if (destroySfx != null)
+        if (destroySfx)
             AudioSource.PlayClipAtPoint(destroySfx, transform.position);
+
+        if (gameObject.CompareTag("SecondLakePartRock"))
+        {
+            GameManager.instance.SetDialogueState(GameManager.DialogueState.RockExploded);
+        }
     }
 }

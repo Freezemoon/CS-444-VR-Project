@@ -1,4 +1,5 @@
 using System;
+using Game;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -30,6 +31,10 @@ public class FishingArea : MonoBehaviour
         FishingRodEnter();
 
         FishingGame.instance.StartGame();
+        
+        // Then used to make larry spawn where the last fish was fished
+        // Ensures that it's on a valid water location and that it's near the player current position
+        GameManager.instance.lastFishSpawnerPosition = transform.position;
     }
 
     private void OnTriggerExit(Collider other)

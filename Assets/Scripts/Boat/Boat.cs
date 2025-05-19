@@ -6,6 +6,7 @@ using UnityEngine.Serialization;
 public class Boat : MonoBehaviour
 {
     public Transform leverTransform; // Reference to the handle
+    public Transform boatInitPos;
     public float speedMultiplier = 3f; // Multiplie the boat speed
     public float turnSensitivity = 0.25f; // Boat turn sensitivity
     public float accelerationRate = 1.5f;
@@ -163,5 +164,11 @@ public class Boat : MonoBehaviour
             reverseIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
             Debug.Log("Reverse is off"); 
         }
+    }
+
+    public void SpawnBackToInitPosBoat()
+    {
+        transform.position = boatInitPos.position;
+        transform.rotation = boatInitPos.rotation;
     }
 }

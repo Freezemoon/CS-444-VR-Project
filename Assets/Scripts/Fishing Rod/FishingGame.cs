@@ -275,7 +275,7 @@ public class FishingGame : MonoBehaviour
         _currentFish = null;
         
         loseAudioSource.Play();
-        GameManager.instance.restartFishingTutoIfLostBeforeGrabFish();
+        GameManager.instance.RestartFishingTutoIfLostBeforeGrabFish();
         
         UpdateText();
     }

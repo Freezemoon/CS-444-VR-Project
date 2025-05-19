@@ -181,7 +181,6 @@ public class ShopDisplay : MonoBehaviour
         RefreshCartTotal();
         RefreshInventoryTotal();
         RefreshPlayerTotal();
-
     }
 
     public void RefreshPlayerTotal()
