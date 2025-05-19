@@ -1,11 +1,6 @@
 using Game;
-using NUnit.Framework;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class ShopDisplay : MonoBehaviour
