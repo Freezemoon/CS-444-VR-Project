@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using Game;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using Random = UnityEngine.Random;
@@ -165,7 +163,12 @@ public class FishingGame : MonoBehaviour
                     _currentFish = Instantiate(fishPrefab, baitFishAttach.position, Quaternion.identity);
                     _currentFish.GetComponent<XRGrabInteractable>().enabled = false;
                     
-                    ConfigurableJoint currentFishJoin = _currentFish.GetComponent<ConfigurableJoint>();
+                    ConfigurableJoint currentFishJoin = _currentFish.AddComponent<ConfigurableJoint>();
+                    currentFishJoin.autoConfigureConnectedAnchor = false;
+                    currentFishJoin.anchor = Vector3.zero;
+                    currentFishJoin.xMotion = ConfigurableJointMotion.Locked;
+                    currentFishJoin.yMotion = ConfigurableJointMotion.Locked;
+                    currentFishJoin.zMotion = ConfigurableJointMotion.Locked;
                     
                     currentFishJoin.connectedBody = baitFishAttach.parent.GetComponent<Rigidbody>();
                     currentFishJoin.anchor = Vector3.left * 0.3f;
