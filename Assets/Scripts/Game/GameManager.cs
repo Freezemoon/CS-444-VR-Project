@@ -26,6 +26,7 @@ namespace Game
 
         [Header("DialogueTiggers")]
         public DialogueTrrigger dialogueTriggerDynamiteBought;
+        public DialogueTrrigger dialogueTriggerCraftBaits;
 
         [Header("Spawning Settings")]
         [Tooltip("The prefab to spawn on the water surface")]
@@ -730,6 +731,9 @@ namespace Game
                         break;
                     case DialogueState.DynamiteBought:
                         dialogueTriggerDynamiteBought.ValidateDialogue();
+                        break;
+                    case DialogueState.CraftBaits:
+                        dialogueTriggerCraftBaits.ValidateDialogue();
                         break;
                 }
 
