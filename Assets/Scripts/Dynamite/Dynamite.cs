@@ -39,9 +39,6 @@ public class Dynamite : MonoBehaviour
 
     [Tooltip("Plays on explosion.")] [SerializeField]
     private AudioClip explosionSound;
-
-    [Tooltip("Plays when landing in water.")] [SerializeField]
-    private AudioClip waterSound;
     
     [Header("Fish prefabs")] [Tooltip("Fish prefabs that will spawn when exploding fishing zones.")]
     [SerializeField] private GameObject easyFish;
@@ -56,15 +53,12 @@ public class Dynamite : MonoBehaviour
     private AudioSource _audioSource;
     private Coroutine _fuseRoutine;
     private XRGrabInteractable _grab;
-    private bool _isSinking;
-    private Rigidbody _rb;
     private GameObject _zippoInstance;
     private Transform _xrOrigin;
 
     private void Awake()
     {
         _audioSource = GetComponent<AudioSource>();
-        _rb = GetComponent<Rigidbody>();
         _grab = GetComponent<XRGrabInteractable>();
         _grab.selectEntered.AddListener(OnGrabbed);
         _grab.selectExited.AddListener(OnReleased);
@@ -84,13 +78,6 @@ public class Dynamite : MonoBehaviour
     {
         _grab.selectEntered.RemoveListener(OnGrabbed);
         _grab.selectExited.RemoveListener(OnReleased);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (_isSinking) return;
-        if (other.CompareTag("WaterFishingLimit"))
-            StartCoroutine(HandleWaterSink(other));
     }
 
     private void OnGrabbed(SelectEnterEventArgs args)
@@ -144,31 +131,6 @@ public class Dynamite : MonoBehaviour
         {
             Destroy(_zippoInstance);
             _zippoInstance = null;
-        }
-    }
-
-    private IEnumerator HandleWaterSink(Collider water)
-    {
-        _isSinking = true;
-
-        // Play splash sound
-        if (waterSound)
-            AudioSource.PlayClipAtPoint(waterSound, transform.position);
-
-        // Freeze at the water surface
-        _rb.isKinematic = true;
-        var pos = transform.position;
-        var surfY = water.transform.position.y;
-        transform.position = new Vector3(pos.x, surfY, pos.z);
-
-        // Wait before sinking
-        yield return new WaitForSeconds(0.15f);
-
-        // Sink slowly
-        while (true)
-        {
-            transform.position += Vector3.down * (0.65f * Time.deltaTime);
-            yield return null;
         }
     }
 
@@ -260,7 +222,7 @@ public class Dynamite : MonoBehaviour
     private void SpawnFishes(FishingGame.Difficulty difficulty, Vector3 origin)
     {
         float radialVelocity = 3f;
-        float upwardVelocity = 3f;
+        float upwardVelocity = 8f;
         
         // pick correct fish prefab
         GameObject prefab;
@@ -274,8 +236,9 @@ public class Dynamite : MonoBehaviour
         
 
         // spawn at the origin
-        var fish = Instantiate(prefab, origin, Quaternion.identity);
+        var fish = Instantiate(prefab, origin + Vector3.up * 0.4f, Quaternion.identity);
 
+        
         // send it flying into the air with some randomness
         if (fish.TryGetComponent<Rigidbody>(out var rbody))
         {
@@ -288,17 +251,20 @@ public class Dynamite : MonoBehaviour
                         * radialVelocity
                         * Random.Range(0.8f, 1.2f);
 
-            rbody.linearVelocity = new Vector3(side.x, up, side.z);
+            rbody.AddForce(
+                new Vector3(side.x, up, side.z),
+                ForceMode.VelocityChange
+            );
             
             rbody.AddTorque(Random.insideUnitSphere * radialVelocity, ForceMode.Impulse);
         }
-
-        // Randomly spawn some easy fish too
-        for (int i = 0; i < Random.Range(1, 3); i++)
+        
+        // Repeat to spawn a random amount of easy fishes
+        for (int i = 0; i < Random.Range(0, 3); i++)
         {
-            var easyFish = Instantiate(this.easyFish, origin, Quaternion.identity);
+            var eFish = Instantiate(this.easyFish, origin + Vector3.up * 0.4f, Quaternion.identity);
             
-            if (easyFish.TryGetComponent<Rigidbody>(out var rb))
+            if (eFish.TryGetComponent<Rigidbody>(out var rb))
             {
                 float up = upwardVelocity * Random.Range(0.8f, 1.2f);
                 
@@ -312,5 +278,6 @@ public class Dynamite : MonoBehaviour
                 rb.AddTorque(Random.insideUnitSphere * radialVelocity, ForceMode.Impulse);
             }
         }
+        
     }
 }
