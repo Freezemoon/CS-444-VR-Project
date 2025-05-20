@@ -11,7 +11,7 @@ namespace Game
         public int Money = 50; // monnaie actuelle en posession du joueur
         public FishingRodStats CurrentRod = FishingRodLibrary.Basic; // Canne actuelle du joueur
 
-        public int BBBaitCount = 1;
+        public int BBBaitCount;
         public int BGBaitCount;
         public int BRBaitCount;
         public int GBBaitCount;
@@ -21,7 +21,7 @@ namespace Game
         public int RGBaitCount;
         public int RRBaitCount;
         
-        public int DynamiteAmount = 1;
+        public int DynamiteAmount;
 
         public int EasyFishCought;
         public int MediumFishCought;

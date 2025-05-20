@@ -80,7 +80,7 @@ public class ShopDisplay : MonoBehaviour
         if (_dynamitesInCart > 0)
         {
             GameManager.instance.AddDynamiteAmount(_dynamitesInCart);
-            GameManager.instance.SetDialogueState(GameManager.DialogueState.DynamiteBought);   
+            GameManager.instance.SetDialogueState(GameManager.DialogueState.DynamiteBought);
         }
 
         ResetCart();
@@ -148,6 +148,11 @@ public class ShopDisplay : MonoBehaviour
         float maxX = bounds.max.x - padX;
         float minZ = bounds.min.z + padZ;
         float maxZ = bounds.max.z - padZ;
+
+        if (amount > 0)
+        {
+            GameManager.instance.SetDialogueState(GameManager.DialogueState.CraftBaits);
+        }
 
         for (int i = 0; i < amount; i++)
         {

@@ -164,9 +164,9 @@ public class FishingGame : MonoBehaviour
                     }
                     _currentFish = Instantiate(fishPrefab, baitFishAttach.position, Quaternion.identity);
                     _currentFish.GetComponent<XRGrabInteractable>().enabled = false;
-                    _currentFish.GetComponent<Rigidbody>().useGravity = false;
+                    // _currentFish.GetComponent<Rigidbody>().useGravity = false;
                     
-                    Physics.IgnoreCollision(baitFishAttach.parent.GetComponent<Collider>(), _currentFish.GetComponent<Collider>());
+                    // Physics.IgnoreCollision(baitFishAttach.parent.GetComponent<Collider>(), _currentFish.GetComponent<Collider>());
                     ConfigurableJoint currentFishJoin = _currentFish.GetComponent<ConfigurableJoint>();
                     
                     currentFishJoin.connectedBody = baitFishAttach.parent.GetComponent<Rigidbody>();

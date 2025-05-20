@@ -454,7 +454,6 @@ namespace Game
                 activateNextText = false
             },
             // Victory
-            // TODO: When the player caught 5 of each kind of fish
             new TextEntry
             {
                 text = "Hey! You did it!\n" +
