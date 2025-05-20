@@ -42,6 +42,11 @@ public class Dynamite : MonoBehaviour
 
     [Tooltip("Plays when landing in water.")] [SerializeField]
     private AudioClip waterSound;
+    
+    [Header("Fish prefabs")] [Tooltip("Fish prefabs that will spawn when exploding fishing zones.")]
+    [SerializeField] private GameObject easyFish;
+    [SerializeField] private GameObject mediumFish;
+    [SerializeField] private GameObject hardFish;
 
     [Header("Debug")] [Tooltip("Lights the dynamite")] [SerializeField]
     private bool lit;
@@ -217,6 +222,7 @@ public class Dynamite : MonoBehaviour
         Explode();
     }
 
+    // ReSharper disable Unity.PerformanceAnalysis
     /// <summary>
     ///     Triggers the explosion VFX, sound, and destroys the dynamite.
     /// </summary>
@@ -235,9 +241,12 @@ public class Dynamite : MonoBehaviour
         foreach (var hit in hits)
         {
             if (hit.CompareTag("FishingZone"))
-                // TODO faire apparaître le poisson correspondant
+            {
+                var difficulty = hit.GetComponent<FishingArea>().areaDifficulty;
+                SpawnFishes(difficulty, hit.transform.position);
                 Destroy(hit.gameObject);
-            
+            }
+
             if (hit.TryGetComponent<Explodable>(out var explodable))
             {
                 explodable.PlaySound();
@@ -246,5 +255,62 @@ public class Dynamite : MonoBehaviour
         }
 
         Destroy(gameObject);
+    }
+
+    private void SpawnFishes(FishingGame.Difficulty difficulty, Vector3 origin)
+    {
+        float radialVelocity = 3f;
+        float upwardVelocity = 3f;
+        
+        // pick correct fish prefab
+        GameObject prefab;
+        switch (difficulty)
+        {
+            case FishingGame.Difficulty.Easy:   prefab = easyFish;   break;
+            case FishingGame.Difficulty.Medium: prefab = mediumFish; break;
+            case FishingGame.Difficulty.Hard:   prefab = hardFish;   break;
+            default:                            prefab = easyFish;   break;
+        }
+        
+
+        // spawn at the origin
+        var fish = Instantiate(prefab, origin, Quaternion.identity);
+
+        // send it flying into the air with some randomness
+        if (fish.TryGetComponent<Rigidbody>(out var rbody))
+        {
+            // a little variation on upward speed
+            float up = upwardVelocity * Random.Range(0.8f, 1.2f);
+
+            // pick a random horizontal direction
+            var dir2d = Random.insideUnitCircle.normalized;
+            var side  = new Vector3(dir2d.x, 0f, dir2d.y) 
+                        * radialVelocity
+                        * Random.Range(0.8f, 1.2f);
+
+            rbody.linearVelocity = new Vector3(side.x, up, side.z);
+            
+            rbody.AddTorque(Random.insideUnitSphere * radialVelocity, ForceMode.Impulse);
+        }
+
+        // Randomly spawn some easy fish too
+        for (int i = 0; i < Random.Range(1, 3); i++)
+        {
+            var easyFish = Instantiate(this.easyFish, origin, Quaternion.identity);
+            
+            if (easyFish.TryGetComponent<Rigidbody>(out var rb))
+            {
+                float up = upwardVelocity * Random.Range(0.8f, 1.2f);
+                
+                var dir2d = Random.insideUnitCircle.normalized;
+                var side  = new Vector3(dir2d.x, 0f, dir2d.y) 
+                            * radialVelocity
+                            * Random.Range(0.8f, 1.2f);
+
+                rb.linearVelocity = new Vector3(side.x, up, side.z);
+                
+                rb.AddTorque(Random.insideUnitSphere * radialVelocity, ForceMode.Impulse);
+            }
+        }
     }
 }
