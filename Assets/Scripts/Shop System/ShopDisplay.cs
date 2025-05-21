@@ -9,19 +9,14 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private Button _closeShopButton;
 
     [Header("Inventory")]
-    [SerializeField] private TextMeshProUGUI _inventoryTotalText;    
-    [SerializeField] private TextMeshProUGUI _inventoryText;
+    [SerializeField] private TextMeshProUGUI _inventoryTotalText;
     [SerializeField] private Button _sellInventory;
 
     [Header("Item Preview Section")]
     [SerializeField] private TextMeshProUGUI _playerGoldText;
-    [SerializeField] private TextMeshProUGUI _itemPreviewName;
-    [SerializeField] private Image _itemPreviewSprite;
-    [SerializeField] private TextMeshProUGUI _itemPreviewDescription;
-    [SerializeField] private TextMeshProUGUI _itemPreviewStat;
     [SerializeField] private TextMeshProUGUI _itemPreviewText;
     [SerializeField] private GameObject[] _itemPreviewObjects = new GameObject[7];
-    
+
     [Header("Components prefabs.")]
     [SerializeField] private GameObject redHook;
     [SerializeField] private GameObject blueHook;
@@ -29,14 +24,13 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private GameObject redCork;
     [SerializeField] private GameObject blueCork;
     [SerializeField] private GameObject greenCork;
-    
+
     [Header("Component spawn location.")]
     [SerializeField] private GameObject componentSpawnLocation;
 
     [Header("Shopping Cart")]
     [SerializeField] private TextMeshProUGUI _basketTotalText;
     [SerializeField] private TextMeshProUGUI _basketTotalInteger;
-    [SerializeField] private TextMeshProUGUI _shoppingCartText;
     [SerializeField] private Button _buyButton;
     [SerializeField] private TextMeshProUGUI _buyButtonText;
     [SerializeField] private GameObject _cartBlueHookPrefab;
@@ -46,7 +40,7 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private GameObject _cartBlueCorkPrefab;
     [SerializeField] private GameObject _cartGreenCorkPrefab;
     [SerializeField] private GameObject _cartDynamitePrefab;
-    
+
     [Header("Price and quantity sold")]
     [SerializeField] private int redCorkPrice = 60;
     [SerializeField] private int blueCorkPrice = 20;
@@ -84,13 +78,13 @@ public class ShopDisplay : MonoBehaviour
         }
 
         ResetCart();
-        
+
         _basketTotalText.SetText("Shopping Cart Total: ");
         GameManager.instance.AddMoney(-basketTotal);
         _basketTotalInteger.SetText("0");
         _itemPreviewText.gameObject.SetActive(true);
         _itemPreviewText.SetText("Thanks for shopping with us !");
-        foreach (var item in _itemPreviewObjects) item.SetActive(false); // remove any preview UI to display thanks 
+        ResetItemPreview(); // remove any preview UI to display thanks 
         RefreshPlayerTotal();
     }
 
@@ -98,24 +92,29 @@ public class ShopDisplay : MonoBehaviour
     {
         _blueHooksInCart = 0;
         _cartBlueHookPrefab.SetActive(false);
-        
+
         _blueCorksInCart = 0;
         _cartBlueCorkPrefab.SetActive(false);
-        
+
         _greenHooksInCart = 0;
         _cartGreenHookPrefab.SetActive(false);
-        
+
         _greenCorksInCart = 0;
         _cartGreenCorkPrefab.SetActive(false);
-        
+
         _redHooksInCart = 0;
         _cartRedHookPrefab.SetActive(false);
-        
+
         _redCorksInCart = 0;
         _cartRedCorkPrefab.SetActive(false);
-        
+
         _dynamitesInCart = 0;
         _cartDynamitePrefab.SetActive(false);
+    }
+
+    public void ResetItemPreview()
+    {
+        foreach (var item in _itemPreviewObjects) item.SetActive(false);
     }
 
     private void SpawnComponents()
@@ -179,7 +178,7 @@ public class ShopDisplay : MonoBehaviour
         GameManager.instance.AddToBucket(-bucketValue);
         RefreshPlayerTotal();
         RefreshCartTotal(); // in case the text was still "not enough money"
-        _inventoryTotalText.SetText("Total inventory : 0G");
+        _inventoryTotalText.SetText("0G");
     }
     public void Start()
     {
@@ -190,18 +189,19 @@ public class ShopDisplay : MonoBehaviour
 
     public void RefreshPlayerTotal()
     {
-        _playerGoldText.SetText($"You currently have: {GameManager.instance.GetMoney()}G");
+        _playerGoldText.SetText($"{GameManager.instance.GetMoney()}G");
     }
 
     public void RefreshInventoryTotal()
     {
-        _inventoryTotalText.SetText($"Total inventory : {GameManager.instance.GetBucketValue()}G");
+        _inventoryTotalText.SetText($"{GameManager.instance.GetBucketValue()}G");
     }
 
     public void AddBlueHookInCart()
     {
         _blueHooksInCart++;
         RefreshCartTotal();
+        ResetItemPreview();
     }
 
     public void RemoveBlueHookInCart()
@@ -215,6 +215,7 @@ public class ShopDisplay : MonoBehaviour
     {
         _greenHooksInCart++;
         RefreshCartTotal();
+        ResetItemPreview();
     }
 
     public void RemoveGreenHookInCart()
@@ -228,6 +229,7 @@ public class ShopDisplay : MonoBehaviour
     {
         _redHooksInCart++;
         RefreshCartTotal();
+        ResetItemPreview();
     }
 
     public void RemoveRedHookInCart()
@@ -241,6 +243,7 @@ public class ShopDisplay : MonoBehaviour
     {
         _blueCorksInCart++;
         RefreshCartTotal();
+        ResetItemPreview();
     }
 
     public void RemoveBlueCorkInCart()
@@ -254,6 +257,7 @@ public class ShopDisplay : MonoBehaviour
     {
         _greenCorksInCart++;
         RefreshCartTotal();
+        ResetItemPreview();
     }
 
     public void RemoveGreenCorkInCart()
@@ -267,6 +271,7 @@ public class ShopDisplay : MonoBehaviour
     {
         _redCorksInCart++;
         RefreshCartTotal();
+        ResetItemPreview();
     }
 
     public void RemoveRedCorkInCart()
@@ -280,6 +285,7 @@ public class ShopDisplay : MonoBehaviour
     {
         _dynamitesInCart ++;
         RefreshCartTotal();
+        ResetItemPreview();
     }
     
     public void RemoveDynamiteFromCart()
