@@ -46,8 +46,8 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private int blueCorkPrice = 20;
     [SerializeField] private int greenCorkPrice = 40;
     [SerializeField] private int redHookPrice = 50;
-    [SerializeField] private int blueHookPrice = 30;
-    [SerializeField] private int greenHookPrice = 10;
+    [SerializeField] private int blueHookPrice = 10;
+    [SerializeField] private int greenHookPrice = 30;
     [SerializeField] private int dynamitePrice = 100;
 
     private int _redCorksInCart;
