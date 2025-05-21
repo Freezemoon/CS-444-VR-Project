@@ -119,8 +119,8 @@ public class BaitMenu : MonoBehaviour
 
     public void OnBaitButtonClickGeneral(Transform selectedBait)
     {
-        int durability = selectedBait.GetComponent<BaitStat>().durability;
-        int strength = selectedBait.GetComponent<BaitStat>().strength;
+        int durability = selectedBait.gameObject.GetComponent<BaitStat>().durability;
+        int strength = selectedBait.gameObject.GetComponent<BaitStat>().strength;
         GameManager.instance.EquipBait(strength, durability);
         
         DefaultPrefab.gameObject.SetActive(false);
