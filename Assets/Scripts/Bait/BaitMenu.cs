@@ -139,38 +139,47 @@ public class BaitMenu : MonoBehaviour
     public void OnBaitButtonClick1()
     {
         OnBaitButtonClickGeneral(BBPrefab);
+        GameManager.instance.State.BBBaitCount -= 1;
     }
     public void OnBaitButtonClick2()
     {
         OnBaitButtonClickGeneral(BGPrefab);
+        GameManager.instance.State.BGBaitCount -= 1;
     }
     public void OnBaitButtonClick3()
     {
         OnBaitButtonClickGeneral(BRPrefab);
+        GameManager.instance.State.BRBaitCount -= 1;
     }
     public void OnBaitButtonClick4()
     {
         OnBaitButtonClickGeneral(GBPrefab);
+        GameManager.instance.State.GBBaitCount -= 1;
     }
     public void OnBaitButtonClick5()
     {
         OnBaitButtonClickGeneral(GGPrefab);
+        GameManager.instance.State.GGBaitCount -= 1;
     }
     public void OnBaitButtonClick6()
     {
         OnBaitButtonClickGeneral(GRPrefab);
+        GameManager.instance.State.GRBaitCount -= 1;
     }
     public void OnBaitButtonClick7()
     {
         OnBaitButtonClickGeneral(RBPrefab);
+        GameManager.instance.State.RBBaitCount -= 1;
     }
     public void OnBaitButtonClick8()
     {
         OnBaitButtonClickGeneral(RGPrefab);
+        GameManager.instance.State.RGBaitCount -= 1;
     }
     public void OnBaitButtonClick9()
     {
-        OnBaitButtonClickGeneral(GGPrefab);
+        OnBaitButtonClickGeneral(RRPrefab);
+        GameManager.instance.State.RRBaitCount -= 1;
     }
     
     public void OnDynamiteButtonClick()
@@ -191,6 +200,6 @@ public class BaitMenu : MonoBehaviour
         if (_selectedBait)
             _selectedBait.gameObject.SetActive(false);
         
-        DefaultPrefab.gameObject.SetActive(false);
+        DefaultPrefab.gameObject.SetActive(true);
     }
 }

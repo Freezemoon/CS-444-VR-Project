@@ -897,6 +897,7 @@ namespace Game
                 State.EquippedBaitDurability = 0;
                 State.EquippedBaitStrength = 0;
                 EquipBait(0, 0);
+                baitMenu.ResetToDefaultBait();
             }
         }
 
@@ -904,7 +905,6 @@ namespace Game
         {
             State.EquippedBaitStrength = strength;
             State.EquippedBaitDurability = durability;
-            baitMenu.ResetToDefaultBait();
         }
     }
 }

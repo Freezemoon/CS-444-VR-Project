@@ -378,6 +378,8 @@ public class FishingGame : MonoBehaviour
         // Check if win
         if (_currentPhaseBeforeWin >= _neededPhaseBeforeWin)
         {
+            if (gameState == GameState.Win) return;
+            
             GameManager.instance.SetDialogueState(GameManager.DialogueState.GrabFish);
             GameManager.instance.HandleBaitDurability(); // decrease bait durability
             gameState = GameState.Win;
