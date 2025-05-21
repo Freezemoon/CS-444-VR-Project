@@ -7,6 +7,7 @@ using Game;
 public class BaitSocket : MonoBehaviour
 {
     private XRSocketInteractor socket;
+    public AudioClip audioClip;
 
     void Awake()
     {
@@ -25,6 +26,10 @@ public class BaitSocket : MonoBehaviour
         int levelA = insertedObject.GetComponent<BaitValue>()?.level ?? 0;
         int levelB = socketObject.GetComponent<BaitValue>()?.level ?? 0;
 
+        if (audioClip != null) {
+            AudioSource.PlayClipAtPoint(audioClip, transform.position);
+        }
+        
         Debug.Log($"object level: {levelA} has been merged with object level: {levelB}");
 
         StoreBait(levelA, levelB);
