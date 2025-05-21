@@ -59,7 +59,6 @@ namespace Game
         public Vector3 lastFishSpawnerPosition;
         
         [Header("Default fish bait")]
-        [SerializeField] private BaitMenu baitMenu;
         [SerializeField] private Transform defaultBait;
 
         public enum DialogueState
@@ -905,7 +904,7 @@ namespace Game
         {
             State.EquippedBaitStrength = strength;
             State.EquippedBaitDurability = durability;
-            baitMenu.OnBaitButtonClickGeneral(defaultBait);
+            defaultBait.gameObject.SetActive(true);
         }
     }
 }
