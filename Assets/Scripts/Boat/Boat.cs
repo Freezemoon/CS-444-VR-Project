@@ -138,7 +138,7 @@ public class Boat : MonoBehaviour
 
             AudioSource.PlayClipAtPoint(engineStartClip, transform.position);
             _engineAudioSource.Play();
-            Debug.Log("Engine is on and reverse is off"); 
+            Debug.Log("Engine is on"); 
         }
         else
         {
