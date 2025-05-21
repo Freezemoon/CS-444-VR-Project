@@ -14,7 +14,7 @@ namespace Game
         public int EquippedBaitStrength;
         public int EquippedBaitDurability;
 
-        public int BBBaitCount;
+        public int BBBaitCount = 1;
         public int BGBaitCount;
         public int BRBaitCount;
         public int GBBaitCount;

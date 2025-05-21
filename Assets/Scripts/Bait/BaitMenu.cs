@@ -185,4 +185,12 @@ public class BaitMenu : MonoBehaviour
         
         GameManager.instance.SetDialogueState(GameManager.DialogueState.DynamiteSpawned);
     }
+
+    public void ResetToDefaultBait()
+    {
+        if (_selectedBait)
+            _selectedBait.gameObject.SetActive(false);
+        
+        DefaultPrefab.gameObject.SetActive(false);
+    }
 }

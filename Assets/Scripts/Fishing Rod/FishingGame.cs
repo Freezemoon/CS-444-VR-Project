@@ -268,10 +268,10 @@ public class FishingGame : MonoBehaviour
     
     public void LoseGame()
     {
-        GameManager.instance.HandleBaitDurability(); // Decrement bait durability
         if (gameState == GameState.Win) return;
         
         gameState = GameState.NotStarted;
+        GameManager.instance.HandleBaitDurability(); // Decrement bait durability
         
         Destroy(_currentFish);
         _currentFish = null;
@@ -379,7 +379,7 @@ public class FishingGame : MonoBehaviour
         if (_currentPhaseBeforeWin >= _neededPhaseBeforeWin)
         {
             GameManager.instance.SetDialogueState(GameManager.DialogueState.GrabFish);
-            
+            GameManager.instance.HandleBaitDurability(); // decrease bait durability
             gameState = GameState.Win;
             
             _currentFish.GetComponent<XRGrabInteractable>().enabled = true;
