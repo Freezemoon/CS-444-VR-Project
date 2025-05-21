@@ -57,6 +57,10 @@ namespace Game
         public int currentTextIndex { get; private set; }
         
         public Vector3 lastFishSpawnerPosition;
+        
+        [Header("Default fish bait")]
+        [SerializeField] private BaitMenu baitMenu;
+        [SerializeField] private Transform defaultBait;
 
         public enum DialogueState
         {
@@ -899,9 +903,9 @@ namespace Game
 
         public void EquipBait(int strength, int durability)
         {
-            // TODO
             State.EquippedBaitStrength = strength;
             State.EquippedBaitDurability = durability;
+            baitMenu.OnBaitButtonClickGeneral(defaultBait);
         }
     }
 }
