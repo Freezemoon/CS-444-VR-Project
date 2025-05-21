@@ -268,6 +268,7 @@ public class FishingGame : MonoBehaviour
     
     public void LoseGame()
     {
+        GameManager.instance.HandleBaitDurability(); // Decrement bait durability
         if (gameState == GameState.Win) return;
         
         gameState = GameState.NotStarted;

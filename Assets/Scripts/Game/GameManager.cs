@@ -880,5 +880,28 @@ namespace Game
                       $"Medium caught : {State.MediumFishCought}, " +
                       $"Hard caught : {State.HardFishCought}.");
         }
+
+        /// <summary>
+        /// This should be called after the player has either won or lost a fishing game.
+        /// The purpose is to decrement the durability of the currently equipped bait and revert it to default if we
+        /// reach 0.
+        /// </summary>
+        public void HandleBaitDurability()
+        {
+            State.EquippedBaitDurability--;
+            if (State.EquippedBaitDurability <= 0)
+            {
+                State.EquippedBaitDurability = 0;
+                State.EquippedBaitStrength = 0;
+                EquipBait(0, 0);
+            }
+        }
+
+        public void EquipBait(int strength, int durability)
+        {
+            // TODO
+            State.EquippedBaitStrength = strength;
+            State.EquippedBaitDurability = durability;
+        }
     }
 }
