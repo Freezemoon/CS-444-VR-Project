@@ -14,11 +14,11 @@ namespace Game
         public int EquippedBaitStrength;
         public int EquippedBaitDurability;
 
-        public int BBBaitCount;
+        public int BBBaitCount = 2;
         public int BGBaitCount;
         public int BRBaitCount;
         public int GBBaitCount;
-        public int GGBaitCount;
+        public int GGBaitCount = 1;
         public int GRBaitCount;
         public int RBBaitCount;
         public int RGBaitCount;

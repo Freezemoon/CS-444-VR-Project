@@ -883,8 +883,8 @@ namespace Game
 
         /// <summary>
         /// This should be called after the player has either won or lost a fishing game.
-        /// The purpose is to decrement the durability of the currently equipped bait and revert it to default if we
-        /// reach 0.
+        /// The purpose is to decrement the durability of the currently equipped bait and revert it to
+        /// default if we reach 0.
         /// </summary>
         public void HandleBaitDurability()
         {
