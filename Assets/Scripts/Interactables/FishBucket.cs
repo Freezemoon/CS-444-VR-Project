@@ -24,8 +24,6 @@ public class FishBucket : MonoBehaviour
         // Update the bucket value properly as well as the type cought
         if (!other.CompareTag("Fish"))
             return;
-        
-        NewFish?.Invoke();
 
         GameManager.instance.HandleCaughtFish(other.GetComponent<GrabFish>().difficulty);
 
@@ -38,6 +36,8 @@ public class FishBucket : MonoBehaviour
 
         // Strip down the duplicate to visuals only
         ToKinetic(duplicate);
+
+        NewFish?.Invoke();
 
         // End with the socket animation
         StartCoroutine(SocketAnimation(duplicate));
