@@ -49,6 +49,13 @@ public class ShopDisplay : MonoBehaviour
     [SerializeField] private int blueHookPrice = 10;
     [SerializeField] private int greenHookPrice = 30;
     [SerializeField] private int dynamitePrice = 100;
+    [SerializeField] private TextMeshProUGUI _redCorkInteger;
+    [SerializeField] private TextMeshProUGUI _blueCorkInteger;
+    [SerializeField] private TextMeshProUGUI _greenCorkInteger;
+    [SerializeField] private TextMeshProUGUI _redHookInteger;
+    [SerializeField] private TextMeshProUGUI _blueHookInteger;
+    [SerializeField] private TextMeshProUGUI _greeHookInteger;
+    [SerializeField] private TextMeshProUGUI _dynamiteInteger;
 
     private int _redCorksInCart;
     private int _blueCorksInCart;
@@ -182,9 +189,23 @@ public class ShopDisplay : MonoBehaviour
     }
     public void Start()
     {
+        FishBucket.NewFish += RefreshInventoryTotal;
         RefreshCartTotal();
         RefreshInventoryTotal();
         RefreshPlayerTotal();
+
+        _redCorkInteger.SetText($"{redCorkPrice}G");
+        _blueCorkInteger.SetText($"{blueCorkPrice}G");
+        _greenCorkInteger.SetText($"{greenCorkPrice}G");
+        _redHookInteger.SetText($"{redHookPrice}G");
+        _blueHookInteger.SetText($"{blueHookPrice}G");
+        _greeHookInteger.SetText($"{greenHookPrice}G");
+        _dynamiteInteger.SetText($"{dynamitePrice}G");
+    }
+
+    void OnDestroy()
+    {
+        FishBucket.NewFish -= RefreshInventoryTotal;
     }
 
     public void RefreshPlayerTotal()
@@ -352,7 +373,7 @@ public class ShopDisplay : MonoBehaviour
         }
         else _cartDynamitePrefab.SetActive(false);
         
-        _basketTotalText.SetText("Shopping Cart Total: ");
+        _basketTotalText.SetText("Shopping Cart Total:");
         _basketTotalInteger.SetText($"{shoppingCartSum}");
     }
 

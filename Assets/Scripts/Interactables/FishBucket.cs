@@ -10,6 +10,8 @@ using UnityEngine;
 /// </summary>
 public class FishBucket : MonoBehaviour
 {
+    public static event Action NewFish;
+
     private AudioSource _audioSource;
 
     private void Awake()
@@ -23,6 +25,8 @@ public class FishBucket : MonoBehaviour
         if (!other.CompareTag("Fish"))
             return;
         
+        NewFish?.Invoke();
+
         GameManager.instance.HandleCaughtFish(other.GetComponent<GrabFish>().difficulty);
 
         GameManager.instance.SetDialogueState(GameManager.DialogueState.HopOnBoat);
