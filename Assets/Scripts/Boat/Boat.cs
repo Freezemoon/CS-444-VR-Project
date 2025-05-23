@@ -7,6 +7,7 @@ public class Boat : MonoBehaviour
 {
     public Transform leverTransform; // Reference to the handle
     public Transform boatInitPos;
+    public Transform boatLake2Pos;
     public float speedMultiplier = 3f; // Multiplie the boat speed
     public float turnSensitivity = 0.25f; // Boat turn sensitivity
     public float accelerationRate = 1.5f;
@@ -170,5 +171,11 @@ public class Boat : MonoBehaviour
     {
         transform.position = boatInitPos.position;
         transform.rotation = boatInitPos.rotation;
+    }
+    
+    public void SpawnBackToLake2Pos()
+    {
+        transform.position = boatLake2Pos.position;
+        transform.rotation = boatLake2Pos.rotation;
     }
 }
