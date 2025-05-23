@@ -899,8 +899,6 @@ namespace Game
             State.EquippedBaitDurability--;
             if (State.EquippedBaitDurability <= 0)
             {
-                State.EquippedBaitDurability = 0;
-                State.EquippedBaitStrength = 0;
                 EquipBait(0, 0);
                 baitMenu.ResetToDefaultBait();
             }

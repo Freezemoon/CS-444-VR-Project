@@ -24,7 +24,7 @@ namespace Game
         public int RGBaitCount;
         public int RRBaitCount;
         
-        public int DynamiteAmount = 5;
+        public int DynamiteAmount = 3;
 
         public int EasyFishCought;
         public int MediumFishCought;
