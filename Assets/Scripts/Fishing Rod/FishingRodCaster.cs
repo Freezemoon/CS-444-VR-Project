@@ -17,27 +17,22 @@ public class FishingRodCaster : MonoBehaviour
     public Transform controllerTransform;  // The hand/controller transform
     public Transform baitTransform;
     public Transform baitInitPosTransform;
-    public Transform baitParentTransform;
     
     [Header("Others")]
     public Rigidbody baitRb;
-
-    [Header("Casting Settings")]
-    public float castForceMultiplier = 1.5f;
+    public GrabRotateAroundPivot grabRotateAroundPivot;
     
     [Header("Hook Detection")]
     public float hookPitchThreshold = 500f; // Degrees per second
     public AudioSource pullSuccessAudioSource;
 
-    private bool _canTriggerPull = false;
+    private bool _canTriggerPull;
     private readonly float _pullCooldown = 1.0f;
     private float _lastPullTime;
     
     private bool _isBaitAtInitPos;
     private bool _isHeld;
     private bool _isHolding;
-    private Vector3 _previousPos;
-    private Vector3 _handVelocity;
     private Quaternion _prevHandRotation;
     private float _backwardPitchSpeed;
     
@@ -76,22 +71,13 @@ public class FishingRodCaster : MonoBehaviour
     {
         FishingGame.instance.canStart = !baitRb.isKinematic;
         
-        UpdateHandVelocity();
-        
         UpdateHandPitchRotation();
         DetectRodPull();
     }
 
     private void OnReelReachedMinLength()
     {
-        baitRb.isKinematic = true;
-
         _isBaitAtInitPos = true;
-
-        _previousPos = controllerTransform.position;
-        
-        baitTransform.SetParent(transform);
-        baitTransform.position = baitInitPosTransform.position;
     }
     
     private void OnGrabbedFishingRod(SelectEnterEventArgs args)
@@ -103,13 +89,6 @@ public class FishingRodCaster : MonoBehaviour
     private void OnReleasedFishingRod(SelectExitEventArgs args)
     {
         _isHeld = false;
-    }
-
-    private void UpdateHandVelocity()
-    {
-        Vector3 current = controllerTransform.position;
-        _handVelocity = (current - _previousPos) / Time.deltaTime;
-        _previousPos = current;
     }
     
     private void OnAButtonPressed(InputAction.CallbackContext context)
@@ -127,11 +106,6 @@ public class FishingRodCaster : MonoBehaviour
         if (FishingGame.instance.canGrabFish) return;
         
         _isHolding = true;
-        
-        baitRb.isKinematic = true;
-        
-        baitTransform.SetParent(transform);
-        baitTransform.position = baitInitPosTransform.position;
     }
 
     private void ReleaseAndCastBait(InputAction.CallbackContext context)
@@ -143,11 +117,14 @@ public class FishingRodCaster : MonoBehaviour
         _isHolding = false;
         _isBaitAtInitPos = false;
         
-        baitTransform.SetParent(baitParentTransform);
-        baitTransform.position = baitInitPosTransform.position;
+        grabRotateAroundPivot.SetLineLength(grabRotateAroundPivot.currentLockedLineLengthMax);
         
-        baitRb.isKinematic = false;
-        baitRb.linearVelocity = _handVelocity * castForceMultiplier;
+        Vector3 baitVelocity = baitRb.linearVelocity;
+        if (baitVelocity.sqrMagnitude > 0.01f)
+        {
+            float releaseForce = Mathf.Clamp(baitVelocity.magnitude, 0f, 2f);
+            baitRb.AddForce(baitVelocity.normalized * releaseForce, ForceMode.Impulse);
+        }
     }
     
     private void UpdateHandPitchRotation()

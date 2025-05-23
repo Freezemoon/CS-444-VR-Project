@@ -168,3 +168,4 @@ crashlytics-build.properties
 .vscode
 .vsconfig
 *.unitypackage.meta
+Assets/Settings/Build\ Profiles/*.asset

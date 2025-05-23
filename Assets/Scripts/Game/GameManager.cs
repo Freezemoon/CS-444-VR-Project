@@ -1,10 +1,5 @@
-using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 namespace Game
@@ -25,10 +20,13 @@ namespace Game
         public AudioClip larrySoundMumble;
         public GameObject larryTextButton;
 
+        public Transform larry;
+
         public GameState State = new();
 
         [Header("DialogueTiggers")]
         public DialogueTrrigger dialogueTriggerDynamiteBought;
+        public DialogueTrrigger dialogueTriggerCraftBaits;
 
         [Header("Spawning Settings")]
         [Tooltip("The prefab to spawn on the water surface")]
@@ -49,8 +47,19 @@ namespace Game
         [SerializeField] private Collider hardZoneCollider;
         [Tooltip("How many medium/hard fish to keep alive at once.")]
         [SerializeField] private int hardSpawnCount = 5;
+        
+        [Header("Fish value")]
+        [Tooltip("This sets the value of each fish.")]
+        [SerializeField] private int easyFishValue = 50;
+        [SerializeField] private int mediumFishValue = 70;
+        [SerializeField] private int hardFishValue = 100;
 
         public int currentTextIndex { get; private set; }
+        
+        public Vector3 lastFishSpawnerPosition;
+        
+        [Header("Default fish bait")]
+        [SerializeField] private BaitMenu baitMenu;
 
         public enum DialogueState
         {
@@ -143,10 +152,10 @@ namespace Game
             // FishingRodGrabbed
             new TextEntry
             {
-                text = "Okay, time for the fun part. Hold the select button.\n" +
-                       "Throw like you’re tossing a paper airplane.\n" +
-                       "Then let go to launch the bait.\n" +
-                       "Aim anywhere — just try it out!",
+                text = "Alright, time for the fun part! It works like a real rod.\n" +
+                       "The bait at the tip moves on its own and sets the direction.\n" +
+                       "Hold the select button, give it a swing, and let go to cast.\n" +
+                       "Try it out anywhere for now!",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -163,10 +172,10 @@ namespace Game
             // AimBubble
             new TextEntry
             {
-                text = "Nice! Now cast again, but look for bubbles on the water.\n" +
-                       "See them? That means a fish is lurking below.\n" +
+                text = "Nice! Try casting a few more times — anywhere you like.\n" +
+                       "Then look for bubbles — means a fish is lurking below.\n" +
                        "Maybe even one of my neighbors.\n" +
-                       "Toss your bait right into that bubbly spot.",
+                       "Toss your bait right into that bubbly spot!",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -175,7 +184,7 @@ namespace Game
             {
                 text = "Now… wait. Patience is key.\n" +
                        "Fish are shy.\n" +
-                       "Like me on Mondays.",
+                       "Like me at a seaweed speed-dating event.",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -183,8 +192,9 @@ namespace Game
             new TextEntry
             {
                 text = "Whoa! You got a bite! Quick — pull back!\n" +
+                       "Do a fast, sharp motion — bring your arm back over your shoulder!\n" +
                        "Show that fish who's boss!\n" +
-                       "Keep pulling... don’t let go yet!",
+                       "Keep pulling… don’t let go yet!",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -200,8 +210,8 @@ namespace Game
             new TextEntry
             {
                 text = "Now keep going — pull, then reel, then pull again.\n" +
-                       "Just keep alternating until the fish gives up.\n" +
-                       "You'll feel it when it's done fighting!",
+                       "Keep switching between the two — pull, reel, pull, reel.\n" +
+                       "You’ll know it’s over when the fish stops fighting!",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -255,7 +265,7 @@ namespace Game
             new TextEntry
             {
                 text = "Need to go backward? There’s a reverse button for that.\n" +
-                       "Just in case you bump into a rock. Or a duck.",
+                       "Especially useful when you accidentally park on a fish’s front porch.",
                 isDisplayable = false,
                 activateNextText = true
             },
@@ -269,8 +279,9 @@ namespace Game
             new TextEntry
             {
                 text = "Oh, by the way —\n" +
-                       "If you ever lose your fishing rod… just press the A button on your right controller.\n" +
-                       "Could save you a swim.",
+                       "Rod disappeared? Just press the A button on your right controller.\n" +
+                       "Boom. Rod's back. No swimming required. We don’t question it.\n" +
+                       "I talk, rods teleport — that’s just how things work around here.",
                 isDisplayable = false,
                 activateNextText = true
             },
@@ -287,8 +298,8 @@ namespace Game
             new TextEntry
             {
                 text = "Hey, you made it!\n" +
-                       "How’s the fishing? Getting the hang of it?\n" +
-                       "Caught anything particularly annoying yet? Heh.",
+                       "How’s the rod treating you?\n" +
+                       "Any fish try to pull you into the lake yet?",
                 isDisplayable = false,
                 activateNextText = true
             },
@@ -310,29 +321,30 @@ namespace Game
             new TextEntry
             {
                 text = "Buuut I have an idea.\n" +
-                       "Head back to the fishing dock. There’s a little shop nearby.\n" +
-                       "You can sell your fish there — and maybe buy a few… tools.",
+                       "Head back to the fishing dock and look for a 'Shop' sign — " +
+                       "it’s near a climbing wall on the hill.",
                 isDisplayable = false,
                 activateNextText = true
             },
             // 25
             new TextEntry
             {
-                text = "Dynamite, for example.\n" +
-                       "Totally legal. Totally safe.\n" +
-                       "And hey — they might help with fishing too.\n" +
-                       "Haha! Anyway...",
+                text = "To reach the shop, climb up using the small rocks on the cliff — " +
+                       "one hand after the other.\n" +
+                       "Don’t worry, the rocks are grab-friendly. Probably.",
                 isDisplayable = false,
                 activateNextText = true
             },
             new TextEntry
             {
-                text = "Let me know when you're all stocked up!",
+                text = "Once you’re up there, sell your fish — maybe grab a few… tools.\n" +
+                       "Dynamite, for example. Totally legal. Totally safe.\n" +
+                       "And hey — might help with fishing too. Haha!\n" +
+                       "Let me know when you're all stocked up!",
                 isDisplayable = false,
                 activateNextText = false
             },
             // DynamiteBought
-            // TODO: When the player buys a dynamite
             new TextEntry
             {
                 text = "Nice! You found the dynamite!\n" +
@@ -341,7 +353,6 @@ namespace Game
                 activateNextText = false
             },
             // RockDynamite
-            // TODO: When the player goes to the rock with at least one dynamite in his inventory
             new TextEntry
             {
                 text = "Hey again!\n" +
@@ -351,7 +362,6 @@ namespace Game
                 activateNextText = false
             },
             // DynamiteSpawned
-            // TODO: When the player spawns a dynamite
             new TextEntry
             {
                 text = "Okay, listen carefully now!\n" +
@@ -363,7 +373,6 @@ namespace Game
             },
             // 30
             // ThrowDynamite
-            // TODO: When the player lighted a dynamite
             new TextEntry
             {
                 text = "Do it! Throw the dynamite at the rock! QUICK!",
@@ -371,7 +380,6 @@ namespace Game
                 activateNextText = false
             },
             // RockExploded
-            // TODO: When the player exploded the rock with a dynamite
             new TextEntry
             {
                 text = "Boom! Good job!\n" +
@@ -381,7 +389,6 @@ namespace Game
                 activateNextText = false
             },
             // WelcomeHome
-            // TODO: When the player reaches the other side of the lake
             new TextEntry
             {
                 text = "Welcome home! Haha.\n" +
@@ -397,7 +404,6 @@ namespace Game
                 activateNextText = false
             },
             // SecondIslandMeetLarry
-            // TODO: When the player meet Larry near the second island
             new TextEntry
             {
                 text = "So, they’re harder to fish, huh?",
@@ -421,17 +427,16 @@ namespace Game
                 activateNextText = false
             },
             // CraftBaits
-            // TODO: When the player buys a bait
             new TextEntry
             {
                 text = "Oh! You found the baits!\n" +
-                       "There are tons of combos — and yep, you gotta craft them.\n" +
-                       "Just grab a piece in each hand and snap ’em together. Easy!",
+                       "Tons of combos — and yep, you craft 'em yourself.\n" +
+                       "Grab a piece in each hand, snap them together, then let go…" +
+                       "It’ll go straight to your inventory!",
                 isDisplayable = false,
                 activateNextText = false
             },
             // EquipBait
-            // TODO: When the player needs to equip a bait
             new TextEntry
             {
                 text = "Great job! Your first custom bait!\n" +
@@ -441,11 +446,11 @@ namespace Game
                 activateNextText = false
             },
             // ReadyToFishMore
-            // TODO: When the player equiped his bait
             new TextEntry
             {
-                text = "Perfect! You're all set now.\n" +
-                       "Go out and fish some more!",
+                text = "Perfect! You're all set.\n" +
+                       "Each bait has its own perks — and limited durability.\n" +
+                       "You can check the details in the shop by clicking on the baits.",
                 isDisplayable = false,
                 activateNextText = true
             },
@@ -458,7 +463,6 @@ namespace Game
                 activateNextText = false
             },
             // Victory
-            // TODO: When the player caught 5 of each kind of fish
             new TextEntry
             {
                 text = "Hey! You did it!\n" +
@@ -519,16 +523,43 @@ namespace Game
             _neededTextTime = 0;
             currentTextIndex = -1;
         }
-        
-        /// <summary>
-        /// Called when a fish with FishDeathNotifier is destroyed; spawns a replacement.
-        /// </summary>
-        private void OnFishDestroyed(FishingArea deadFish)
+
+        private void Update()
         {
-            // Unsubscribe
-            deadFish.onDeath -= OnFishDestroyed;
-            // Spawn a single replacement
-            SpawnOne();
+            // Update victory
+            if (State.EasyFishCought >= 5 && State.MediumFishCought >= 5 && State.HardFishCought >= 5)
+            {
+                larry.position = lastFishSpawnerPosition;
+                SetDialogueState(DialogueState.Victory);
+            }
+            
+            // Update typewriter
+            _currentTextTime += Time.deltaTime;
+            
+            if (currentTextIndex < 0 || currentTextIndex >= larryTexts.Count) return;
+
+            if (_currentTextTime <= _neededTextTime) return;
+
+            if (!larryTexts[currentTextIndex].isDisplayable) return;
+            
+            typewriterEffectCanvas.SetActive(true);
+            larryTextButton.SetActive(false);
+            typewriterEffect.fullText = larryTexts[currentTextIndex].text;
+            typewriterEffect.StartTyping();
+
+            if (currentTextIndex < larrySounds.Count && larrySounds[currentTextIndex])
+            {
+                larryAudioSource.clip = larrySounds[currentTextIndex];
+                isMumbleEnabled = false;
+            }
+            else
+            {
+                larryAudioSource.clip = larrySoundMumble;
+                isMumbleEnabled = true;
+            }
+            larryAudioSource.Play();
+            
+            currentTextIndex++;
         }
 
         /// <summary>
@@ -576,36 +607,6 @@ namespace Game
             }
         }
 
-        private void Update()
-        {
-            _currentTextTime += Time.deltaTime;
-            
-            if (currentTextIndex < 0 || currentTextIndex >= larryTexts.Count) return;
-
-            if (_currentTextTime <= _neededTextTime) return;
-
-            if (!larryTexts[currentTextIndex].isDisplayable) return;
-            
-            typewriterEffectCanvas.SetActive(true);
-            larryTextButton.SetActive(false);
-            typewriterEffect.fullText = larryTexts[currentTextIndex].text;
-            typewriterEffect.StartTyping();
-
-            if (currentTextIndex < larrySounds.Count && larrySounds[currentTextIndex])
-            {
-                larryAudioSource.clip = larrySounds[currentTextIndex];
-                isMumbleEnabled = false;
-            }
-            else
-            {
-                larryAudioSource.clip = larrySoundMumble;
-                isMumbleEnabled = true;
-            }
-            larryAudioSource.Play();
-            
-            currentTextIndex++;
-        }
-
         public void ConfirmDialogue()
         {
             if (currentTextIndex >= larryTexts.Count) return;
@@ -622,7 +623,7 @@ namespace Game
             larryTextButton.SetActive(larryTexts[currentTextIndex-1].activateNextText);
         }
 
-        public void restartFishingTutoIfLostBeforeGrabFish()
+        public void RestartFishingTutoIfLostBeforeGrabFish()
         {
             if (currentTextIndex <= 12)
             {
@@ -630,7 +631,7 @@ namespace Game
             }
         }
 
-        public void SetDialogueState(DialogueState state, bool canSetToPrevDialogue = false)
+        public bool SetDialogueState(DialogueState state, bool canSetToPrevDialogue = false)
         {
             int index = 0;
             switch (state)
@@ -739,8 +740,26 @@ namespace Game
                     case DialogueState.DynamiteBought:
                         dialogueTriggerDynamiteBought.ValidateDialogue();
                         break;
+                    case DialogueState.CraftBaits:
+                        dialogueTriggerCraftBaits.ValidateDialogue();
+                        break;
                 }
+
+                return true;
             }
+
+            return false;
+        }
+        
+        /// <summary>
+        /// Called when a fish with FishDeathNotifier is destroyed; spawns a replacement.
+        /// </summary>
+        private void OnFishDestroyed(FishingArea deadFish)
+        {
+            // Unsubscribe
+            deadFish.onDeath -= OnFishDestroyed;
+            // Spawn a single replacement
+            SpawnOne();
         }
 
         
@@ -844,27 +863,51 @@ namespace Game
         public void ChangeFishingRod(FishingRodStats fishingRod) => State.CurrentRod = fishingRod;
         public FishingRodStats GetPlayerRod() => State.CurrentRod;
 
-        public int GetComponent1Amount() => State.Component1Amount;
-        public void AddComponent1Amount(int amount) => State.Component1Amount += amount;
-
-        public int GetComponent2Amount() => State.Component2Amount;
-        public void AddComponent2Amount(int amount) => State.Component2Amount += amount;
-
-        public int GetComponent3Amount() => State.Component3Amount;
-        public void AddComponent3Amount(int amount) => State.Component3Amount += amount;
-
-        public int GetComponent4Amount() => State.Component4Amount;
-        public void AddComponent4Amount(int amount) => State.Component4Amount += amount;
-
-        public int GetComponent5Amount() => State.Component5Amount;
-        public void AddComponent5Amount(int amount) => State.Component5Amount += amount;
-
-        public int GetComponent6Amount() => State.Component6Amount;
-        public void AddComponent6Amount(int amount) => State.Component6Amount += amount;
-
         public int GetDynamiteAmount() => State.DynamiteAmount;
         public void AddDynamiteAmount(int amount) => State.DynamiteAmount += amount;
 
-        
+        public void HandleCaughtFish(FishingGame.Difficulty diff)
+        {
+            switch (diff)
+            {
+                case FishingGame.Difficulty.Easy:
+                    AddToBucket(easyFishValue);
+                    State.EasyFishCought++;
+                    break;
+                
+                case FishingGame.Difficulty.Medium:
+                    AddToBucket(mediumFishValue);
+                    State.MediumFishCought++;
+                    break;
+                case FishingGame.Difficulty.Hard:
+                    break;
+            }
+
+            Debug.Log($"The player bucketed a fish! The bucket value is now {GetBucketValue()}. Easy caught : " +
+                      $"{State.EasyFishCought}, " +
+                      $"Medium caught : {State.MediumFishCought}, " +
+                      $"Hard caught : {State.HardFishCought}.");
+        }
+
+        /// <summary>
+        /// This should be called after the player has either won or lost a fishing game.
+        /// The purpose is to decrement the durability of the currently equipped bait and revert it to
+        /// default if we reach 0.
+        /// </summary>
+        public void HandleBaitDurability()
+        {
+            State.EquippedBaitDurability--;
+            if (State.EquippedBaitDurability <= 0)
+            {
+                EquipBait(0, 0);
+                baitMenu.ResetToDefaultBait();
+            }
+        }
+
+        public void EquipBait(int strength, int durability)
+        {
+            State.EquippedBaitStrength = strength;
+            State.EquippedBaitDurability = durability;
+        }
     }
 }

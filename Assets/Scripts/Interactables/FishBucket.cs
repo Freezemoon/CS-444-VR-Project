@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Game;
 using UnityEngine;
@@ -9,6 +10,8 @@ using UnityEngine;
 /// </summary>
 public class FishBucket : MonoBehaviour
 {
+    public static event Action NewFish;
+
     private AudioSource _audioSource;
 
     private void Awake()
@@ -18,8 +21,11 @@ public class FishBucket : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
+        // Update the bucket value properly as well as the type cought
         if (!other.CompareTag("Fish"))
             return;
+
+        GameManager.instance.HandleCaughtFish(other.GetComponent<GrabFish>().difficulty);
 
         GameManager.instance.SetDialogueState(GameManager.DialogueState.HopOnBoat);
         // Duplicate the fish
@@ -30,6 +36,8 @@ public class FishBucket : MonoBehaviour
 
         // Strip down the duplicate to visuals only
         ToKinetic(duplicate);
+
+        NewFish?.Invoke();
 
         // End with the socket animation
         StartCoroutine(SocketAnimation(duplicate));

@@ -6,6 +6,8 @@ using UnityEngine.Serialization;
 public class Boat : MonoBehaviour
 {
     public Transform leverTransform; // Reference to the handle
+    public Transform boatInitPos;
+    public Transform boatLake2Pos;
     public float speedMultiplier = 3f; // Multiplie the boat speed
     public float turnSensitivity = 0.25f; // Boat turn sensitivity
     public float accelerationRate = 1.5f;
@@ -137,7 +139,7 @@ public class Boat : MonoBehaviour
 
             AudioSource.PlayClipAtPoint(engineStartClip, transform.position);
             _engineAudioSource.Play();
-            Debug.Log("Engine is on and reverse is off"); 
+            Debug.Log("Engine is on"); 
         }
         else
         {
@@ -163,5 +165,17 @@ public class Boat : MonoBehaviour
             reverseIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
             Debug.Log("Reverse is off"); 
         }
+    }
+
+    public void SpawnBackToInitPosBoat()
+    {
+        transform.position = boatInitPos.position;
+        transform.rotation = boatInitPos.rotation;
+    }
+    
+    public void SpawnBackToLake2Pos()
+    {
+        transform.position = boatLake2Pos.position;
+        transform.rotation = boatLake2Pos.rotation;
     }
 }

@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using Game;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using Random = UnityEngine.Random;
@@ -21,6 +19,8 @@ public class FishingGame : MonoBehaviour
     public GameObject mediumFishPrefab;
     public GameObject hardFishPrefab;
     public Transform baitFishAttach;
+
+    public ParticleSystem conffetiParticleSystem;
 
     [Header("Haptics")]
     public HapticImpulsePlayer rightHandHaptics;
@@ -147,6 +147,8 @@ public class FishingGame : MonoBehaviour
                 // Check if fish can spawn
                 if (_currentWaitingFishTime >= _neededWaitingFishTime)
                 {
+                    rightHandHaptics.SendHapticImpulse(0.8f, 2);
+                    
                     GameObject fishPrefab = null;
                     switch (difficulty)
                     {
@@ -162,10 +164,13 @@ public class FishingGame : MonoBehaviour
                     }
                     _currentFish = Instantiate(fishPrefab, baitFishAttach.position, Quaternion.identity);
                     _currentFish.GetComponent<XRGrabInteractable>().enabled = false;
-                    _currentFish.GetComponent<Rigidbody>().useGravity = false;
                     
-                    Physics.IgnoreCollision(baitFishAttach.parent.GetComponent<Collider>(), _currentFish.GetComponent<Collider>());
-                    ConfigurableJoint currentFishJoin = _currentFish.GetComponent<ConfigurableJoint>();
+                    ConfigurableJoint currentFishJoin = _currentFish.AddComponent<ConfigurableJoint>();
+                    currentFishJoin.autoConfigureConnectedAnchor = false;
+                    currentFishJoin.anchor = Vector3.zero;
+                    currentFishJoin.xMotion = ConfigurableJointMotion.Locked;
+                    currentFishJoin.yMotion = ConfigurableJointMotion.Locked;
+                    currentFishJoin.zMotion = ConfigurableJointMotion.Locked;
                     
                     currentFishJoin.connectedBody = baitFishAttach.parent.GetComponent<Rigidbody>();
                     currentFishJoin.anchor = Vector3.left * 0.3f;
@@ -268,12 +273,13 @@ public class FishingGame : MonoBehaviour
         if (gameState == GameState.Win) return;
         
         gameState = GameState.NotStarted;
+        GameManager.instance.HandleBaitDurability(); // Decrement bait durability
         
         Destroy(_currentFish);
         _currentFish = null;
         
         loseAudioSource.Play();
-        GameManager.instance.restartFishingTutoIfLostBeforeGrabFish();
+        GameManager.instance.RestartFishingTutoIfLostBeforeGrabFish();
         
         UpdateText();
     }
@@ -374,14 +380,20 @@ public class FishingGame : MonoBehaviour
         // Check if win
         if (_currentPhaseBeforeWin >= _neededPhaseBeforeWin)
         {
-            GameManager.instance.SetDialogueState(GameManager.DialogueState.GrabFish);
+            if (gameState == GameState.Win) return;
             
+            GameManager.instance.SetDialogueState(GameManager.DialogueState.GrabFish);
+            GameManager.instance.HandleBaitDurability(); // decrease bait durability
             gameState = GameState.Win;
             
             _currentFish.GetComponent<XRGrabInteractable>().enabled = true;
-            _currentFish.GetComponent<Rigidbody>().useGravity = true;
+            Rigidbody _rb = _currentFish.GetComponent<Rigidbody>();
+            _rb.useGravity = true;
+            _rb.linearDamping = 0;
+            _rb.angularDamping = 0.05f;
             
             victoryAudioSource?.Play();
+            Instantiate(conffetiParticleSystem, _currentFish.transform.position, Quaternion.identity);
             UpdateText();
             
             return;
