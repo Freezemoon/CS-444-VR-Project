@@ -20,6 +20,8 @@ public class FishingGame : MonoBehaviour
     public GameObject hardFishPrefab;
     public Transform baitFishAttach;
 
+    public ParticleSystem conffetiParticleSystem;
+
     [Header("Haptics")]
     public HapticImpulsePlayer rightHandHaptics;
     public HapticImpulsePlayer leftHandHaptics;
@@ -391,6 +393,7 @@ public class FishingGame : MonoBehaviour
             _rb.angularDamping = 0.05f;
             
             victoryAudioSource?.Play();
+            Instantiate(conffetiParticleSystem, _currentFish.transform.position, Quaternion.identity);
             UpdateText();
             
             return;

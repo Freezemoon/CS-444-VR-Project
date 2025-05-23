@@ -30,6 +30,8 @@ public class BaitSocket : MonoBehaviour
             AudioSource.PlayClipAtPoint(audioClip, transform.position);
         }
         
+        Instantiate(FishingGame.instance.conffetiParticleSystem, transform.position, Quaternion.identity);
+        
         Debug.Log($"object level: {levelA} has been merged with object level: {levelB}");
 
         StoreBait(levelA, levelB);

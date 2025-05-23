@@ -152,10 +152,10 @@ namespace Game
             // FishingRodGrabbed
             new TextEntry
             {
-                text = "Okay, time for the fun part. Hold the select button.\n" +
-                       "Throw like you’re tossing a paper airplane.\n" +
-                       "Then let go to launch the bait.\n" +
-                       "Aim anywhere — just try it out!",
+                text = "Alright, time for the fun part! It works like a real rod.\n" +
+                       "The bait at the tip moves on its own and sets the direction.\n" +
+                       "Hold the select button, give it a swing, and let go to cast.\n" +
+                       "Try it out anywhere for now!",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -172,10 +172,10 @@ namespace Game
             // AimBubble
             new TextEntry
             {
-                text = "Nice! Now cast again, but look for bubbles on the water.\n" +
-                       "See them? That means a fish is lurking below.\n" +
+                text = "Nice! Try casting a few more times — anywhere you like.\n" +
+                       "Then look for bubbles — means a fish is lurking below.\n" +
                        "Maybe even one of my neighbors.\n" +
-                       "Toss your bait right into that bubbly spot.",
+                       "Toss your bait right into that bubbly spot!",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -184,7 +184,7 @@ namespace Game
             {
                 text = "Now… wait. Patience is key.\n" +
                        "Fish are shy.\n" +
-                       "Like me on Mondays.",
+                       "Like me at a seaweed speed-dating event.",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -192,8 +192,9 @@ namespace Game
             new TextEntry
             {
                 text = "Whoa! You got a bite! Quick — pull back!\n" +
+                       "Do a fast, sharp motion — bring your arm back over your shoulder!\n" +
                        "Show that fish who's boss!\n" +
-                       "Keep pulling... don’t let go yet!",
+                       "Keep pulling… don’t let go yet!",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -209,8 +210,8 @@ namespace Game
             new TextEntry
             {
                 text = "Now keep going — pull, then reel, then pull again.\n" +
-                       "Just keep alternating until the fish gives up.\n" +
-                       "You'll feel it when it's done fighting!",
+                       "Keep switching between the two — pull, reel, pull, reel.\n" +
+                       "You’ll know it’s over when the fish stops fighting!",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -264,7 +265,7 @@ namespace Game
             new TextEntry
             {
                 text = "Need to go backward? There’s a reverse button for that.\n" +
-                       "Just in case you bump into a rock. Or a duck.",
+                       "Especially useful when you accidentally park on a fish’s front porch.",
                 isDisplayable = false,
                 activateNextText = true
             },
@@ -278,8 +279,9 @@ namespace Game
             new TextEntry
             {
                 text = "Oh, by the way —\n" +
-                       "If you ever lose your fishing rod… just press the A button on your right controller.\n" +
-                       "Could save you a swim.",
+                       "Rod disappeared? Just press the A button on your right controller.\n" +
+                       "Boom. Rod's back. No swimming required. We don’t question it.\n" +
+                       "I talk, rods teleport — that’s just how things work around here.",
                 isDisplayable = false,
                 activateNextText = true
             },
@@ -296,8 +298,8 @@ namespace Game
             new TextEntry
             {
                 text = "Hey, you made it!\n" +
-                       "How’s the fishing? Getting the hang of it?\n" +
-                       "Caught anything particularly annoying yet? Heh.",
+                       "How’s the rod treating you?\n" +
+                       "Any fish try to pull you into the lake yet?",
                 isDisplayable = false,
                 activateNextText = true
             },
@@ -319,24 +321,26 @@ namespace Game
             new TextEntry
             {
                 text = "Buuut I have an idea.\n" +
-                       "Head back to the fishing dock. There’s a little shop nearby.\n" +
-                       "You can sell your fish there — and maybe buy a few… tools.",
+                       "Head back to the fishing dock and look for a 'Shop' sign — " +
+                       "it’s near a climbing wall on the hill.",
                 isDisplayable = false,
                 activateNextText = true
             },
             // 25
             new TextEntry
             {
-                text = "Dynamite, for example.\n" +
-                       "Totally legal. Totally safe.\n" +
-                       "And hey — they might help with fishing too.\n" +
-                       "Haha! Anyway...",
+                text = "To reach the shop, climb up using the small rocks on the cliff — " +
+                       "one hand after the other.\n" +
+                       "Don’t worry, the rocks are grab-friendly. Probably.",
                 isDisplayable = false,
                 activateNextText = true
             },
             new TextEntry
             {
-                text = "Let me know when you're all stocked up!",
+                text = "Once you’re up there, sell your fish — maybe grab a few… tools.\n" +
+                       "Dynamite, for example. Totally legal. Totally safe.\n" +
+                       "And hey — might help with fishing too. Haha!\n" +
+                       "Let me know when you're all stocked up!",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -426,9 +430,9 @@ namespace Game
             new TextEntry
             {
                 text = "Oh! You found the baits!\n" +
-                       "There are tons of combos — and yep, you gotta craft them.\n" +
-                       "Grab a piece in each hand, snap ’em together, then let go — " +
-                       "it’ll go straight to your inventory!",
+                       "Tons of combos — and yep, you craft 'em yourself.\n" +
+                       "Grab a piece in each hand, snap them together, then let go…" +
+                       "It’ll go straight to your inventory!",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -444,8 +448,9 @@ namespace Game
             // ReadyToFishMore
             new TextEntry
             {
-                text = "Perfect! You're all set now.\n" +
-                       "Go out and fish some more!",
+                text = "Perfect! You're all set.\n" +
+                       "Each bait has its own perks — and limited durability.\n" +
+                       "You can check the details in the shop by clicking on the baits.",
                 isDisplayable = false,
                 activateNextText = true
             },
