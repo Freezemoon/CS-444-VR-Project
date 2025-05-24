@@ -14,7 +14,7 @@ namespace Game
         public int EquippedBaitStrength;
         public int EquippedBaitDurability;
 
-        public int BBBaitCount = 1;
+        public int BBBaitCount;
         public int BGBaitCount;
         public int BRBaitCount;
         public int GBBaitCount;
@@ -24,7 +24,7 @@ namespace Game
         public int RGBaitCount;
         public int RRBaitCount;
         
-        public int DynamiteAmount = 3;
+        public int DynamiteAmount;
 
         public int EasyFishCought;
         public int MediumFishCought;
