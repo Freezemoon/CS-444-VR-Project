@@ -1,3 +1,4 @@
+using System;
 using Game;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -23,6 +24,7 @@ public class BoatHandle : MonoBehaviour
     private float _initialGrabAngle;
     private float _initialHandleRotation;
     private Vector3 _buttonPosition;
+    private Vector3 _cachedHandWorldPos;
 
     private void Start()
     {
@@ -41,6 +43,14 @@ public class BoatHandle : MonoBehaviour
         throttleAction.action.Disable();
     }
 
+    private void Update()
+    {
+        if (_grabbingHand)
+        {
+            _cachedHandWorldPos = _grabbingHand.position;
+        }
+    }
+
     private void FixedUpdate()
     {
         if (!_grabbingHand)
@@ -55,7 +65,7 @@ public class BoatHandle : MonoBehaviour
             return;
         }
 
-        Vector3 handLocal = boat.InverseTransformPoint(_grabbingHand.position);
+        Vector3 handLocal = boat.InverseTransformPoint(_cachedHandWorldPos);
         Vector3 pivotLocal = boat.InverseTransformPoint(handlePivot.position);
         Vector3 dir = handLocal - pivotLocal;
 

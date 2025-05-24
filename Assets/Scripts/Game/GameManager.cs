@@ -365,9 +365,9 @@ namespace Game
             new TextEntry
             {
                 text = "Okay, listen carefully now!\n" +
-                       "First, grab the dynamite with one hand.\n" +
-                       "Then, use the lighter in your other hand to light the fuse.\n" +
-                       "Once it starts burning… aim for the rock — and toss it!",
+                       "Step closer to the rock.\n" +
+                       "Grab the dynamite with one hand, light it with the other, " +
+                       "then toss it once it’s burning!",
                 isDisplayable = false,
                 activateNextText = false
             },
@@ -430,8 +430,9 @@ namespace Game
             new TextEntry
             {
                 text = "Oh! You found the baits!\n" +
-                       "Tons of combos — and yep, you craft 'em yourself.\n" +
-                       "Grab a piece in each hand, snap them together, then let go…" +
+                       "They’re on the table right next to the shop." +
+                       "Tons of combos — just grab a piece in each hand, " +
+                       "snap ’em together, then let go." +
                        "It’ll go straight to your inventory!",
                 isDisplayable = false,
                 activateNextText = false

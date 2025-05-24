@@ -26,7 +26,7 @@ public class BaitSocket : MonoBehaviour
         int levelA = insertedObject.GetComponent<BaitValue>()?.level ?? 0;
         int levelB = socketObject.GetComponent<BaitValue>()?.level ?? 0;
 
-        if (audioClip != null) {
+        if (audioClip) {
             AudioSource.PlayClipAtPoint(audioClip, transform.position);
         }
         

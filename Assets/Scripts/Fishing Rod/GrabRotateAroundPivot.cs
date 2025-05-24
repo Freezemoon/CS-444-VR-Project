@@ -102,8 +102,8 @@ public class GrabRotateAroundPivot : MonoBehaviour
     private void UpdateMaxLineLengthAndReelForceMultiplier()
     {
         // If game is started the max length of the line and the reel force are increased 
-        if (FishingGame.instance.gameState == FishingGame.GameState.Reeling ||
-            FishingGame.instance.gameState == FishingGame.GameState.Pulling)
+        if (FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Pulling ||
+            FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Reeling)
         {
             currentLockedLineLengthMax = _lockedLineLengthMax + _lockedLineLengthMaxAddForGame;
             _currentReelForceMultiplier = reelForceMultiplier / FishingGame.instance.reelForceMultiplierDivisor;
@@ -130,8 +130,8 @@ public class GrabRotateAroundPivot : MonoBehaviour
             float angleDelta = Vector3.SignedAngle(_previousDirectionOnPlane, projectedHand, planeNormal);
             CheckLineLength(angleDelta, toBait);
 
-            bool canReachMinLength = FishingGame.instance.gameState == FishingGame.GameState.NotStarted || 
-                                     FishingGame.instance.gameState == FishingGame.GameState.Win;
+            bool canReachMinLength = FishingGame.instance.fishingGameState == FishingGame.FishingGameState.NotStarted || 
+                                     FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Win;
             
             float currentLineLength = Vector3.Distance(baitRigidbody.position, pullTowardTransform.position);
             if (canReachMinLength && currentLineLength <= lineLengthMin * 1.1f)
@@ -160,7 +160,10 @@ public class GrabRotateAroundPivot : MonoBehaviour
 
     private void CheckLineLength(float angleDelta, Vector3 toBait)
     {
-        if (FishingGame.instance.gameState == FishingGame.GameState.Pulling) return;
+        if (FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Pulling)
+        {
+            SetLineLength(currentLockedLineLengthMax);
+        }
         
         // Clamp the angle delta to prevent it from going too far
         angleDelta = Mathf.Clamp(angleDelta, 0, 30f);

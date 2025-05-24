@@ -1,11 +1,20 @@
 using System;
+using System.Net.Mime;
 using Game;
 using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 public class BaitMenu : MonoBehaviour
 {
+    [Header("GameState texts")]
+    [Tooltip("The TextMeshPro text to display fish tracking and money.")]
+    [SerializeField] private TextMeshProUGUI moneyText;
+    [SerializeField] private TextMeshProUGUI fishTrackerEasyText;
+    [SerializeField] private TextMeshProUGUI fishTrackerMediumText;
+    [SerializeField] private TextMeshProUGUI fishTrackerHardText;
+    
     [Header("Buttons")]
     [Tooltip("The button prefabs for inventory elements.")]
     [SerializeField] private GameObject baitButton1;
@@ -87,6 +96,17 @@ public class BaitMenu : MonoBehaviour
 
     private void UpdateUI()
     {
+        int money = GameManager.instance.GetMoney();
+        int bucketValue = GameManager.instance.GetBucketValue();
+        int easyFishCount = GameManager.instance.State.EasyFishCought;
+        int mediumFishCount = GameManager.instance.State.MediumFishCought;
+        int hardFishCount = GameManager.instance.State.HardFishCought;
+
+        moneyText.text = $"Money: {money}<color=#FFD700>G</color>    In Bucket: {bucketValue}<color=#FFD700>G</color>";
+        fishTrackerEasyText.text = easyFishCount.ToString();
+        fishTrackerMediumText.text = mediumFishCount.ToString();
+        fishTrackerHardText.text = hardFishCount.ToString();
+        
         baitButton1.SetActive(GameManager.instance.State.BBBaitCount > 0);
         baitButton2.SetActive(GameManager.instance.State.BGBaitCount > 0);
         baitButton3.SetActive(GameManager.instance.State.BRBaitCount > 0);

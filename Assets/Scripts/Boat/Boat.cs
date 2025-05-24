@@ -37,6 +37,9 @@ public class Boat : MonoBehaviour
         reverseIndicatorLamp.GetComponent<MeshRenderer>().enabled = false;
 
         _engineAudioSource = gameObject.AddComponent<AudioSource>();
+        _engineAudioSource.spatialBlend = 1;
+        _engineAudioSource.maxDistance = 30f;
+        _engineAudioSource.minDistance = 10f;
         _engineAudioSource.loop = true;
         _engineAudioSource.playOnAwake = false;
         _engineAudioSource.clip = engineLoopClip;

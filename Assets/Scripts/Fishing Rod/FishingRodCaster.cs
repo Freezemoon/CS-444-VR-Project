@@ -69,8 +69,6 @@ public class FishingRodCaster : MonoBehaviour
 
     private void Update()
     {
-        FishingGame.instance.canStart = !baitRb.isKinematic;
-        
         UpdateHandPitchRotation();
         DetectRodPull();
     }
@@ -112,6 +110,8 @@ public class FishingRodCaster : MonoBehaviour
     {
         if (!_isHeld) return;
         if (!_isHolding) return;
+
+        FishingGame.instance.canStart = true;
         
         GameManager.instance.SetDialogueState(GameManager.DialogueState.Reel);
         _isHolding = false;
@@ -158,7 +158,7 @@ public class FishingRodCaster : MonoBehaviour
     {
         if (!_isHeld) return;
         
-        if (FishingGame.instance.gameState == FishingGame.GameState.Pulling &&
+        if (FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Pulling &&
             Time.time - _lastPullTime >= _pullCooldown)
         {
             _canTriggerPull = true;
