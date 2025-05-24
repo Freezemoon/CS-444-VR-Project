@@ -23,8 +23,8 @@ public class FishingArea : MonoBehaviour
     {
         if (!other.CompareTag("FishingBait")) return;
         
-        if (FishingGame.instance.gameState != FishingGame.GameState.NotStarted &&
-            FishingGame.instance.gameState != FishingGame.GameState.WaitingFish) return;
+        if (FishingGame.instance.fishingGameState != FishingGame.FishingGameState.NotStarted &&
+            FishingGame.instance.fishingGameState != FishingGame.FishingGameState.WaitingFish) return;
         
         FishingGame.instance.difficulty = areaDifficulty;
         
@@ -41,8 +41,8 @@ public class FishingArea : MonoBehaviour
     {
         if (!other.CompareTag("FishingBait")) return;
         
-        if (FishingGame.instance.gameState != FishingGame.GameState.NotStarted &&
-            FishingGame.instance.gameState != FishingGame.GameState.WaitingFish) return;
+        if (FishingGame.instance.fishingGameState != FishingGame.FishingGameState.NotStarted &&
+            FishingGame.instance.fishingGameState != FishingGame.FishingGameState.WaitingFish) return;
         
         DebugFishingRodExit();
 

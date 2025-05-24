@@ -158,7 +158,7 @@ public class FishingRodCaster : MonoBehaviour
     {
         if (!_isHeld) return;
         
-        if (FishingGame.instance.gameState == FishingGame.GameState.Pulling &&
+        if (FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Pulling &&
             Time.time - _lastPullTime >= _pullCooldown)
         {
             _canTriggerPull = true;

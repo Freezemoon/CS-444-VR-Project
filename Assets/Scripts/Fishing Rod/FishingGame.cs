@@ -61,7 +61,7 @@ public class FishingGame : MonoBehaviour
     public int minPhaseBeforeWinHard = 4;
     public int maxPhaseBeforeWinHard = 6;
     
-    public enum GameState
+    public enum FishingGameState
     {
         NotStarted,
         WaitingFish,
@@ -77,13 +77,13 @@ public class FishingGame : MonoBehaviour
         Hard
     }
     
-    public GameState gameState { get; set; } = GameState.NotStarted;
+    public FishingGameState fishingGameState { get; set; } = FishingGameState.NotStarted;
     public Difficulty difficulty { get; set; } = Difficulty.Easy;
     public bool canStart { get; set; } = false;
     
-    public bool canBaitGoInWater => gameState == GameState.WaitingFish && _currentWaitingFishTime >= _neededTimeBeforeBaitGoesInWater;
+    public bool canBaitGoInWater => fishingGameState == FishingGameState.WaitingFish && _currentWaitingFishTime >= _neededTimeBeforeBaitGoesInWater;
     
-    public bool canGrabFish => gameState == GameState.Win && _currentFish;
+    public bool canGrabFish => fishingGameState == FishingGameState.Win && _currentFish;
     
     public static FishingGame instance { get; private set; }
     
@@ -130,9 +130,9 @@ public class FishingGame : MonoBehaviour
 
     private void Update()
     {
-        switch (gameState)
+        switch (fishingGameState)
         {
-            case GameState.WaitingFish:
+            case FishingGameState.WaitingFish:
                 _currentWaitingFishTime += Time.deltaTime;
 
                 if (!_wasBaitAlreadyInWaterThisRound &&
@@ -183,8 +183,8 @@ public class FishingGame : MonoBehaviour
                 UpdateText();
                 
                 break;
-            case GameState.Pulling:
-            case GameState.Reeling:
+            case FishingGameState.Pulling:
+            case FishingGameState.Reeling:
                 _currentPhaseTimeBeforeLose += Time.deltaTime;
                 
                 if (_currentPhaseTimeBeforeLose >= _neededPhaseTimeBeforeLose)
@@ -195,8 +195,8 @@ public class FishingGame : MonoBehaviour
                 UpdateText();
 
                 break;
-            case GameState.NotStarted:
-            case GameState.Win:
+            case FishingGameState.NotStarted:
+            case FishingGameState.Win:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -205,7 +205,7 @@ public class FishingGame : MonoBehaviour
 
     public void ResetGameWhenFishIsGrabbedByUser()
     {
-        gameState = GameState.NotStarted;
+        fishingGameState = FishingGameState.NotStarted;
     }
 
     public void StartGame()
@@ -215,7 +215,7 @@ public class FishingGame : MonoBehaviour
         canStart = false;
 
         _wasBaitAlreadyInWaterThisRound = false;
-        gameState = GameState.WaitingFish;
+        fishingGameState = FishingGameState.WaitingFish;
         
         rightHandHaptics.SendHapticImpulse(0.8f, 1.6f);
         
@@ -260,11 +260,24 @@ public class FishingGame : MonoBehaviour
                 break;
         }
         _neededPhaseBeforeWin = Random.Range(minPhaseBeforeWin, maxPhaseBeforeWin + 1);
+        
+        switch (GameManager.instance.State.EquippedBaitStrength)
+        {
+            case 1:
+                _neededPhaseBeforeWin -= 0;
+                break;
+            case 2:
+                _neededPhaseBeforeWin -= 1;
+                break;
+            case 3:                
+                _neededPhaseBeforeWin -= 2;
+                break;
+        }
     }
 
     public void ExitFishingArea()
     {
-        if (gameState == GameState.WaitingFish)
+        if (fishingGameState == FishingGameState.WaitingFish)
         {
             LoseGame();
         }
@@ -272,9 +285,9 @@ public class FishingGame : MonoBehaviour
     
     public void LoseGame()
     {
-        if (gameState == GameState.Win) return;
+        if (fishingGameState == FishingGameState.Win) return;
         
-        gameState = GameState.NotStarted;
+        fishingGameState = FishingGameState.NotStarted;
         GameManager.instance.HandleBaitDurability(); // Decrement bait durability
         
         Destroy(_currentFish);
@@ -288,7 +301,7 @@ public class FishingGame : MonoBehaviour
 
     public bool ReelSuccess(float amount)
     {
-        if (gameState != GameState.Reeling) return false;
+        if (fishingGameState != FishingGameState.Reeling) return false;
         
         _currentReel += amount;
 
@@ -302,7 +315,7 @@ public class FishingGame : MonoBehaviour
 
     public void PullSuccess()
     {
-        if (gameState != GameState.Pulling) return;
+        if (fishingGameState != FishingGameState.Pulling) return;
         
         _currentPull++;
 
@@ -315,7 +328,7 @@ public class FishingGame : MonoBehaviour
     {
         GameManager.instance.SetDialogueState(GameManager.DialogueState.PullFight);
         
-        gameState = GameState.Pulling;
+        fishingGameState = FishingGameState.Pulling;
         rightHandHaptics.SendHapticImpulse(0.8f, 0.8f);
         
         _currentPull = 0;
@@ -338,6 +351,19 @@ public class FishingGame : MonoBehaviour
                 break;
         }
         _neededPull = Random.Range(minPull, maxPull + 1);
+
+        switch (GameManager.instance.State.EquippedBaitStrength)
+        {
+            case 1:
+                _neededPull -= 1;
+                break;
+            case 2:
+                _neededPull -= 1;
+                break;
+            case 3:                
+                _neededPull -= 2;
+                break;
+        }
         
         _currentPhaseTimeBeforeLose = 0;
         _neededPhaseTimeBeforeLose = maxPullingTimeBeforeLose;
@@ -347,7 +373,7 @@ public class FishingGame : MonoBehaviour
     {
         GameManager.instance.SetDialogueState(GameManager.DialogueState.ReelFight);
         
-        gameState = GameState.Reeling;
+        fishingGameState = FishingGameState.Reeling;
         leftHandHaptics.SendHapticImpulse(0.8f, 0.8f);
         
         _currentReel = 0;
@@ -370,6 +396,19 @@ public class FishingGame : MonoBehaviour
                 break;
         }
         _neededReel = Random.Range(minReelLength, maxReelLength);
+
+        switch (GameManager.instance.State.EquippedBaitStrength)
+        {
+            case 1:
+                _neededReel *= 0.9f;
+                break;
+            case 2:
+                _neededReel *= 0.7f;
+                break;
+            case 3:
+                _neededReel *= 0.5f;
+                break;
+        }
         
         _currentPhaseTimeBeforeLose = 0;
         _neededPhaseTimeBeforeLose = maxReelingTimeBeforeLose;
@@ -382,11 +421,11 @@ public class FishingGame : MonoBehaviour
         // Check if win
         if (_currentPhaseBeforeWin >= _neededPhaseBeforeWin)
         {
-            if (gameState == GameState.Win) return;
+            if (fishingGameState == FishingGameState.Win) return;
             
             GameManager.instance.SetDialogueState(GameManager.DialogueState.GrabFish);
             GameManager.instance.HandleBaitDurability(); // decrease bait durability
-            gameState = GameState.Win;
+            fishingGameState = FishingGameState.Win;
             
             _currentFish.GetComponent<XRGrabInteractable>().enabled = true;
             Rigidbody _rb = _currentFish.GetComponent<Rigidbody>();
@@ -403,18 +442,18 @@ public class FishingGame : MonoBehaviour
         
         phaseSuccessAudioSource?.Play();
         
-        switch (gameState)
+        switch (fishingGameState)
         {
-            case GameState.Pulling:
+            case FishingGameState.Pulling:
                 StartReeling();
                 break;
-            case GameState.Reeling:
+            case FishingGameState.Reeling:
                 GameManager.instance.SetDialogueState(GameManager.DialogueState.AlternatePullReel);
                 StartPulling();
                 break;
-            case GameState.NotStarted:
-            case GameState.WaitingFish:
-            case GameState.Win:
+            case FishingGameState.NotStarted:
+            case FishingGameState.WaitingFish:
+            case FishingGameState.Win:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -423,24 +462,24 @@ public class FishingGame : MonoBehaviour
 
     private void UpdateText()
     {
-        switch (gameState)
+        switch (fishingGameState)
         {
-            case GameState.NotStarted:
-            case GameState.Win:
-                tmpText.text = gameState.ToString() + ":";
+            case FishingGameState.NotStarted:
+            case FishingGameState.Win:
+                tmpText.text = fishingGameState.ToString() + ":";
                 break;
-            case GameState.WaitingFish:
-                tmpText.text = gameState.ToString() + ": " + _currentWaitingFishTime.ToString("F2") + "/"
+            case FishingGameState.WaitingFish:
+                tmpText.text = fishingGameState.ToString() + ": " + _currentWaitingFishTime.ToString("F2") + "/"
                                + _neededWaitingFishTime.ToString("F2");
                 break;
-            case GameState.Pulling:
-                tmpText.text = gameState.ToString() + ": " + _currentPull + "/" + _neededPull + "\n"
+            case FishingGameState.Pulling:
+                tmpText.text = fishingGameState.ToString() + ": " + _currentPull + "/" + _neededPull + "\n"
                                + _currentPhaseTimeBeforeLose.ToString("F2") + "/"
                                + _neededPhaseTimeBeforeLose.ToString("F2") + "\n"
                                + _currentPhaseBeforeWin + "/" + _neededPhaseBeforeWin;
                 break;
-            case GameState.Reeling:
-                tmpText.text = gameState.ToString() + ": " + _currentReel.ToString("F2") + "/" 
+            case FishingGameState.Reeling:
+                tmpText.text = fishingGameState.ToString() + ": " + _currentReel.ToString("F2") + "/" 
                                + _neededReel.ToString("F2") + "\n"
                                + _currentPhaseTimeBeforeLose.ToString("F2") + "/" 
                                + _neededPhaseTimeBeforeLose.ToString("F2") + "\n"
