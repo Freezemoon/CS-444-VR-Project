@@ -1,3 +1,4 @@
+using System;
 using Game;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -24,28 +25,6 @@ public class GrabFish : MonoBehaviour
     void OnDisable()
     {
         _grabInteractable.selectEntered.RemoveListener(OnGrab);
-    }
-    
-    private void OnTriggerStay(Collider other)
-    {
-        if (!other.CompareTag("WaterFishingLimit")) return;
-        if (!GetComponent<ConfigurableJoint>()) return;
-        
-        _rb.useGravity = false;
-        _rb.linearVelocity = Vector3.zero;
-        _rb.angularVelocity = Vector3.zero;
-        _rb.linearDamping = 100f;
-        _rb.angularDamping = 100f;
-    }
-    
-    private void OnTriggerExit(Collider other)
-    {
-        if (!other.CompareTag("WaterFishingLimit")) return;
-        if (!GetComponent<ConfigurableJoint>()) return;
-        
-        _rb.useGravity = true;
-        _rb.linearDamping = 0;
-        _rb.angularDamping = 0.05f;
     }
 
     private void OnGrab(SelectEnterEventArgs args)

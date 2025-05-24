@@ -530,7 +530,7 @@ namespace Game
             // Update victory
             if (State.EasyFishCought >= 5 && State.MediumFishCought >= 5 && State.HardFishCought >= 5)
             {
-                larry.position = lastFishSpawnerPosition;
+                larry.position = lastFishSpawnerPosition + Vector3.up * 0.3f;
                 SetDialogueState(DialogueState.Victory);
             }
             
@@ -881,6 +881,8 @@ namespace Game
                     State.MediumFishCought++;
                     break;
                 case FishingGame.Difficulty.Hard:
+                    AddToBucket(hardFishValue);
+                    State.HardFishCought++;
                     break;
             }
 
