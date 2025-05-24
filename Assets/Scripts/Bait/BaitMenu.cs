@@ -11,7 +11,9 @@ public class BaitMenu : MonoBehaviour
     [Header("GameState texts")]
     [Tooltip("The TextMeshPro text to display fish tracking and money.")]
     [SerializeField] private TextMeshProUGUI moneyText;
-    [SerializeField] private TextMeshProUGUI fishTrackerText;
+    [SerializeField] private TextMeshProUGUI fishTrackerEasyText;
+    [SerializeField] private TextMeshProUGUI fishTrackerMediumText;
+    [SerializeField] private TextMeshProUGUI fishTrackerHardText;
     
     [Header("Buttons")]
     [Tooltip("The button prefabs for inventory elements.")]
@@ -101,9 +103,9 @@ public class BaitMenu : MonoBehaviour
         int hardFishCount = GameManager.instance.State.HardFishCought;
 
         moneyText.text = $"Money: {money}<color=#FFD700>G</color>    In Bucket: {bucketValue}<color=#FFD700>G</color>";
-        fishTrackerText.text = $"Fish tracker: {easyFishCount}x <color=blue>Easy</color>, " +
-                               $"{mediumFishCount}x <color=green>Medium</color>, " +
-                               $"{hardFishCount}x <color=red>Hard</color>";
+        fishTrackerEasyText.text = easyFishCount.ToString();
+        fishTrackerMediumText.text = mediumFishCount.ToString();
+        fishTrackerHardText.text = hardFishCount.ToString();
         
         baitButton1.SetActive(GameManager.instance.State.BBBaitCount > 0);
         baitButton2.SetActive(GameManager.instance.State.BGBaitCount > 0);

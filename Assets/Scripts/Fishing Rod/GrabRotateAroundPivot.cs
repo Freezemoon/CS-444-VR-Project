@@ -102,8 +102,8 @@ public class GrabRotateAroundPivot : MonoBehaviour
     private void UpdateMaxLineLengthAndReelForceMultiplier()
     {
         // If game is started the max length of the line and the reel force are increased 
-        if (FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Reeling ||
-            FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Pulling)
+        if (FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Pulling ||
+            FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Reeling)
         {
             currentLockedLineLengthMax = _lockedLineLengthMax + _lockedLineLengthMaxAddForGame;
             _currentReelForceMultiplier = reelForceMultiplier / FishingGame.instance.reelForceMultiplierDivisor;
@@ -113,8 +113,6 @@ public class GrabRotateAroundPivot : MonoBehaviour
             currentLockedLineLengthMax = _lockedLineLengthMax;
             _currentReelForceMultiplier = reelForceMultiplier;
         }
-        
-        SetLineLength(currentLockedLineLengthMax);
     }
 
     private void UpdateLineLength()
@@ -162,7 +160,10 @@ public class GrabRotateAroundPivot : MonoBehaviour
 
     private void CheckLineLength(float angleDelta, Vector3 toBait)
     {
-        if (FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Pulling) return;
+        if (FishingGame.instance.fishingGameState == FishingGame.FishingGameState.Pulling)
+        {
+            SetLineLength(currentLockedLineLengthMax);
+        }
         
         // Clamp the angle delta to prevent it from going too far
         angleDelta = Mathf.Clamp(angleDelta, 0, 30f);

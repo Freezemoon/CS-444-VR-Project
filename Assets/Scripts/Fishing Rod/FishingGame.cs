@@ -400,13 +400,13 @@ public class FishingGame : MonoBehaviour
         switch (GameManager.instance.State.EquippedBaitStrength)
         {
             case 1:
-                _neededReel *= 0.9f;
+                _neededReel *= 0.85f;
                 break;
             case 2:
                 _neededReel *= 0.7f;
                 break;
             case 3:
-                _neededReel *= 0.5f;
+                _neededReel *= 0.4f;
                 break;
         }
         
