@@ -113,6 +113,8 @@ public class GrabRotateAroundPivot : MonoBehaviour
             currentLockedLineLengthMax = _lockedLineLengthMax;
             _currentReelForceMultiplier = reelForceMultiplier;
         }
+        
+        SetLineLength(currentLockedLineLengthMax);
     }
 
     private void UpdateLineLength()

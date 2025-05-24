@@ -16,7 +16,7 @@ public class FishingArea : MonoBehaviour
 
     private void Start()
     {
-        FishingRodExit();
+        DebugFishingRodExit();
     }
     
     private void OnTriggerEnter(Collider other)
@@ -28,7 +28,7 @@ public class FishingArea : MonoBehaviour
         
         FishingGame.instance.difficulty = areaDifficulty;
         
-        FishingRodEnter();
+        DebugFishingRodEnter();
 
         FishingGame.instance.StartGame();
         
@@ -44,7 +44,7 @@ public class FishingArea : MonoBehaviour
         if (FishingGame.instance.gameState != FishingGame.GameState.NotStarted &&
             FishingGame.instance.gameState != FishingGame.GameState.WaitingFish) return;
         
-        FishingRodExit();
+        DebugFishingRodExit();
 
         FishingGame.instance.ExitFishingArea();
     }
@@ -55,12 +55,12 @@ public class FishingArea : MonoBehaviour
         onDeath?.Invoke(this);
     }
     
-    private void FishingRodExit()
+    private void DebugFishingRodExit()
     {
         GetComponent<Renderer>().material.color = _defaultColor;
     }
     
-    private void FishingRodEnter()
+    private void DebugFishingRodEnter()
     {
         GetComponent<Renderer>().material.color = _enterColor;
     }

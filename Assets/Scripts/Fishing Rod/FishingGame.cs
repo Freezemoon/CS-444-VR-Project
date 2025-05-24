@@ -212,6 +212,8 @@ public class FishingGame : MonoBehaviour
     {
         if (!canStart) return;
 
+        canStart = false;
+
         _wasBaitAlreadyInWaterThisRound = false;
         gameState = GameState.WaitingFish;
         
