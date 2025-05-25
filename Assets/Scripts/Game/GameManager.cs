@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Turning;
 using Random = UnityEngine.Random;
 
 namespace Game
@@ -61,6 +63,10 @@ namespace Game
         [Header("Default fish bait")]
         [SerializeField] private BaitMenu baitMenu;
 
+        [Header("Turn input and provider")]
+        [SerializeField] private GameObject turnProvider;
+        [SerializeField] private InputActionReference rightThumbStickClickInput;
+
         public enum DialogueState
         {
             Start,
@@ -97,6 +103,8 @@ namespace Game
         private bool _isCurrentTextDisplay;
         
         private bool isMumbleEnabled;
+
+        private bool _isSnapTurn = true;
         
         private class TextEntry
         {
@@ -512,6 +520,16 @@ namespace Game
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
+        
+        void OnEnable()
+        {
+            // wire up the Input Action
+            if (rightThumbStickClickInput != null)
+            {
+                rightThumbStickClickInput.action.performed += ToggleRotationMode;
+                rightThumbStickClickInput.action.Enable();
+            }
+        }
 
         private void Start()
         {
@@ -561,6 +579,17 @@ namespace Game
             larryAudioSource.Play();
             
             currentTextIndex++;
+        }
+
+        /// <summary>
+        /// Toggle turn mode
+        /// </summary>
+        private void ToggleRotationMode(InputAction.CallbackContext ctx)
+        {
+            SnapTurnProvider snap = turnProvider.GetComponent<SnapTurnProvider>();
+            ContinuousTurnProvider continuous = turnProvider.GetComponent<ContinuousTurnProvider>();
+            snap.enabled = !snap.enabled;
+            continuous.enabled = !continuous.enabled;
         }
 
         /// <summary>
