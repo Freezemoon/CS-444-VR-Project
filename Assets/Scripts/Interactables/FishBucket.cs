@@ -27,7 +27,7 @@ public class FishBucket : MonoBehaviour
 
         GameManager.instance.HandleCaughtFish(other.GetComponent<GrabFish>().difficulty);
 
-        GameManager.instance.SetDialogueState(GameManager.DialogueState.DropFishInBucket);
+        GameManager.instance.SetDialogueState(GameManager.DialogueState.HopOnBoat);
         FishingGame.instance.ResetGameWhenFishIsGrabbedByUser();
         
         // Duplicate the fish
